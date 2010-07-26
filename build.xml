@@ -101,9 +101,9 @@
 
     </target>
 
-    <target name="tag.build">
+    <target name="tag.build" depends="-pre-pre-jar">
         <copy file="${jogl.root}/${rootrel.build}/artifact.properties" todir="${dist.jar.dir}" overwrite="true"/>
-        <echo file="${dist.jar.dir}/artifact.properties" message='jocl.build.number="${build.number}"${line.separator}' append="true" />
+        <echo file="${dist.jar.dir}/artifact.properties" message='jocl.build.number=${jocl.build.number}${line.separator}' append="true" />
     </target>
 
     <target name="jar.natives" unless="c.dont.compile">

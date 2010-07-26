@@ -473,7 +473,9 @@ is divided into following sections:
     <target depends="init" name="-pre-pre-jar">
         <dirname file="${dist.jar}" property="dist.jar.dir"/>
         <mkdir dir="${dist.jar.dir}"/>
+        <property file="${dist.jar.dir}/artifact.properties"/>
     </target>
+
     <target name="-pre-jar">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
