@@ -474,6 +474,11 @@ is divided into following sections:
         <dirname file="${dist.jar}" property="dist.jar.dir"/>
         <mkdir dir="${dist.jar.dir}"/>
         <property file="${dist.jar.dir}/artifact.properties"/>
+        <condition property="jocl.build.number" value="manual-build">
+          <not>
+              <isset property="jocl.build.number"/>
+          </not>
+        </condition>
     </target>
 
     <target name="-pre-jar">
