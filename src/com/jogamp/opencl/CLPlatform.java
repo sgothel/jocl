@@ -30,10 +30,11 @@ package com.jogamp.opencl;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.os.DynamicLookupHelper;
+import java.nio.Buffer;
 import java.security.PrivilegedAction;
 import com.jogamp.common.JogampRuntimeException;
 import com.jogamp.common.os.NativeLibrary;
-import com.jogamp.common.nio.PointerBuffer;
+import com.jogamp.common.nio.NativeSizeBuffer;
 import com.jogamp.gluegen.runtime.FunctionAddressResolver;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.opencl.impl.CLImpl;
@@ -41,7 +42,6 @@ import com.jogamp.opencl.impl.CLProcAddressTable;
 import com.jogamp.opencl.util.Filter;
 import com.jogamp.opencl.util.JOCLVersion;
 
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,9 +106,12 @@ public final class CLPlatform {
 
     private Set<String> extensions;
 
+    private final CLPlatformInfoAccessor info;
 
     private CLPlatform(long id) {
+        initialize();
         this.ID = id;
+        this.info = new CLPlatformInfoAccessor(id, cl);
         this.version = new CLVersion(getInfoString(CL_PLATFORM_VERSION));
     }
 
@@ -226,7 +229,7 @@ public final class CLPlatform {
         checkForError(ret, "can not enumerate platforms");
 
         // receive platform ids
-        PointerBuffer platformId = PointerBuffer.allocateDirect(ib.get(0));
+        NativeSizeBuffer platformId = NativeSizeBuffer.allocateDirect(ib.get(0));
         ret = cl.clGetPlatformIDs(platformId.capacity(), platformId, null);
         checkForError(ret, "can not enumerate platforms");
 
@@ -273,14 +276,15 @@ public final class CLPlatform {
         initialize();
 
         List<CLDevice> list = new ArrayList<CLDevice>();
+        
         for(int t = 0; t < types.length; t++) {
             CLDevice.Type type = types[t];
 
-            PointerBuffer deviceIDs = getDeviceIDs(type.TYPE); 
+            long[] deviceIDs = info.getDeviceIDs(type.TYPE);
 
             //add device to list
-            for (int n = 0; n < deviceIDs.capacity(); n++) {
-                list.add(new CLDevice(cl, this, deviceIDs.get(n)));
+            for (int n = 0; n < deviceIDs.length; n++) {
+                list.add(new CLDevice(cl, this, deviceIDs[n]));
             }
         }
 
@@ -296,11 +300,11 @@ public final class CLPlatform {
 
         List<CLDevice> list = new ArrayList<CLDevice>();
         
-        PointerBuffer deviceIDs = getDeviceIDs(CL_DEVICE_TYPE_ALL);
+        long[] deviceIDs = info.getDeviceIDs(CL_DEVICE_TYPE_ALL);
 
         //add device to list
-        for (int n = 0; n < deviceIDs.capacity(); n++) {
-            CLDevice device = new CLDevice(cl, this, deviceIDs.get(n));
+        for (int n = 0; n < deviceIDs.length; n++) {
+            CLDevice device = new CLDevice(cl, this, deviceIDs[n]);
             addIfAccepted(device, list, filters);
         }
 
@@ -308,30 +312,6 @@ public final class CLPlatform {
 
     }
 
-    private PointerBuffer getDeviceIDs(long type) {
-        
-        IntBuffer ib = Buffers.newDirectIntBuffer(1);
-        
-        //find all devices
-        int ret = cl.clGetDeviceIDs(ID, type, 0, null, ib);
-        
-        PointerBuffer deviceIDs = null;
-        
-        // return null rather than throwing an exception
-        if(ret == CL.CL_DEVICE_NOT_FOUND || ib.get(0) == 0) {
-            deviceIDs = PointerBuffer.allocate(0);
-        }else{
-            deviceIDs = PointerBuffer.allocateDirect(ib.get(0));
-            
-            checkForError(ret, "error while enumerating devices");
-
-            ret = cl.clGetDeviceIDs(ID, type, deviceIDs.capacity(), deviceIDs, null);
-            checkForError(ret, "error while enumerating devices");
-        }
-        
-        return deviceIDs;
-    }
-    
     private static <I> void addIfAccepted(I item, List<I> list, Filter<I>[] filters) {
         if(filters == null) {
             list.add(item);
@@ -510,22 +490,57 @@ public final class CLPlatform {
      * Returns a info string in exchange for a key (CL_PLATFORM_*).
      */
     public String getInfoString(int key) {
-        PointerBuffer size = PointerBuffer.allocateDirect(1);
-        // TODO use cache/query size
-        ByteBuffer bb = ByteBuffer.allocateDirect(512);
+        return info.getString(key);
+    }
 
-        int ret = cl.clGetPlatformInfo(ID, key, bb.capacity(), bb, size);
-        checkForError(ret, "can not receive info string");
+    private final static class CLPlatformInfoAccessor extends CLInfoAccessor {
 
-        return CLUtil.clString2JavaString(bb, (int)size.get(0));
+        private final long ID;
+        private final CL cl;
+
+        private CLPlatformInfoAccessor(long id, CL cl) {
+            this.ID = id;
+            this.cl = cl;
+        }
+
+        @Override
+        protected int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+            return cl.clGetPlatformInfo(ID, name, valueSize, value, valueSizeRet);
+        }
+
+        public long[] getDeviceIDs(long type) {
+
+            IntBuffer buffer = getBB(4).asIntBuffer();
+            int ret = cl.clGetDeviceIDs(ID, type, 0, null, buffer);
+            int count = buffer.get(0);
+
+            // return an empty buffer rather than throwing an exception
+            if(ret == CL.CL_DEVICE_NOT_FOUND || count == 0) {
+                return new long[0];
+            }else{
+                checkForError(ret, "error while enumerating devices");
+
+                NativeSizeBuffer deviceIDs = NativeSizeBuffer.wrap(getBB(count*NativeSizeBuffer.elementSize()));
+                ret = cl.clGetDeviceIDs(ID, type, count, deviceIDs, null);
+                checkForError(ret, "error while enumerating devices");
+
+                long[] ids = new long[count];
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = deviceIDs.get(i);
+                }
+                return ids;
+            }
+
+        }
+
     }
 
     @Override
     public String toString() {
-        return "CLPlatform [name:" + getName()
-                         +" vendor:"+getVendor()
-                         +" profile:"+getProfile()
-                         +" version:"+getVersion()+"]";
+        return "CLPlatform [name: " + getName()
+                         +", vendor: "+getVendor()
+                         +", profile: "+getProfile()
+                         +", version: "+getVersion()+"]";
     }
 
     @Override
