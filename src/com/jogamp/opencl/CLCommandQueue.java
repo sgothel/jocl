@@ -30,7 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.common.nio.CachedBufferFactory;
 import com.jogamp.opencl.gl.CLGLI;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.gl.CLGLObject;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -66,9 +66,9 @@ public class CLCommandQueue extends CLObject implements CLResource {
      * Those direct memory buffers are used to move data between the JVM and OpenCL.
      */
     private final IntBuffer pbA;
-    private final NativeSizeBuffer ibA;
-    private final NativeSizeBuffer ibB;
-    private final NativeSizeBuffer ibC;
+    private final PointerBuffer ibA;
+    private final PointerBuffer ibB;
+    private final PointerBuffer ibC;
 
     private CLCommandQueue(CLContext context, long id, CLDevice device, long properties) {
         super(context, id);
@@ -79,9 +79,9 @@ public class CLCommandQueue extends CLObject implements CLResource {
         int pbsize = PointerBuffer.ELEMENT_SIZE;
         CachedBufferFactory factory = CachedBufferFactory.create(9*pbsize + 4, true);
         
-        this.ibA = NativeSizeBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
-        this.ibB = NativeSizeBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
-        this.ibC = NativeSizeBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
+        this.ibA = PointerBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
+        this.ibB = PointerBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
+        this.ibC = PointerBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
         
         this.pbA = factory.newDirectIntBuffer(1);
 
@@ -117,7 +117,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
      */
     public CLCommandQueue putWriteBuffer(CLBuffer<?> writeBuffer, boolean blockingWrite, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -161,7 +161,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
      */
     public CLCommandQueue putReadBuffer(CLBuffer<?> readBuffer, boolean blockingRead, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -210,7 +210,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
      */
     public CLCommandQueue putCopyBuffer(CLBuffer<?> src, CLBuffer<?> dest, int srcOffset, int destOffset, long bytesToCopy, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -280,7 +280,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
             long rowPitch, long slicePitch, long hostRowPitch, long hostSlicePitch,
             boolean blockingWrite, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -358,7 +358,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
             long rowPitch, long slicePitch, long hostRowPitch, long hostSlicePitch,
             boolean blockingRead, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -439,7 +439,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
             long srcRowPitch, long srcSlicePitch, long destRowPitch, long destSlicePitch,
             CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -507,7 +507,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
     public CLCommandQueue putWriteImage(CLImage2d<?> writeImage, int inputRowPitch,
             int originX, int originY, int rangeX, int rangeY, boolean blockingWrite, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -569,7 +569,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
     public CLCommandQueue putWriteImage(CLImage3d<?> writeImage, int inputRowPitch, int inputSlicePitch,
             int originX, int originY, int originZ, int rangeX, int rangeY, int rangeZ, boolean blockingWrite, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -630,7 +630,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
     public CLCommandQueue putReadImage(CLImage2d<?> readImage, int inputRowPitch,
             int originX, int originY, int rangeX, int rangeY, boolean blockingRead, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -692,7 +692,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
     public CLCommandQueue putReadImage(CLImage3d<?> readImage, int inputRowPitch, int inputSlicePitch,
             int originX, int originY, int originZ, int rangeX, int rangeY, int rangeZ, boolean blockingRead, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -756,7 +756,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
                                         int dstOriginX, int dstOriginY,
                                         int rangeX, int rangeY, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -825,7 +825,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
                                         int dstOriginX, int dstOriginY, int dstOriginZ,
                                         int rangeX, int rangeY, int rangeZ, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -889,7 +889,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
                                         long srcOffset, int dstOriginX, int dstOriginY,
                                         int rangeX, int rangeY, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -956,7 +956,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
                                         long srcOffset, int dstOriginX, int dstOriginY, int dstOriginZ,
                                         int rangeX, int rangeY, int rangeZ, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1020,7 +1020,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
                                         int srcOriginX, int srcOriginY,
                                         int rangeX, int rangeY, long dstOffset, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1087,7 +1087,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
                                         int srcOriginX, int srcOriginY, int srcOriginZ, 
                                         int rangeX, int rangeY, int rangeZ, long dstOffset, CLEventList condition, CLEventList events) {
         
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1145,7 +1145,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
      */
     public ByteBuffer putMapBuffer(CLBuffer<?> buffer, CLMemory.Map flag, long offset, long length, boolean blockingMap, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1205,7 +1205,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
                                     int offsetX, int offsetY,
                                     int rangeX, int rangeY, boolean blockingMap, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1271,7 +1271,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
                                     int offsetX, int offsetY, int offsetZ,
                                     int rangeX, int rangeY, int rangeZ, boolean blockingMap, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1315,7 +1315,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
      */
     public CLCommandQueue putUnmapMemory(CLMemory<?> memory, Buffer mapped, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1407,7 +1407,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
      */
     public CLCommandQueue putTask(CLKernel kernel, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1444,9 +1444,9 @@ public class CLCommandQueue extends CLObject implements CLResource {
      * Calls {@native clEnqueueNDRangeKernel}.
      */
     public CLCommandQueue put1DRangeKernel(CLKernel kernel, long globalWorkOffset, long globalWorkSize, long localWorkSize, CLEventList condition, CLEventList events) {
-        NativeSizeBuffer globWO = null;
-        NativeSizeBuffer globWS = null;
-        NativeSizeBuffer locWS = null;
+        PointerBuffer globWO = null;
+        PointerBuffer globWS = null;
+        PointerBuffer locWS = null;
 
         if(globalWorkOffset != 0) {
             globWO = copy2NIO(ibA, globalWorkOffset);
@@ -1495,9 +1495,9 @@ public class CLCommandQueue extends CLObject implements CLResource {
     public CLCommandQueue put2DRangeKernel(CLKernel kernel, long globalWorkOffsetX, long globalWorkOffsetY,
                                                             long globalWorkSizeX, long globalWorkSizeY,
                                                             long localWorkSizeX, long localWorkSizeY, CLEventList condition, CLEventList events) {
-        NativeSizeBuffer globalWorkOffset = null;
-        NativeSizeBuffer globalWorkSize = null;
-        NativeSizeBuffer localWorkSize = null;
+        PointerBuffer globalWorkOffset = null;
+        PointerBuffer globalWorkSize = null;
+        PointerBuffer localWorkSize = null;
 
         if(globalWorkOffsetX != 0 || globalWorkOffsetY != 0) {
             globalWorkOffset = copy2NIO(ibA, globalWorkOffsetX, globalWorkOffsetY);
@@ -1545,9 +1545,9 @@ public class CLCommandQueue extends CLObject implements CLResource {
     public CLCommandQueue put3DRangeKernel(CLKernel kernel, long globalWorkOffsetX, long globalWorkOffsetY, long globalWorkOffsetZ,
                                                             long globalWorkSizeX, long globalWorkSizeY, long globalWorkSizeZ,
                                                             long localWorkSizeX, long localWorkSizeY, long localWorkSizeZ, CLEventList condition, CLEventList events) {
-        NativeSizeBuffer globalWorkOffset = null;
-        NativeSizeBuffer globalWorkSize = null;
-        NativeSizeBuffer localWorkSize = null;
+        PointerBuffer globalWorkOffset = null;
+        PointerBuffer globalWorkSize = null;
+        PointerBuffer localWorkSize = null;
 
         if(globalWorkOffsetX != 0 || globalWorkOffsetY != 0 || globalWorkOffsetZ != 0) {
             globalWorkOffset = copy2NIO(ibA, globalWorkOffsetX, globalWorkOffsetY, globalWorkOffsetZ);
@@ -1565,7 +1565,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, NativeSizeBuffer globalWorkOffset, NativeSizeBuffer globalWorkSize, NativeSizeBuffer localWorkSize) {
+    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, PointerBuffer globalWorkOffset, PointerBuffer globalWorkSize, PointerBuffer localWorkSize) {
         this.putNDRangeKernel(kernel, workDimension, globalWorkOffset, globalWorkSize, localWorkSize, null, null);
         return this;
     }
@@ -1573,7 +1573,7 @@ public class CLCommandQueue extends CLObject implements CLResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, NativeSizeBuffer globalWorkOffset, NativeSizeBuffer globalWorkSize, NativeSizeBuffer localWorkSize, CLEventList events) {
+    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, PointerBuffer globalWorkOffset, PointerBuffer globalWorkSize, PointerBuffer localWorkSize, CLEventList events) {
         this.putNDRangeKernel(kernel, workDimension, globalWorkOffset, globalWorkSize, localWorkSize, null, events);
         return this;
     }
@@ -1581,10 +1581,10 @@ public class CLCommandQueue extends CLObject implements CLResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, NativeSizeBuffer globalWorkOffset,
-            NativeSizeBuffer globalWorkSize, NativeSizeBuffer localWorkSize, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, PointerBuffer globalWorkOffset,
+            PointerBuffer globalWorkSize, PointerBuffer localWorkSize, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1657,9 +1657,9 @@ public class CLCommandQueue extends CLObject implements CLResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putAcquireGLObjects(NativeSizeBuffer glObjectIDs, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putAcquireGLObjects(PointerBuffer glObjectIDs, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1726,9 +1726,9 @@ public class CLCommandQueue extends CLObject implements CLResource {
     /**
      * Calls {@native clEnqueueReleaseGLObjects}.
      */
-    public CLCommandQueue putReleaseGLObjects(NativeSizeBuffer glObjectIDs, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReleaseGLObjects(PointerBuffer glObjectIDs, CLEventList condition, CLEventList events) {
 
-        NativeSizeBuffer conditionIDs = null;
+        PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
             conditionIDs = condition.IDsView;
@@ -1792,19 +1792,19 @@ public class CLCommandQueue extends CLObject implements CLResource {
         }
     }
 
-    private static NativeSizeBuffer copy2NIO(NativeSizeBuffer buffer, long a) {
+    private static PointerBuffer copy2NIO(PointerBuffer buffer, long a) {
         return buffer.put(2, a).position(2);
     }
 
-    private static NativeSizeBuffer copy2NIO(NativeSizeBuffer buffer, long a, long b) {
+    private static PointerBuffer copy2NIO(PointerBuffer buffer, long a, long b) {
         return buffer.position(1).put(a).put(b).position(1);
     }
 
-    private static NativeSizeBuffer copy2NIO(NativeSizeBuffer buffer, long a, long b, long c) {
+    private static PointerBuffer copy2NIO(PointerBuffer buffer, long a, long b, long c) {
         return buffer.rewind().put(a).put(b).put(c).rewind();
     }
 
-    private static String toStr(NativeSizeBuffer buffer) {
+    private static String toStr(PointerBuffer buffer) {
         if(buffer == null) {
             return null;
         }

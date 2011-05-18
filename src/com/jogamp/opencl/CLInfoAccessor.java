@@ -28,7 +28,7 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.common.os.Platform;
 import com.jogamp.opencl.util.CLUtil;
 import java.nio.Buffer;
@@ -54,11 +54,11 @@ abstract class CLInfoAccessor {
         }
 
     };
-    protected final static ThreadLocal<NativeSizeBuffer> localNSB = new ThreadLocal<NativeSizeBuffer>() {
+    protected final static ThreadLocal<PointerBuffer> localNSB = new ThreadLocal<PointerBuffer>() {
 
         @Override
-        protected NativeSizeBuffer initialValue() {
-            return NativeSizeBuffer.allocateDirect(1);
+        protected PointerBuffer initialValue() {
+            return PointerBuffer.allocateDirect(1);
         }
 
     };
@@ -74,7 +74,7 @@ abstract class CLInfoAccessor {
 
     public final String getString(int key) {
         
-        NativeSizeBuffer sizeBuffer = getNSB();
+        PointerBuffer sizeBuffer = getNSB();
         int ret = getInfo(key, 0, null, sizeBuffer);
         checkForError(ret, "error while asking for info string");
 
@@ -118,11 +118,11 @@ abstract class CLInfoAccessor {
         }
     }
 
-    protected NativeSizeBuffer getNSB() {
+    protected PointerBuffer getNSB() {
         return localNSB.get();
     }
 
-    protected abstract int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet);
+    protected abstract int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet);
 
 
 }

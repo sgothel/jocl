@@ -30,7 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.common.nio.Buffers;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -73,7 +73,7 @@ public class CLKernel extends CLObject implements CLResource, Cloneable {
 
         if(name == null) {
             // get function name
-            NativeSizeBuffer size = NativeSizeBuffer.wrap(buffer);
+            PointerBuffer size = PointerBuffer.wrap(buffer);
             int ret = cl.clGetKernelInfo(ID, CL_KERNEL_FUNCTION_NAME, 0, null, size);
             checkForError(ret, "error while asking for kernel function name");
 

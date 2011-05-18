@@ -30,7 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.common.AutoCloseable;
 import com.jogamp.common.nio.CachedBufferFactory;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import java.util.Iterator;
 
 /**
@@ -44,12 +44,12 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
     /**
      * stores event ids for fast access.
      */
-    final NativeSizeBuffer IDs;
+    final PointerBuffer IDs;
     
     /**
      * Points always to the first element of the id buffer.
      */
-    final NativeSizeBuffer IDsView;
+    final PointerBuffer IDsView;
     
     int size;
     
@@ -82,9 +82,9 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         size = events.length;
     }
     
-    private NativeSizeBuffer initIDBuffer(CachedBufferFactory factory, int size) {
+    private PointerBuffer initIDBuffer(CachedBufferFactory factory, int size) {
         if(factory == null) {
-            return NativeSizeBuffer.allocateDirect(size);
+            return PointerBuffer.allocateDirect(size);
         }else{
             return PointerBuffer.wrap(factory.newDirectByteBuffer(size*PointerBuffer.ELEMENT_SIZE));
         }

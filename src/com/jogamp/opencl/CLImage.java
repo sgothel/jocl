@@ -28,7 +28,7 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import java.nio.Buffer;
 
 import static com.jogamp.opencl.CL.*;
@@ -110,7 +110,7 @@ public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
             this.id = id;
         }
         @Override
-        public int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+        public int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
             return cl.clGetImageInfo(id, name, valueSize, value, valueSizeRet);
         }
     }

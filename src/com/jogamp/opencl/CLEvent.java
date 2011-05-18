@@ -29,7 +29,7 @@
 package com.jogamp.opencl;
 
 import com.jogamp.opencl.impl.CLEventCallback;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import java.nio.Buffer;
 
 import static com.jogamp.opencl.CL.*;
@@ -141,7 +141,7 @@ public class CLEvent extends CLObject implements CLResource {
     private class CLEventInfoAccessor extends CLInfoAccessor {
 
         @Override
-        protected int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
             return cl.clGetEventInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
@@ -150,7 +150,7 @@ public class CLEvent extends CLObject implements CLResource {
     private class CLEventProfilingInfoAccessor extends CLInfoAccessor {
 
         @Override
-        protected int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
             return cl.clGetEventProfilingInfo(ID, name, valueSize, value, valueSizeRet);
         }
 

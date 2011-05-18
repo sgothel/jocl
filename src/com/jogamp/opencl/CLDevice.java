@@ -29,7 +29,7 @@
 package com.jogamp.opencl;
 
 import com.jogamp.opencl.util.CLUtil;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import java.nio.Buffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -702,7 +702,7 @@ public final class CLDevice extends CLObject {
         }
 
         @Override
-        protected int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
             return cl.clGetDeviceInfo(ID, name, valueSize, value, valueSizeRet);
         }
 

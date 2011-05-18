@@ -30,7 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.opencl.gl.CLGLI;
 import com.jogamp.common.nio.Buffers;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.impl.CLMemObjectDestructorCallback;
 import java.nio.Buffer;
 import java.nio.IntBuffer;

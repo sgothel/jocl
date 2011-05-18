@@ -34,7 +34,7 @@ import java.nio.Buffer;
 import java.security.PrivilegedAction;
 import com.jogamp.common.JogampRuntimeException;
 import com.jogamp.common.os.NativeLibrary;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.gluegen.runtime.FunctionAddressResolver;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.opencl.impl.CLImpl;
@@ -229,7 +229,7 @@ public final class CLPlatform {
         checkForError(ret, "can not enumerate platforms");
 
         // receive platform ids
-        NativeSizeBuffer platformId = NativeSizeBuffer.allocateDirect(ib.get(0));
+        PointerBuffer platformId = PointerBuffer.allocateDirect(ib.get(0));
         ret = cl.clGetPlatformIDs(platformId.capacity(), platformId, null);
         checkForError(ret, "can not enumerate platforms");
 
@@ -504,7 +504,7 @@ public final class CLPlatform {
         }
 
         @Override
-        protected int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
             return cl.clGetPlatformInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
@@ -520,7 +520,7 @@ public final class CLPlatform {
             }else{
                 checkForError(ret, "error while enumerating devices");
 
-                NativeSizeBuffer deviceIDs = NativeSizeBuffer.wrap(getBB(count*NativeSizeBuffer.elementSize()));
+                PointerBuffer deviceIDs = PointerBuffer.wrap(getBB(count*PointerBuffer.ELEMENT_SIZE));
                 ret = cl.clGetDeviceIDs(ID, type, count, deviceIDs, null);
                 checkForError(ret, "error while enumerating devices");
 
