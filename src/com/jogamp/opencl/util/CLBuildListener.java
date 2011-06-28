@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@ import com.jogamp.opencl.CLProgram;
  * has been built (successfully or unsuccessfully).<br/>
  * Note1: registering a build callback can make {@link com.jogamp.opencl.llb.CL#clBuildProgram} non blocking (OpenCL implementation dependent).<br/>
  * Note2: the thread which calls this method is unspecified. The Application should ensure propper synchronization.
- * @author Michael Bien
+ * @author Michael Bien, et al.
  * @see com.jogamp.opencl.llb.CL#clBuildProgram(long, int, com.jogamp.common.nio.PointerBuffer, java.lang.String, com.jogamp.opencl.llb.impl.BuildProgramCallback)
  */
 public interface CLBuildListener {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -48,7 +48,7 @@ import static com.jogamp.common.os.Platform.*;
  * CLKernel is not threadsafe.
  * @see CLProgram#createCLKernel(java.lang.String)
  * @see CLProgram#createCLKernels()
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public class CLKernel extends CLObjectResource implements Cloneable {
 

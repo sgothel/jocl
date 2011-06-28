@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -56,7 +56,7 @@ import static com.jogamp.opencl.util.CLUtil.*;
  * form multiple Threads will require the application to perform appropriate synchronization.
  * </p>
  * @see CLDevice#createCommandQueue(com.jogamp.opencl.CLCommandQueue.Mode...)
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public class CLCommandQueue extends CLObjectResource {
 

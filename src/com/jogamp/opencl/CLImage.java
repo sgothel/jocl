@@ -37,7 +37,7 @@ import static com.jogamp.opencl.llb.CL.*;
 
 /**
  *
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -42,7 +42,7 @@ import static com.jogamp.opencl.CLException.*;
 
 /**
  * OpenCL buffer object wrapping an optional NIO buffer.
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public class CLBuffer<B extends Buffer> extends CLMemory<B> {
 

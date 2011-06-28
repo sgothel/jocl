@@ -99,7 +99,7 @@ import static com.jogamp.opencl.llb.CL.*;
  * concurrency:<br/>
  * CLPlatform is threadsafe.
  * 
- * @author Michael Bien
+ * @author Michael Bien, et al.
  * @see #initialize()
  * @see #getDefault()
  * @see #listCLPlatforms()

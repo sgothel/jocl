@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -79,7 +79,7 @@ import static java.util.Collections.*;
  * concurrency:<br/>
  * CLContext is threadsafe.
  * 
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public class CLContext extends CLObjectResource {
 

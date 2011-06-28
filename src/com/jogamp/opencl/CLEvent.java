@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -43,7 +43,7 @@ import static com.jogamp.opencl.CLException.*;
  * measure execution time of a command.
  * Profiling of OpenCL commands can be enabled by using a {@link com.jogamp.opencl.CLCommandQueue} created with
  * {@link com.jogamp.opencl.CLCommandQueue.Mode#PROFILING_MODE}.
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public class CLEvent extends CLObjectResource {
 

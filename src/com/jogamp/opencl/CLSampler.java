@@ -41,7 +41,7 @@ import static com.jogamp.opencl.util.CLUtil.*;
 /**
  * Object representing an OpenCL sampler.
  * @see CLContext#createSampler(com.jogamp.opencl.CLSampler.AddressingMode, com.jogamp.opencl.CLSampler.FilteringMode, boolean)
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public class CLSampler extends CLObjectResource {
 
