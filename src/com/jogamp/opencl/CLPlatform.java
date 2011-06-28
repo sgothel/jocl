@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -28,17 +28,18 @@
 
 package com.jogamp.opencl;
 
+import com.jogamp.opencl.impl.CLTLAccessorFactory;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.os.DynamicLookupHelper;
-import java.nio.Buffer;
-import java.security.PrivilegedAction;
 import com.jogamp.common.JogampRuntimeException;
 import com.jogamp.common.os.NativeLibrary;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.gluegen.runtime.FunctionAddressResolver;
+import com.jogamp.opencl.spi.CLPlatformInfoAccessor;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.opencl.impl.CLImpl;
 import com.jogamp.opencl.impl.CLProcAddressTable;
+import com.jogamp.opencl.spi.CLAccessorFactory;
 import com.jogamp.opencl.util.Filter;
 import com.jogamp.opencl.util.JOCLVersion;
 
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.security.PrivilegedAction;
 
 import static java.security.AccessController.*;
 import static com.jogamp.opencl.CLException.*;
@@ -90,7 +92,7 @@ import static com.jogamp.opencl.CL.*;
  * @see #getDefault()
  * @see #listCLPlatforms()
  */
-public final class CLPlatform {
+public class CLPlatform {
 
     /**
      * OpenCL platform id for this platform.
@@ -102,16 +104,27 @@ public final class CLPlatform {
      */
     public final CLVersion version;
 
-    private static CL cl;
+    protected static CL cl;
+    private static CLAccessorFactory defaultFactory;
+    private final CLAccessorFactory factory;
 
     private Set<String> extensions;
 
-    private final CLPlatformInfoAccessor info;
+    protected final CLPlatformInfoAccessor info;
 
     private CLPlatform(long id) {
+        this(id, null);
+    }
+
+    protected CLPlatform(long id, CLAccessorFactory factory) {
         initialize();
         this.ID = id;
-        this.info = new CLPlatformInfoAccessor(id, cl);
+        if(factory == null) {
+            this.factory = defaultFactory;
+        }else{
+            this.factory = factory;
+        }
+        this.info = this.factory.createPlatformInfoAccessor(cl, id);
         this.version = new CLVersion(getInfoString(CL_PLATFORM_VERSION));
     }
 
@@ -119,15 +132,34 @@ public final class CLPlatform {
      * Eagerly initializes JOCL. Subsequent calls do nothing.
      * @throws JogampRuntimeException if something went wrong in the initialization (e.g. OpenCL lib not found).
      */
-    public synchronized static void initialize() throws JogampRuntimeException {
+    public static void initialize() throws JogampRuntimeException {
+        initialize(null);
+    }
+
+    // keep package private until SPI is stablized
+    /**
+     * Eagerly initializes JOCL. Subsequent calls do nothing.
+     * @param factory CLAccessorFactory used for creating the bindings.
+     * @throws JogampRuntimeException if something went wrong in the initialization (e.g. OpenCL lib not found).
+     */
+    synchronized static void initialize(CLAccessorFactory factory) throws JogampRuntimeException {
 
         if(cl != null) {
             return;
+        }
+        
+        if(defaultFactory == null) {
+            if(factory == null) {
+                defaultFactory = new CLTLAccessorFactory();
+            }else{
+                defaultFactory = factory;
+            }
         }
 
         try {
 
             final CLProcAddressTable table = new CLProcAddressTable(new FunctionAddressResolver() {
+                @Override
                 public long resolve(String name, DynamicLookupHelper lookup) {
 
                     //FIXME workaround to fix a gluegen issue
@@ -150,6 +182,7 @@ public final class CLPlatform {
 
             //load JOCL and init table
             doPrivileged(new PrivilegedAction<Object>() {
+                @Override
                 public Object run() {
 
                     NativeLibrary libOpenCL = JOCLJNILibLoader.loadOpenCL();
@@ -284,7 +317,7 @@ public final class CLPlatform {
 
             //add device to list
             for (int n = 0; n < deviceIDs.length; n++) {
-                list.add(new CLDevice(cl, this, deviceIDs[n]));
+                list.add(createDevice(deviceIDs[n]));
             }
         }
 
@@ -304,12 +337,16 @@ public final class CLPlatform {
 
         //add device to list
         for (int n = 0; n < deviceIDs.length; n++) {
-            CLDevice device = new CLDevice(cl, this, deviceIDs[n]);
+            CLDevice device = createDevice(deviceIDs[n]);
             addIfAccepted(device, list, filters);
         }
 
         return list.toArray(new CLDevice[list.size()]);
 
+    }
+
+    protected CLDevice createDevice(long id) {
+        return new CLDevice(cl, this, id);
     }
 
     private static <I> void addIfAccepted(I item, List<I> list, Filter<I>[] filters) {
@@ -489,50 +526,16 @@ public final class CLPlatform {
     /**
      * Returns a info string in exchange for a key (CL_PLATFORM_*).
      */
-    public String getInfoString(int key) {
+    public final String getInfoString(int key) {
         return info.getString(key);
     }
 
-    private final static class CLPlatformInfoAccessor extends CLInfoAccessor {
+    final CLAccessorFactory getAccessorFactory(){
+        return factory;
+    }
 
-        private final long ID;
-        private final CL cl;
-
-        private CLPlatformInfoAccessor(long id, CL cl) {
-            this.ID = id;
-            this.cl = cl;
-        }
-
-        @Override
-        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
-            return cl.clGetPlatformInfo(ID, name, valueSize, value, valueSizeRet);
-        }
-
-        public long[] getDeviceIDs(long type) {
-
-            IntBuffer buffer = getBB(4).asIntBuffer();
-            int ret = cl.clGetDeviceIDs(ID, type, 0, null, buffer);
-            int count = buffer.get(0);
-
-            // return an empty buffer rather than throwing an exception
-            if(ret == CL.CL_DEVICE_NOT_FOUND || count == 0) {
-                return new long[0];
-            }else{
-                checkForError(ret, "error while enumerating devices");
-
-                PointerBuffer deviceIDs = PointerBuffer.wrap(getBB(count*PointerBuffer.ELEMENT_SIZE));
-                ret = cl.clGetDeviceIDs(ID, type, count, deviceIDs, null);
-                checkForError(ret, "error while enumerating devices");
-
-                long[] ids = new long[count];
-                for (int i = 0; i < ids.length; i++) {
-                    ids[i] = deviceIDs.get(i);
-                }
-                return ids;
-            }
-
-        }
-
+    public final CLPlatformInfoAccessor getCLAccessor(){
+        return info;
     }
 
     @Override

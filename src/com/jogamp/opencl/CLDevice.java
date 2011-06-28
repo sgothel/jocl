@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -29,8 +29,7 @@
 package com.jogamp.opencl;
 
 import com.jogamp.opencl.util.CLUtil;
-import com.jogamp.common.nio.PointerBuffer;
-import java.nio.Buffer;
+import com.jogamp.opencl.spi.CLInfoAccessor;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,23 +50,23 @@ import static com.jogamp.opencl.CL.*;
  * @see CLContext#getMaxFlopsDevice(com.jogamp.opencl.CLDevice.Type)
  * @author Michael Bien
  */
-public final class CLDevice extends CLObject {
+public class CLDevice extends CLObject {
 
     private Set<String> extensions;
 
-    private final CLDeviceInfoAccessor deviceInfo;
+    private final CLInfoAccessor deviceInfo;
     private final CLPlatform platform;
 
-    CLDevice(CL cl, CLPlatform platform, long id) {
+    protected CLDevice(CL cl, CLPlatform platform, long id) {
         super(cl, id);
         this.platform = platform;
-        this.deviceInfo = new CLDeviceInfoAccessor(cl, id);
+        this.deviceInfo = platform.getAccessorFactory().createDeviceInfoAccessor(cl, id);
     }
 
-    CLDevice(CLContext context, long id) {
+    protected CLDevice(CLContext context, long id) {
         super(context, id);
         this.platform = context.getPlatform();
-        this.deviceInfo = new CLDeviceInfoAccessor(context.getCL(), id);
+        this.deviceInfo = platform.getAccessorFactory().createDeviceInfoAccessor(cl, id);
     }
 
     public CLCommandQueue createCommandQueue() {
@@ -691,21 +690,8 @@ public final class CLDevice extends CLObject {
         return CLUtil.obtainDeviceProperties(this);
     }
 
-    private final static class CLDeviceInfoAccessor extends CLInfoAccessor {
-
-        private final CL cl;
-        private final long ID;
-
-        private CLDeviceInfoAccessor(CL cl, long id) {
-            this.cl = cl;
-            this.ID = id;
-        }
-
-        @Override
-        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
-            return cl.clGetDeviceInfo(ID, name, valueSize, value, valueSizeRet);
-        }
-
+    public final CLInfoAccessor getCLAccessor() {
+        return deviceInfo;
     }
 
     @Override

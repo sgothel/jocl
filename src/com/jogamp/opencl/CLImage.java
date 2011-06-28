@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@
 package com.jogamp.opencl;
 
 import com.jogamp.common.nio.PointerBuffer;
+import com.jogamp.opencl.impl.CLTLInfoAccessor;
 import java.nio.Buffer;
 
 import static com.jogamp.opencl.CL.*;
@@ -41,7 +42,7 @@ public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
 
     protected CLImageFormat format;
 
-    final CLInfoAccessor imageInfo;
+    final CLTLInfoAccessor imageInfo;
 
     public final int width;
     public final int height;
@@ -100,7 +101,7 @@ public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
     }
 
 
-    protected final static class CLImageInfoAccessor extends CLInfoAccessor {
+    protected final static class CLImageInfoAccessor extends CLTLInfoAccessor {
 
         private final long id;
         private final CL cl;

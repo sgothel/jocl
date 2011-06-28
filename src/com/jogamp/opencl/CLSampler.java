@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -29,6 +29,7 @@
 package com.jogamp.opencl;
 
 import com.jogamp.common.nio.PointerBuffer;
+import com.jogamp.opencl.impl.CLTLInfoAccessor;
 
 import java.nio.Buffer;
 
@@ -73,6 +74,7 @@ public class CLSampler extends CLObject implements CLResource {
         return samplerInfo.getLong(CL_SAMPLER_NORMALIZED_COORDS) == CL_TRUE;
     }
 
+    @Override
     public void release() {
         int ret = cl.clReleaseSampler(ID);
         context.onSamplerReleased(this);
@@ -81,7 +83,7 @@ public class CLSampler extends CLObject implements CLResource {
         }
     }
 
-    private class CLSamplerInfoAccessor extends CLInfoAccessor {
+    private class CLSamplerInfoAccessor extends CLTLInfoAccessor {
 
         @Override
         protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
