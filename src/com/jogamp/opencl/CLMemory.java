@@ -30,7 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.common.nio.Buffers;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.llb.impl.CLMemObjectDestructorCallback;
 import java.nio.Buffer;
@@ -90,9 +90,9 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
     }
 
     protected static long getSizeImpl(CLContext context, long id) {
-        NativeSizeBuffer pb = NativeSizeBuffer.allocateDirect(1);
-        CLMemObjBinding binding = context.getPlatform().getMemObjectBinding();
-        int ret = binding.clGetMemObjectInfo(id, CL_MEM_SIZE, NativeSizeBuffer.elementSize(), pb.getBuffer(), null);
+        PointerBuffer pb = PointerBuffer.allocateDirect(1);
+        CLMemObjBinding binding = context.getPlatform().getMemObjectBinding(); // FIXME: CL separation makes this pretty complicated !
+        int ret = binding.clGetMemObjectInfo(id, CL_MEM_SIZE, pb.elementSize(), pb.getBuffer(), null);
         checkForError(ret, "can not obtain buffer info");
         return pb.get();
     }

@@ -33,7 +33,6 @@ import com.jogamp.opencl.llb.CLProgramBinding;
 import com.jogamp.opencl.util.CLProgramConfiguration;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.common.os.Platform;
-import com.jogamp.common.nio.NativeSizeBuffer;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.CLKernelBinding;
 import com.jogamp.opencl.llb.impl.BuildProgramCallback;
@@ -82,7 +81,7 @@ public class CLProgram extends CLObjectResource {
 
         IntBuffer status = newDirectIntBuffer(1);
         
-        NativeSizeBuffer length = NativeSizeBuffer.allocateDirect(1).put(0, src.length());
+        PointerBuffer length = PointerBuffer.allocateDirect(1).put(0, src.length());
         String[] srcArray = new String[] {src};
         
         // Create the program
@@ -107,13 +106,13 @@ public class CLProgram extends CLObjectResource {
             binarySize += entry.getValue().length;
         }
 
-        int pbSize = NativeSizeBuffer.elementSize();
+        int pbSize = PointerBuffer.ELEMENT_SIZE;
         int deviceCount = binaries.size();
         
         CachedBufferFactory bf = CachedBufferFactory.create(binarySize + pbSize*deviceCount*3 + 4, true);
-        NativeSizeBuffer devices  = NativeSizeBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
+        PointerBuffer devices  = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
         PointerBuffer codeBuffers = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
-        NativeSizeBuffer lengths  = NativeSizeBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
+        PointerBuffer lengths  = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
         
         int i = 0;
         for (Map.Entry<CLDevice, byte[]> entry : entries) {
@@ -171,7 +170,7 @@ public class CLProgram extends CLObjectResource {
             return "";
         }
 
-        NativeSizeBuffer size = NativeSizeBuffer.allocateDirect(1);
+        PointerBuffer size = PointerBuffer.allocateDirect(1);
 
         int ret = binding.clGetProgramBuildInfo(ID, device.ID, flag, 0, null, size);
         if(ret != CL_SUCCESS) {
@@ -194,7 +193,7 @@ public class CLProgram extends CLObjectResource {
             return "";
         }
 
-        NativeSizeBuffer size = NativeSizeBuffer.allocateDirect(1);
+        PointerBuffer size = PointerBuffer.allocateDirect(1);
 
         int ret = binding.clGetProgramInfo(ID, flag, 0, null, size);
         checkForError(ret, "on clGetProgramInfo");
@@ -338,10 +337,10 @@ public class CLProgram extends CLObjectResource {
             releaseKernels();
         }
 
-        NativeSizeBuffer deviceIDs = null;
+        PointerBuffer deviceIDs = null;
         int count = 0;
         if(devices != null && devices.length != 0) {
-            deviceIDs = NativeSizeBuffer.allocateDirect(devices.length);
+            deviceIDs = PointerBuffer.allocateDirect(devices.length);
             for (int i = 0; i < devices.length; i++) {
                 deviceIDs.put(i, devices[i].ID);
             }
@@ -441,7 +440,7 @@ public class CLProgram extends CLObjectResource {
 
         if(numKernels.get(0) > 0) {
 
-            NativeSizeBuffer kernelIDs = NativeSizeBuffer.allocateDirect(numKernels.get(0));
+            PointerBuffer kernelIDs = PointerBuffer.allocateDirect(numKernels.get(0));
             ret = kernelBinding.clCreateKernelsInProgram(ID, kernelIDs.capacity(), kernelIDs, null);
             if(ret != CL_SUCCESS) {
                 throw newException(ret, "can not create "+kernelIDs.capacity()+" kernels for "+this);
@@ -507,7 +506,7 @@ public class CLProgram extends CLObjectResource {
             return new CLDevice[0];
         }
 
-        NativeSizeBuffer size = NativeSizeBuffer.allocateDirect(1);
+        PointerBuffer size = PointerBuffer.allocateDirect(1);
         int ret = binding.clGetProgramInfo(ID, CL_PROGRAM_DEVICES, 0, null, size);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "on clGetProgramInfo of "+this);
@@ -617,8 +616,8 @@ public class CLProgram extends CLObjectResource {
         
         CLDevice[] devices = getCLDevices();
 
-        NativeSizeBuffer sizes = NativeSizeBuffer.allocateDirect(devices.length);
-        int ret = binding.clGetProgramInfo(ID, CL_PROGRAM_BINARY_SIZES, sizes.capacity()*NativeSizeBuffer.elementSize(), sizes.getBuffer(), null);
+        PointerBuffer sizes = PointerBuffer.allocateDirect(devices.length);
+        int ret = binding.clGetProgramInfo(ID, CL_PROGRAM_BINARY_SIZES, sizes.capacity()*sizes.elementSize(), sizes.getBuffer(), null);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "on clGetProgramInfo(CL_PROGRAM_BINARY_SIZES) of "+this);
         }
@@ -632,7 +631,7 @@ public class CLProgram extends CLObjectResource {
 
         
         long address = InternalBufferUtil.getDirectBufferAddress(binaries);
-        NativeSizeBuffer addresses = NativeSizeBuffer.allocateDirect(sizes.capacity());
+        PointerBuffer addresses = PointerBuffer.allocateDirect(sizes.capacity());
         sizes.rewind();
         while(sizes.remaining() != 0) {
             addresses.put(address);
@@ -640,7 +639,7 @@ public class CLProgram extends CLObjectResource {
         }
         addresses.rewind();
         
-        ret = binding.clGetProgramInfo(ID, CL_PROGRAM_BINARIES, addresses.capacity()*NativeSizeBuffer.elementSize(), addresses.getBuffer(), null);
+        ret = binding.clGetProgramInfo(ID, CL_PROGRAM_BINARIES, addresses.capacity()*addresses.elementSize(), addresses.getBuffer(), null);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "on clGetProgramInfo(CL_PROGRAM_BINARIES) of "+this);
         }

@@ -30,7 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.common.AutoCloseable;
 import com.jogamp.common.nio.CachedBufferFactory;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import java.util.Iterator;
 
 /**
@@ -44,12 +44,12 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
     /**
      * stores event ids for fast access.
      */
-    final NativeSizeBuffer IDs;
+    final PointerBuffer IDs;
     
     /**
      * Points always to the first element of the id buffer.
      */
-    final NativeSizeBuffer IDsView;
+    final PointerBuffer IDsView;
     
     int size;
     
@@ -64,13 +64,13 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
     public CLEventList(CachedBufferFactory factory, int capacity) {
         this.events = new CLEvent[capacity];
         this.IDs = initIDBuffer(factory, capacity);
-        this.IDsView = NativeSizeBuffer.wrap(IDs.getBuffer().duplicate());
+        this.IDsView = IDs.duplicate();
     }
 
     public CLEventList(CachedBufferFactory factory, CLEvent... events) {
         this.events = events;
         this.IDs = initIDBuffer(factory, events.length);
-        this.IDsView = NativeSizeBuffer.wrap(IDs.getBuffer().duplicate());
+        this.IDsView = IDs.duplicate();
         
         for (CLEvent event : events) {
             if(event == null) {
@@ -82,11 +82,11 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         size = events.length;
     }
     
-    private NativeSizeBuffer initIDBuffer(CachedBufferFactory factory, int size) {
+    private PointerBuffer initIDBuffer(CachedBufferFactory factory, int size) {
         if(factory == null) {
-            return NativeSizeBuffer.allocateDirect(size);
+            return PointerBuffer.allocateDirect(size);
         }else{
-            return NativeSizeBuffer.wrap(factory.newDirectByteBuffer(size*NativeSizeBuffer.elementSize()));
+            return PointerBuffer.wrap(factory.newDirectByteBuffer(size*PointerBuffer.ELEMENT_SIZE));
         }
     }
 
@@ -99,8 +99,8 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         size++;
     }
     
-    NativeSizeBuffer getEventBuffer(int index) {
-        return NativeSizeBuffer.wrap(IDs.getBuffer().duplicate()).position(index);
+    PointerBuffer getEventBuffer(int index) {
+        return IDs.duplicate();
     }
 
     /**
@@ -122,7 +122,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
             throw new IndexOutOfBoundsException("args: [start: "+start+" range: "+range+"], eventcount: "+size);
         }
 
-        NativeSizeBuffer view = getEventBuffer(start);
+        final PointerBuffer view = getEventBuffer(start);
         getEvent(start).getPlatform().getEventBinding().clWaitForEvents(range, view);
     }
 
@@ -130,7 +130,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
      * Waits for the event with the given index in this list to occur.
      */
     public void waitForEvent(int index) {
-        NativeSizeBuffer view = getEventBuffer(index);
+        final PointerBuffer view = getEventBuffer(index);
         getEvent(index).getPlatform().getEventBinding().clWaitForEvents(1, view);
     }
 

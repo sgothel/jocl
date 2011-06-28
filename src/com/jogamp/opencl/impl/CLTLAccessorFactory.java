@@ -4,7 +4,7 @@
 package com.jogamp.opencl.impl;
 
 import java.nio.IntBuffer;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.llb.CLDeviceBinding;
 import com.jogamp.opencl.spi.CLAccessorFactory;
@@ -41,7 +41,7 @@ public class CLTLAccessorFactory implements CLAccessorFactory {
         }
 
         @Override
-        public int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+        public int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
             return cl.clGetDeviceInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
@@ -58,7 +58,7 @@ public class CLTLAccessorFactory implements CLAccessorFactory {
         }
 
         @Override
-        public int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+        public int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
             return cl.clGetPlatformInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
@@ -75,7 +75,7 @@ public class CLTLAccessorFactory implements CLAccessorFactory {
             }else{
                 checkForError(ret, "error while enumerating devices");
 
-                NativeSizeBuffer deviceIDs = NativeSizeBuffer.wrap(getBB(count*NativeSizeBuffer.elementSize()));
+                PointerBuffer deviceIDs = PointerBuffer.wrap(getBB(count*PointerBuffer.ELEMENT_SIZE));
                 ret = cl.clGetDeviceIDs(ID, type, count, deviceIDs, null);
                 checkForError(ret, "error while enumerating devices");
 

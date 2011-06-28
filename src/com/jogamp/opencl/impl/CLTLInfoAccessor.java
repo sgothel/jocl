@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -29,7 +29,7 @@
 package com.jogamp.opencl.impl;
 
 import com.jogamp.opencl.spi.CLInfoAccessor;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.common.os.Platform;
 import com.jogamp.opencl.util.CLUtil;
 import java.nio.Buffer;
@@ -55,11 +55,11 @@ public abstract class CLTLInfoAccessor implements CLInfoAccessor {
         }
 
     };
-    protected final static ThreadLocal<NativeSizeBuffer> localNSB = new ThreadLocal<NativeSizeBuffer>() {
+    protected final static ThreadLocal<PointerBuffer> localNSB = new ThreadLocal<PointerBuffer>() {
 
         @Override
-        protected NativeSizeBuffer initialValue() {
-            return NativeSizeBuffer.allocateDirect(1);
+        protected PointerBuffer initialValue() {
+            return PointerBuffer.allocateDirect(1);
         }
 
     };
@@ -77,7 +77,7 @@ public abstract class CLTLInfoAccessor implements CLInfoAccessor {
     @Override
     public final String getString(int key) {
         
-        NativeSizeBuffer sizeBuffer = getNSB();
+        PointerBuffer sizeBuffer = getNSB();
         int ret = getInfo(key, 0, null, sizeBuffer);
         checkForError(ret, "error while asking for info string");
 
@@ -122,11 +122,11 @@ public abstract class CLTLInfoAccessor implements CLInfoAccessor {
         }
     }
 
-    protected NativeSizeBuffer getNSB() {
+    protected PointerBuffer getNSB() {
         return localNSB.get();
     }
 
-    protected abstract int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet);
+    protected abstract int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet);
 
 
 }

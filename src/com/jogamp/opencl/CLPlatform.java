@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -39,7 +39,7 @@ import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.os.DynamicLookupHelper;
 import com.jogamp.common.JogampRuntimeException;
 import com.jogamp.common.os.NativeLibrary;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.gluegen.runtime.FunctionAddressResolver;
 import com.jogamp.opencl.llb.CLBufferBinding;
 import com.jogamp.opencl.llb.CLCommandQueueBinding;
@@ -274,7 +274,7 @@ public class CLPlatform {
         checkForError(ret, "can not enumerate platforms");
 
         // receive platform ids
-        NativeSizeBuffer platformId = NativeSizeBuffer.allocateDirect(ib.get(0));
+        PointerBuffer platformId = PointerBuffer.allocateDirect(ib.get(0));
         ret = cl.clGetPlatformIDs(platformId.capacity(), platformId, null);
         checkForError(ret, "can not enumerate platforms");
 

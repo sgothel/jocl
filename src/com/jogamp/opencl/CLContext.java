@@ -33,7 +33,7 @@ import com.jogamp.common.nio.Buffers;
 import com.jogamp.opencl.CLDevice.Type;
 import com.jogamp.opencl.CLSampler.AddressingMode;
 import com.jogamp.opencl.CLSampler.FilteringMode;
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.CLContextBinding;
 import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
 import java.io.BufferedReader;
@@ -121,7 +121,7 @@ public class CLContext extends CLObjectResource {
         
         if (devices == null) {
 
-            NativeSizeBuffer deviceCount = NativeSizeBuffer.allocateDirect(1);
+            PointerBuffer deviceCount = PointerBuffer.allocateDirect(1);
 
             int ret = cl.clGetContextInfo(ID, CL_CONTEXT_DEVICES, 0, null, deviceCount);
             checkForError(ret, "can not enumerate devices");
@@ -172,7 +172,7 @@ public class CLContext extends CLObjectResource {
 
         long type = toDeviceBitmap(deviceTypes);
 
-        NativeSizeBuffer properties = setupContextProperties(platform);
+        PointerBuffer properties = setupContextProperties(platform);
         ErrorDispatcher dispatcher = new ErrorDispatcher();
         return new CLContext(platform, createContextFromType(platform, dispatcher, properties, type), dispatcher);
     }
@@ -190,7 +190,7 @@ public class CLContext extends CLObjectResource {
 
         CLPlatform platform = devices[0].getPlatform();
 
-        NativeSizeBuffer properties = setupContextProperties(platform);
+        PointerBuffer properties = setupContextProperties(platform);
         ErrorDispatcher dispatcher = new ErrorDispatcher();
         CLContext context = new CLContext(platform, createContext(platform, dispatcher, properties, devices), dispatcher);
         if(devices != null) {
@@ -201,8 +201,7 @@ public class CLContext extends CLObjectResource {
         return context;
     }
 
-    protected static long createContextFromType(CLPlatform platform, CLErrorHandler handler, NativeSizeBuffer properties, long deviceType) {
-
+    protected static long createContextFromType(CLPlatform platform, CLErrorHandler handler, PointerBuffer properties, long deviceType) {
         IntBuffer status = newDirectIntBuffer(1);
         CLContextBinding cl = platform.getContextBinding();
         long context = cl.clCreateContextFromType(properties, deviceType, handler, status);
@@ -212,12 +211,11 @@ public class CLContext extends CLObjectResource {
         return context;
     }
 
-    protected static long createContext(CLPlatform platform, CLErrorHandler handler, NativeSizeBuffer properties, CLDevice... devices) {
-
+    protected static long createContext(CLPlatform platform, CLErrorHandler handler, PointerBuffer properties, CLDevice... devices) {
         IntBuffer status = newDirectIntBuffer(1);
-        NativeSizeBuffer pb = null;
+        PointerBuffer pb = null;
         if(devices != null && devices.length != 0) {
-            pb = NativeSizeBuffer.allocateDirect(devices.length);
+            pb = PointerBuffer.allocateDirect(devices.length);
             for (int i = 0; i < devices.length; i++) {
                 CLDevice device = devices[i];
                 if(device == null) {
@@ -234,13 +232,12 @@ public class CLContext extends CLObjectResource {
         return context;
     }
 
-    private static NativeSizeBuffer setupContextProperties(CLPlatform platform) {
-
+    private static PointerBuffer setupContextProperties(CLPlatform platform) {
         if(platform == null) {
             throw new RuntimeException("no OpenCL installation found");
         }
 
-        return NativeSizeBuffer.allocateDirect(3).put(CL_CONTEXT_PLATFORM)
+        return PointerBuffer.allocateDirect(3).put(CL_CONTEXT_PLATFORM)
                                               .put(platform.ID).put(0) // 0 terminated array
                                               .rewind();
     }

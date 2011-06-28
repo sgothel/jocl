@@ -34,8 +34,8 @@
                         <li><a href="../../deployment/autobuilds/master/">Download JOCL</a></li>
                         <li><a href="../../deployment/webstart-next/javadoc/jocl/javadoc/">JOCL JavaDoc</a></li>
                         <li><a href="../../wiki/index.php/JOCL_FAQ#Getting_Started">JOCL Hello World</a></li>
-                        <li><a href="http://github.com/mbien/jocl">Code Repository</a></li>
-                        <li><a href="http://github.com/mbien/jocl-demos">Demos Repository</a></li> 
+                        <li><a href="http://jogamp.org/git/?p=jocl.git">Code Repository</a></li>
+                        <li><a href="http://jogamp.org/git/?p=jocl-demos.git">Demos Code Repository</a></li>
                     </ul>
                     <h3>External References</h3>
                     <ul>
@@ -96,19 +96,19 @@
                     <ol>
                         <li><b>Optain the source code</b> using git:
                             <ul>
-                                <li><a href="http://github.com/mbien/jocl">JOCL Dev GIT Repo</a></li>
+                                <li><a href="http://jogamp.org/git/?p=jocl.git">JOCL Dev GIT Repo</a></li>
                             </ul>
 
                             It is important that you checkout the source project side by side to its dependencies:
                             <pre>
-    /home/dude/projects/jogamp> git clone git://github.com/mbien/jocl.git jocl
+    /home/dude/projects/jogamp> git clone git://jogamp.com/srv/scm/jocl.git jocl
                             </pre>
                             Now you should have following directory structure:
                             <pre>
     /home/dude/projects/jogamp
     /home/dude/projects/jogamp/gluegen
-    /home/dude/projects/jogamp/jocl
     /home/dude/projects/jogamp/jogl
+    /home/dude/projects/jogamp/jocl
                             </pre>
                             you can now open the projects with NetBeans or proceed with:
                         </li>
@@ -116,12 +116,9 @@
                         <li> <b>Build the source tree:</b> <br/>
                             Open a command shell in the "jocl" directory of the source tree and type <code>"ant jar"</code>.
                         </li>
-                        <li> <b>Test your build:</b> <br/>
-                            <code>"ant test"</code>
-                        </li>
-
-                        <li> <b>Build Javadoc:</b> <br/>
-                            <code>"ant javadoc"</code>
+                        <li> <b>Test your build:</b> <br/> Stay in your command shell in the "jocl" directory of the source tree and type <code>"ant test"</code>.</li>
+                        <li> <b>Build Javadoc:</b> <br/> Stay in your command shell in the "jocl" directory of the source tree and type "<code>ant javadoc"</code>.
+                            This will produce the end-user documentation for JOCL.
                         </li>
                     </ol>
 

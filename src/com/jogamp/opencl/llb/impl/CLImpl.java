@@ -31,7 +31,7 @@
  */
 package com.jogamp.opencl.llb.impl;
 
-import com.jogamp.common.nio.NativeSizeBuffer;
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.common.os.Platform;
 import com.jogamp.common.util.LongLongHashMap;
 import com.jogamp.opencl.CLErrorHandler;
@@ -57,7 +57,7 @@ public class CLImpl extends CLAbstractImpl {
     }
 
     @Override
-    public long clCreateContext(NativeSizeBuffer properties, NativeSizeBuffer devices, CLErrorHandler pfn_notify, IntBuffer errcode_ret) {
+    public long clCreateContext(PointerBuffer properties, PointerBuffer devices, CLErrorHandler pfn_notify, IntBuffer errcode_ret) {
 
         if (properties != null && !properties.isDirect()) {
             throw new RuntimeException("Argument \"properties\" was not a direct buffer");
@@ -89,8 +89,7 @@ public class CLImpl extends CLAbstractImpl {
     private native long clCreateContext0(Object cl_context_properties, int props_offset, int numDevices, Object devices, int devices_offset, Object pfn_notify, long[] global, Object errcode_ret, int err_offset, long address);
 
     @Override
-    public long clCreateContextFromType(NativeSizeBuffer properties, long device_type, CLErrorHandler pfn_notify, IntBuffer errcode_ret) {
-
+    public long clCreateContextFromType(PointerBuffer properties, long device_type, CLErrorHandler pfn_notify, IntBuffer errcode_ret) {
         if (properties != null && !properties.isDirect()) {
             throw new RuntimeException("Argument \"properties\" was not a direct buffer");
         }
@@ -138,8 +137,7 @@ public class CLImpl extends CLAbstractImpl {
 
     /** Interface to C language function: <br> <code> int32_t clBuildProgram(cl_program, uint32_t, cl_device_id * , const char * , void * ); </code>    */
     @Override
-    public int clBuildProgram(long program, int deviceCount, NativeSizeBuffer deviceList, String options, BuildProgramCallback cb) {
-
+    public int clBuildProgram(long program, int deviceCount, PointerBuffer deviceList, String options, BuildProgramCallback cb) {
         if (deviceList != null && !deviceList.isDirect()) {
             throw new RuntimeException("Argument \"properties\" was not a direct buffer");
         }
@@ -181,19 +179,19 @@ public class CLImpl extends CLAbstractImpl {
 
 
     /** Interface to C language function: <br> <code> void *  {@native clEnqueueMapImage}(cl_command_queue command_queue, cl_mem image, uint32_t blocking_map, uint64_t map_flags, const size_t * , const size_t * , size_t *  image_row_pitch, size_t *  image_slice_pitch, uint32_t num_events_in_wait_list, cl_event *  event_wait_list, cl_event *  event, int32_t *  errcode_ret); </code>
-    @param origin a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param range a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param image_row_pitch a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param image_slice_pitch a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param event_wait_list a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param event a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
+    @param origin a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param range a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param image_row_pitch a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param image_slice_pitch a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param event_wait_list a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param event a direct {@link com.jogamp.common.nio.PointerBuffer}
     @param errcode_ret a direct {@link java.nio.IntBuffer}   */
     @Override
     public ByteBuffer clEnqueueMapImage(long command_queue, long image, int blocking_map, long map_flags,
-            NativeSizeBuffer origin, NativeSizeBuffer range,
-            NativeSizeBuffer image_row_pitch, NativeSizeBuffer image_slice_pitch,
+            PointerBuffer origin, PointerBuffer range,
+            PointerBuffer image_row_pitch, PointerBuffer image_slice_pitch,
             int num_events_in_wait_list,
-            NativeSizeBuffer event_wait_list, NativeSizeBuffer event, IntBuffer errcode_ret) {
+            PointerBuffer event_wait_list, PointerBuffer event, IntBuffer errcode_ret) {
 
         if (origin != null && !origin.isDirect()) {
             throw new CLException("Argument \"origin\" was not a direct buffer");
@@ -242,12 +240,12 @@ public class CLImpl extends CLAbstractImpl {
     }
 
     /** Entry point to C language function: <code> void *  {@native clEnqueueMapImage}(cl_command_queue command_queue, cl_mem image, uint32_t blocking_map, uint64_t map_flags, const size_t * , const size_t * , size_t *  image_row_pitch, size_t *  image_slice_pitch, uint32_t num_events_in_wait_list, cl_event *  event_wait_list, cl_event *  event, int32_t *  errcode_ret); </code>
-    @param origin a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param range a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param image_row_pitch a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param image_slice_pitch a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param event_wait_list a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
-    @param event a direct {@link com.jogamp.common.nio.NativeSizeBuffer}
+    @param origin a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param range a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param image_row_pitch a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param image_slice_pitch a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param event_wait_list a direct {@link com.jogamp.common.nio.PointerBuffer}
+    @param event a direct {@link com.jogamp.common.nio.PointerBuffer}
     @param errcode_ret a direct {@link java.nio.IntBuffer}   */
     private native ByteBuffer clEnqueueMapImage0(long command_queue, long image, int blocking_map, long map_flags,
             Object origin, int origin_byte_offset, Object range, int range_byte_offset, Object image_row_pitch,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 - 2010 JogAmp Community. All rights reserved.
+ * Copyright (c) 2009 JogAmp Community. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
@@ -28,8 +28,8 @@
 
 package com.jogamp.opencl;
 
+import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.impl.CLTLInfoAccessor;
-import com.jogamp.common.nio.NativeSizeBuffer;
 import com.jogamp.opencl.llb.CLSamplerBinding;
 
 import java.nio.Buffer;
@@ -91,7 +91,7 @@ public class CLSampler extends CLObjectResource {
     private class CLSamplerInfoAccessor extends CLTLInfoAccessor {
 
         @Override
-        protected int getInfo(int name, long valueSize, Buffer value, NativeSizeBuffer valueSizeRet) {
+        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
             return binding.clGetSamplerInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
