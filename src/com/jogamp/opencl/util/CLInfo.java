@@ -49,9 +49,9 @@ public class CLInfo {
         // host
         sb.append("HOST_JRE: ").append(System.getProperty("java.runtime.version")).append("\n");
         sb.append("HOST_JVM: ").append(System.getProperty("java.vm.name")).append("\n");
-        sb.append("HOST_ARCH: ").append(Platform.getArch()).append("\n");
+        sb.append("HOST_ARCH: ").append(Platform.getArchName()).append("\n");
         sb.append("HOST_NUM_CORES: ").append(Runtime.getRuntime().availableProcessors()).append("\n");
-        sb.append("HOST_OS: ").append(Platform.getOS()).append("\n");
+        sb.append("HOST_OS: ").append(Platform.getOSName()).append("\n");
         sb.append("HOST_LITTLE_ENDIAN: ").append(Platform.isLittleEndian()).append("\n");
 
         CLPlatform.initialize();

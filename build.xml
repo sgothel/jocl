@@ -418,9 +418,19 @@
             <syslibset dir="${opencl.lib32.dir}" libs="OpenCL"  if="opencl.lib32.dir"/>
         </linker>
 
+        <linker id="linker.cfg.linux.x86.jocl" extends="linker.cfg.linux.x86">
+            <syslibset dir="/usr/lib"            libs="OpenCL"  if="static.binding" unless="opencl.lib32.dir"/>
+            <syslibset dir="${opencl.lib32.dir}" libs="OpenCL"  if="opencl.lib32.dir"/>
+        </linker>
+
         <linker id="linker.cfg.linux.amd64.jocl" extends="linker.cfg.linux.amd64" >
             <syslibset dir="/usr/lib"            libs="OpenCL"  if="static.binding" unless="opencl.lib64.dir"/>
             <syslibset dir="${opencl.lib64.dir}" libs="OpenCL"  if="opencl.lib64.dir"/>
+        </linker>
+
+        <linker id="linker.cfg.linux.armv7.jocl" extends="linker.cfg.linux.armv7">
+            <syslibset dir="/usr/lib"            libs="OpenCL"  if="static.binding" unless="opencl.libarmv7.dir"/>
+            <syslibset dir="${opencl.libarmv7.dir}" libs="OpenCL"  if="opencl.libarmv7.dir"/>
         </linker>
 
         <linker id="linker.cfg.win32.mingw.jocl" extends="linker.cfg.win32.mingw">
@@ -443,7 +453,7 @@
     <target name="c.configure.default" depends="c.configure.os" />
     <target name="c.configure.os"      depends="c.configure.win, c.configure.linux, c.configure.macosx" />
     <target name="c.configure.win"     depends="c.configure.win.mingw32, c.configure.win.mingw64" if="isWindows" />
-    <target name="c.configure.linux"   depends="c.configure.linux.x86, c.configure.linux.amd64" if="isLinux" />
+    <target name="c.configure.linux"   depends="c.configure.linux.x86, c.configure.linux.amd64, c.configure.linux.armv7" if="isLinux" />
 
     <target name="c.configure.win.mingw32" if="isMingW32">
         <echo message="Win.Ming32W" />
@@ -458,12 +468,17 @@
     <target name="c.configure.linux.x86" if="isLinuxX86">
         <echo message="Linux.x86" />
         <property name="compiler.cfg.id"  value="${compiler.cfg.id.base}" />
-        <property name="linker.cfg.id"    value="linker.cfg.linux.jocl" />
+        <property name="linker.cfg.id"    value="linker.cfg.linux.x86.jocl" />
     </target>
     <target name="c.configure.linux.amd64" if="isLinuxAMD64">
         <echo message="Linux.AMD64" />
         <property name="compiler.cfg.id"  value="${compiler.cfg.id.base}" />
         <property name="linker.cfg.id"    value="linker.cfg.linux.amd64.jocl" />
+    </target>
+    <target name="c.configure.linux.armv7" if="isLinuxARMv7">
+        <echo message="Linux.ARMv7" />
+        <property name="compiler.cfg.id"  value="${compiler.cfg.id.base}" />
+        <property name="linker.cfg.id"    value="linker.cfg.linux.armv7.jocl" />
     </target>
     <target name="c.configure.macosx"      if="isOSX">
         <echo message="MacOS" />
