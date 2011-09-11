@@ -281,6 +281,7 @@
             <filterchain>
                 <replacestring from="JOCL_CODEBASE_TAG"     to="${jocl.jnlp.codebase}"/>
                 <replacestring from="GLUEGEN_CODEBASE_TAG"  to="${gluegen.jnlp.codebase}"/>
+                <replacestring from="jar/jocl"              to="jocl"/>
             </filterchain>
         </copy>
         
