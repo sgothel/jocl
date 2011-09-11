@@ -299,7 +299,7 @@
         
         <!-- jars and jared natives -->
         <copy todir="${dist.dir}/tmp/${dist.zip.name}/jar" flatten="true">
-            <fileset dir="${dist.dir}" includes="jocl.jar,jocl-natives-*.jar,lib/*.jar"/>
+            <fileset dir="${dist.dir}" includes="jocl.jar,jocl-natives-*.jar"/>
         </copy>
         <copy todir="${dist.dir}/tmp/${dist.zip.name}/jnlp-files">
             <fileset dir="." includes="*.jnlp"/>
@@ -312,7 +312,6 @@
         <!-- native files, TODO: remove when no longer needed -->
         <copy todir="${dist.dir}/tmp/${dist.zip.name}/lib" failonerror="false">
             <fileset dir="${basedir}/${rootrel.build}/natives/jocl" excludes="*.xml"/>
-            <fileset dir="${jogl.root}/${rootrel.build}/lib" excludes="*.xml"/>
         </copy>
         
         <!-- zip/7z it -->
