@@ -7,5 +7,5 @@ if [ -e $SDIR/../../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh ] ; then
 fi
 
 ant  \
-    -Drootrel.build=build-x86_64 \
-    $* 2>&1 | tee make.jocl.all.linux-x86_64.log
+    -Drootrel.build=build-solaris-x86_64 \
+    $* 2>&1 | tee make.jocl.all.solaris-x86_64.log

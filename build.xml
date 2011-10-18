@@ -395,7 +395,7 @@
         <copydir src="${basedir}/resources/includes/CL" dest="${basedir}/resources/includes/OpenCL"/>
     </target>
 
-    <target name="c.setup.build" depends="gluegen.cpptasks.configure.compiler, gluegen.cpptasks.declare.compiler, c.configure.default, jocl.configure.linker, mac.includepath.hack">
+    <target name="c.setup.build" depends="gluegen.cpptasks.configure.compiler, gluegen.cpptasks.declare.compiler, c.configure.default, jocl.configure.compiler, jocl.configure.linker, mac.includepath.hack">
 
         <property name="obj.dir" value="${build.dir}/obj"/>
         <property name="natives.dir" value="${build.dir}/natives"/>
@@ -407,6 +407,26 @@
         <property name="c.compiler.optimise" value="none"/>
         <property name="c.compiler.debug" value="false"/>
         <property name="namespace" value=""/>
+
+    </target>
+
+    <!-- compiler configuration -->
+    <target name="jocl.configure.compiler">
+      <!-- a hackish way on Solaris10 w/ gcc in 'sfw'
+           to make mmintrin.h, pmmintrin.h and xmmintrin.h visible -->
+
+      <compiler id="compiler.cfg.solaris.jocl" extends="compiler.cfg.solaris">
+        <compilerarg value="-I/usr/sfw/lib/gcc/i386-pc-solaris2.10/3.4.3/install-tools/include" />
+      </compiler>
+
+      <compiler id="compiler.cfg.solaris.jocl.sparcv9" extends="compiler.cfg.solaris.sparcv9">
+        <!-- dunno .. need to fix, if we ever compile on Solaris/sparcv9 -->
+        <compilerarg value="-I/usr/sfw/lib/gcc/sparc-pc-solaris2.10/3.4.3/install-tools/include" />
+      </compiler>
+
+      <compiler id="compiler.cfg.solaris.jocl.amd64" extends="compiler.cfg.solaris.amd64">
+        <compilerarg value="-I/usr/sfw/lib/gcc/i386-pc-solaris2.10/3.4.3/install-tools/include" />
+      </compiler>
 
     </target>
 
@@ -451,9 +471,10 @@
 
     <!-- configure for current platform -->
     <target name="c.configure.default" depends="c.configure.os" />
-    <target name="c.configure.os"      depends="c.configure.win, c.configure.linux, c.configure.macosx" />
+    <target name="c.configure.os"      depends="c.configure.win, c.configure.linux, c.configure.macosx, c.configure.solaris" />
     <target name="c.configure.win"     depends="c.configure.win.mingw32, c.configure.win.mingw64" if="isWindows" />
     <target name="c.configure.linux"   depends="c.configure.linux.x86, c.configure.linux.amd64, c.configure.linux.armv7" if="isLinux" />
+    <target name="c.configure.solaris" depends="c.configure.solaris32, c.configure.solaris.sparcv9, c.configure.solaris.amd64" if="isSolaris" />
 
     <target name="c.configure.win.mingw32" if="isMingW32">
         <echo message="Win.Ming32W" />
@@ -480,6 +501,25 @@
         <property name="compiler.cfg.id"  value="${compiler.cfg.id.base}" />
         <property name="linker.cfg.id"    value="linker.cfg.linux.armv7.jocl" />
     </target>
+
+    <target name="c.configure.solaris32" if="isSolaris32Bit">
+      <echo message="Solaris" />
+      <property name="compiler.cfg.id"    value="compiler.cfg.solaris.jocl" />
+      <property name="linker.cfg.id"      value="linker.cfg.solaris" />
+    </target>
+ 
+    <target name="c.configure.solaris.sparcv9" if="isSolarisSparcv9">
+      <echo message="SolarisSparcv9" />
+      <property name="compiler.cfg.id"    value="compiler.cfg.solaris.jocl.sparcv9" />
+      <property name="linker.cfg.id"      value="linker.cfg.solaris.sparcv9" />
+    </target>
+
+    <target name="c.configure.solaris.amd64" if="isSolarisAMD64">
+      <echo message="SolarisAMD64" />
+      <property name="compiler.cfg.id"    value="compiler.cfg.solaris.jocl.amd64" />
+      <property name="linker.cfg.id"      value="linker.cfg.solaris.amd64" />
+    </target>
+   
     <target name="c.configure.macosx"      if="isOSX">
         <echo message="MacOS" />
         <property name="compiler.cfg.id"  value="${compiler.cfg.id.base}" />
