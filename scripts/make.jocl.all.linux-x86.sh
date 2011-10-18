@@ -1,7 +1,9 @@
 #! /bin/sh
 
-if [ -e ../setenv-build-jogl-x86.sh ] ; then
-    . ../setenv-build-jogl-x86.sh
+SDIR=`dirname $0` 
+
+if [ -e $SDIR/../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh ] ; then
+    . $SDIR/../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh
 fi
 
 ant  \

@@ -34,6 +34,10 @@
         <isset property="c.dont.compile"/>
     </condition>
     
+    <target name="-pre-init" depends="gluegen.cpptasks.detect.os">
+        <!-- gluegen.cpptasks... sets jvmDataModel.arg -->
+    </target>
+
     <!-- -post-init is after all properties are imported -->
     <target name="-post-init" depends="jogamp.env.init,gluegen.cpptasks.detect.os">
         <property name="jocl.version" value="${jocl_base_version}-b${jocl.build.number}-${version.timestamp}" />
@@ -415,8 +419,13 @@
       <!-- a hackish way on Solaris10 w/ gcc in 'sfw'
            to make mmintrin.h, pmmintrin.h and xmmintrin.h visible -->
 
-      <compiler id="compiler.cfg.solaris.jocl" extends="compiler.cfg.solaris">
+      <compiler id="compiler.cfg.solaris.jocl.x86" extends="compiler.cfg.solaris">
         <compilerarg value="-I/usr/sfw/lib/gcc/i386-pc-solaris2.10/3.4.3/install-tools/include" />
+      </compiler>
+
+      <compiler id="compiler.cfg.solaris.jocl.sparc" extends="compiler.cfg.solaris">
+        <!-- dunno .. need to fix, if we ever compile on Solaris/sparcv9 -->
+        <compilerarg value="-I/usr/sfw/lib/gcc/sparc-pc-solaris2.10/3.4.3/install-tools/include" />
       </compiler>
 
       <compiler id="compiler.cfg.solaris.jocl.sparcv9" extends="compiler.cfg.solaris.sparcv9">
@@ -474,7 +483,7 @@
     <target name="c.configure.os"      depends="c.configure.win, c.configure.linux, c.configure.macosx, c.configure.solaris" />
     <target name="c.configure.win"     depends="c.configure.win.mingw32, c.configure.win.mingw64" if="isWindows" />
     <target name="c.configure.linux"   depends="c.configure.linux.x86, c.configure.linux.amd64, c.configure.linux.armv7" if="isLinux" />
-    <target name="c.configure.solaris" depends="c.configure.solaris32, c.configure.solaris.sparcv9, c.configure.solaris.amd64" if="isSolaris" />
+    <target name="c.configure.solaris" depends="c.configure.solaris.x86, c.configure.solaris.sparc, c.configure.solaris.sparcv9, c.configure.solaris.amd64" if="isSolaris" />
 
     <target name="c.configure.win.mingw32" if="isMingW32">
         <echo message="Win.Ming32W" />
@@ -502,9 +511,15 @@
         <property name="linker.cfg.id"    value="linker.cfg.linux.armv7.jocl" />
     </target>
 
-    <target name="c.configure.solaris32" if="isSolaris32Bit">
-      <echo message="Solaris" />
-      <property name="compiler.cfg.id"    value="compiler.cfg.solaris.jocl" />
+    <target name="c.configure.solaris.x86" if="isSolarisX86">
+      <echo message="SolarisX86" />
+      <property name="compiler.cfg.id"    value="compiler.cfg.solaris.jocl.x86" />
+      <property name="linker.cfg.id"      value="linker.cfg.solaris" />
+    </target>
+ 
+    <target name="c.configure.solaris.sparc" if="isSolarisSparc">
+      <echo message="SolarisSparc" />
+      <property name="compiler.cfg.id"    value="compiler.cfg.solaris.jocl.sparc" />
       <property name="linker.cfg.id"      value="linker.cfg.solaris" />
     </target>
  
