@@ -28,8 +28,13 @@
 
 package com.jogamp.opencl;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import com.jogamp.common.jvm.JNILibLoaderBase;
 import com.jogamp.common.os.NativeLibrary;
+import com.jogamp.common.os.Platform;
+import com.jogamp.common.util.cache.TempJarCache;
 
 
 /**
@@ -43,7 +48,16 @@ class JOCLJNILibLoader extends JNILibLoaderBase {
      * @return Returns libOpenCL represented as NativeLibrary.
      */
     static NativeLibrary loadOpenCL() {
-        loadLibrary("jocl", null, false);
-        return NativeLibrary.open("OpenCL", JOCLJNILibLoader.class.getClassLoader());
+        return AccessController.doPrivileged(new PrivilegedAction<NativeLibrary>() {
+          public NativeLibrary run() {
+            Platform.initSingleton();
+            final String libName = "jocl";
+            if(TempJarCache.isInitialized() && null == TempJarCache.findLibrary(libName)) {
+                addNativeJarLibs(JOCLJNILibLoader.class, "jocl", null );
+            }
+            loadLibrary(libName, false);
+            return NativeLibrary.open("OpenCL", JOCLJNILibLoader.class.getClassLoader());
+          }
+        });
     }
 }
