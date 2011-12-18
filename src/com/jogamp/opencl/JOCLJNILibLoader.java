@@ -51,12 +51,20 @@ class JOCLJNILibLoader extends JNILibLoaderBase {
         return AccessController.doPrivileged(new PrivilegedAction<NativeLibrary>() {
           public NativeLibrary run() {
             Platform.initSingleton();
+            
+            // Implementation should move to com.jogamp.common.os.DynamicLibraryBundleInfo, 
+            // eg.: jogamp.opengl.GLDynamicLibraryBundleInfo etc.
             final String libName = "jocl";
             if(TempJarCache.isInitialized() && null == TempJarCache.findLibrary(libName)) {
                 addNativeJarLibs(JOCLJNILibLoader.class, "jocl", null );
             }
             loadLibrary(libName, false);
-            return NativeLibrary.open("OpenCL", JOCLJNILibLoader.class.getClassLoader());
+            NativeLibrary res = NativeLibrary.open("OpenCL", JOCLJNILibLoader.class.getClassLoader());
+            if(null == res) {
+                // try unix name w/ version (eg.: AMD has a /usr/lib32/fglrx/libOpenCL.so.1 only)
+                res = NativeLibrary.open("libOpenCL.so.1", JOCLJNILibLoader.class.getClassLoader());
+            }
+            return res;
           }
         });
     }
