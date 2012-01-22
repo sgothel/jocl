@@ -34,8 +34,11 @@
         <isset property="c.dont.compile"/>
     </condition>
     
-    <target name="-pre-init" depends="gluegen.cpptasks.detect.os">
-        <!-- gluegen.cpptasks... sets jvmDataModel.arg -->
+    <target name="-pre-init" depends="jogamp.env.init,gluegen.cpptasks.detect.os">
+        <property name="javac.debug" value="${javacdebug}"/>
+        <property name="javac.source" value="${target.sourcelevel}"/>
+        <property name="javac.target" value="${target.targetlevel}"/>
+        <property name="javac.compilerargs" value="-bootclasspath ${target.rt.jar} -Xlint -g:${javacdebuglevel}"/>
     </target>
 
     <!-- -post-init is after all properties are imported -->
@@ -247,7 +250,15 @@
         <!--compile build utilities-->
         <mkdir dir="${etc.build.dir}"/>
 
-        <javac destdir="${etc.build.dir}" classpath="${ant.core.lib}" source="1.5" debug="true" debuglevel="lines,vars,source" includeantruntime="false">
+        <javac destdir="${etc.build.dir}" 
+               classpath="${ant.core.lib}" 
+               fork="yes"
+               includeAntRuntime="false"
+               memoryMaximumSize="${javac.memorymax}"
+               source="${target.sourcelevel}" 
+               target="${target.targetlevel}" 
+               bootclasspath="${target.rt.jar}"
+               debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <src path="${basedir}/etc/src"/>
         </javac>
 
