@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- JOCL's main build file-->
-<project name="JOCL" default="default" basedir=".">
+<project xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxrpc="http://www.netbeans.org/ns/j2se-project/jax-rpc" basedir="." default="default" name="JOCL">
 
     <description>Builds, tests, and runs the project JOCL.</description>
 
@@ -659,6 +659,33 @@
         <antcall target="test-single" inheritall="true"/>
     </target>
     
+    <!-- overwrites default target - watch out when build-impl.xml changes -->
+    <target name="-pre-test-run" depends="init" if="have.tests" > 
+        <mkdir dir="${build.test.results.dir}"/>
+    </target>
+
+    <target name="junit.run.local" unless="isCrosscompilation">
+        <j2seproject3:junit testincludes="**/*Test.java"/>
+    </target>
+
+    <target name="junit.run.remote.ssh" if="isCrosscompilation" unless="isAndroid">
+        <copy todir="${build.test.results.dir}" file="${gluegen.root}/make/lib/TEST-com.jogamp.junit.DisabledTest.xml"/>
+    </target>
+
+    <target name="junit.run.tests" depends="junit.run.local, junit.run.remote.ssh"/>
+
+    <target name="junit.run.if.enabled" unless="junit.is.disabled">
+        <antcall target="junit.run.tests"      inheritRefs="true" inheritAll="true"/>
+    </target>
+
+    <target name="junit.run.if.disabled" if="junit.is.disabled">
+        <copy todir="${build.test.results.dir}" file="${gluegen.root}/make/lib/TEST-com.jogamp.junit.DisabledTest.xml"/>
+    </target>
+
+    <!-- overwrites default target - watch out when build-impl.xml changes -->
+    <target name="-do-test-run" depends="init,compile-test,-pre-test-run,junit.run.if.enabled,junit.run.if.disabled" if="have.tests" >
+    </target>
+
     <!-- overwrites default target - watch out when build-impl.xml changes -->
     <target name="-post-test-run" depends="init,compile-test,-pre-test-run,-do-test-run" if="have.tests">
         <zip destfile="${dist.dir}/${dist.zip.name}-test-results-${build.node.name}.zip">
