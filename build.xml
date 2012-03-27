@@ -29,6 +29,7 @@
     <import file="${gluegen.root}/make/gluegen-cpptasks.xml" />
     <import file="${gluegen.root}/make/jogamp-env.xml" />
     <import file="${gluegen.root}/make/jogamp-archivetasks.xml" />
+    <import file="${gluegen.root}/make/jogamp-androidtasks.xml" />
     
     <condition property="build.archiveon" value="true">
         <isset property="c.dont.compile"/>
@@ -43,7 +44,8 @@
 
     <!-- -post-init is after all properties are imported -->
     <target name="-post-init" depends="jogamp.env.init,gluegen.cpptasks.detect.os">
-        <property name="jocl.version" value="${jocl_base_version}-b${jocl.build.number}-${version.timestamp}" />
+        <property name="jocl.version"      value="${jocl_base_version}-b${jocl.build.number}-${version.timestamp}" />
+        <property name="jocl.version.plus" value="${jocl_base_version}-${jocl.build.branch}-b${jocl.build.number}-${jocl.build.commit}-${version.timestamp}" />
         <property name="dist.zip.name" value="jocl-${jocl.version}-${os.and.arch}"/>
     </target>
     
@@ -282,7 +284,7 @@
         
     </target>
 
-    <target name="-post-jar" depends="jar.natives,tag.build,package-dist,archive-dist"/>
+    <target name="-post-jar" depends="jar.natives,android.package,tag.build,package-dist,archive-dist"/>
         
     <target name="package-dist">
         <!-- don't know how to get rid of the NetBeans readme file -->
@@ -315,7 +317,7 @@
         
         <!-- jars and jared natives -->
         <copy todir="${dist.dir}/tmp/${dist.zip.name}/jar" flatten="true">
-            <fileset dir="${dist.dir}" includes="jocl.jar,jocl-natives-*.jar"/>
+            <fileset dir="${dist.dir}" includes="jocl.jar,jocl*.apk,jocl-natives-*.jar"/>
         </copy>
         <copy todir="${dist.dir}/tmp/${dist.zip.name}/jnlp-files">
             <fileset dir="." includes="*.jnlp"/>
@@ -351,9 +353,22 @@
         <jar basedir="${natives.jocl.dir}/${namespace}" excludes="*.xml"
              destfile="${dist.jar.dir}/jocl-natives-${os.and.arch}.jar"
              manifest="${rootrel.build}/manifest.mf" />
-
     </target>
 
+    <target name="android.package" if="isAndroid">
+        <aapt.signed 
+            jarsrcdir="${src.java}"
+            jarbuilddir="${dist.jar.dir}"
+            jarbasename="jocl"
+            nativebuilddir="${natives.jocl.dir}/${namespace}"
+            nativebasename=""
+            android.abi="${android.abi}"
+            androidmanifest.path="resources/android/AndroidManifest-jocl.xml"
+            androidresources.path="resources/android/res-jocl"
+            jarmanifest.path="${rootrel.build}/manifest.mf"
+            version.code="${jocl_int_version}"
+            version.name="${jocl.version.plus}" />
+    </target>
 
     <target name="c.compile.default" depends="gluegen.cpptasks.detect.os, gluegen.cpptasks.detect.compiler, jocl.c.compile, c.rename.lib.mingw" />
 
