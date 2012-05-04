@@ -58,7 +58,7 @@ class JOCLJNILibLoader extends JNILibLoaderBase {
             if(TempJarCache.isInitialized() && null == TempJarCache.findLibrary(libName)) {
                 addNativeJarLibs(JOCLJNILibLoader.class, "jocl", null );
             }
-            loadLibrary(libName, false);
+            loadLibrary(libName, false, JOCLJNILibLoader.class.getClassLoader());
             NativeLibrary res = NativeLibrary.open("OpenCL", JOCLJNILibLoader.class.getClassLoader());
             if(null == res) {
                 // try unix name w/ version (eg.: AMD has a /usr/lib32/fglrx/libOpenCL.so.1 only)
