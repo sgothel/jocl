@@ -56,7 +56,8 @@ class JOCLJNILibLoader extends JNILibLoaderBase {
             // eg.: jogamp.opengl.GLDynamicLibraryBundleInfo etc.
             final String libName = "jocl";
             if(TempJarCache.isInitialized() && null == TempJarCache.findLibrary(libName)) {
-                addNativeJarLibs(JOCLJNILibLoader.class, "jocl", null );
+                // only: jocl.jar -> jocl-natives-<os.and.arch>.jar
+                addNativeJarLibs(new Class<?>[] { JOCLJNILibLoader.class }, null, null );
             }
             loadLibrary(libName, false, JOCLJNILibLoader.class.getClassLoader());
             NativeLibrary res = NativeLibrary.open("OpenCL", JOCLJNILibLoader.class.getClassLoader());
