@@ -312,6 +312,13 @@
         
     <target name="archive-dist" if="build.archiveon">
     
+        <!-- source zip -->
+        <zip destfile="${dist.dir}/jocl-java-src.zip" level="0">
+            <fileset dir="${src.dir}"/>
+            <fileset dir="${src.java.dir}"/>
+            <!-- fileset dir="${build.generated.sources.dir}"/-->
+        </zip>
+
         <!-- zip distribution -->
         <mkdir dir="${dist.dir}/tmp/${dist.zip.name}"/>
         
@@ -324,7 +331,7 @@
         </copy>
         <copy todir="${dist.dir}/tmp/${dist.zip.name}">
             <fileset dir="." includes="README,LICENSE"/>
-            <fileset dir="${dist.dir}" includes="*.properties"/>
+            <fileset dir="${dist.dir}" includes="*.properties,jocl-java-src.zip"/>
         </copy>
         
         <!-- native files, TODO: remove when no longer needed -->
@@ -332,8 +339,7 @@
             <fileset dir="${basedir}/${rootrel.build}/natives/jocl" excludes="*.xml"/>
         </copy>
         
-        <!-- zip/7z it -->
-        <zip        basedir="${dist.dir}/tmp" destfile="${dist.dir}/${dist.zip.name}.zip"/>
+        <!-- 7z it -->
         <archive.7z basedir="${dist.dir}/tmp" destfile="${dist.dir}/${dist.zip.name}.7z"  includes="*"/>
         
         <delete dir="${dist.dir}/tmp"/>
@@ -662,9 +668,6 @@
     </target>
     
     <target name="archive-javadoc" if="build.archiveon">
-        <zip destfile="${dist.dir}/jocl-javadoc.zip">
-            <zipfileset dir="${dist.javadoc.dir}" prefix="jocl/javadoc"/>
-        </zip>
         <archive.7z basedir="${dist.dir}/javadoc" destfile="${dist.dir}/jocl-javadoc.7z" includes="jocl/*"/>
     </target>
 
@@ -703,9 +706,6 @@
 
     <!-- overwrites default target - watch out when build-impl.xml changes -->
     <target name="-post-test-run" depends="init,compile-test,-pre-test-run,-do-test-run" if="have.tests">
-        <zip destfile="${dist.dir}/${dist.zip.name}-test-results-${build.node.name}.zip">
-            <zipfileset dir="${build.test.results.dir}" prefix="${dist.zip.name}/test-results"/>
-        </zip>
         <archive.7z basedir="${build.test.results.dir}" destfile="${dist.dir}/${dist.zip.name}-test-results-${build.node.name}.7z" includes="*"/>
         <fail if="tests.failed" unless="ignore.failing.tests">Some tests failed; see details above.</fail>
     </target>
