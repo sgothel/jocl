@@ -74,15 +74,7 @@ public class CLGLTest {
     private static Window window;
 
     public static void initGL() {
-        GLProfile.initSingleton(true);
-
-        Display display = NewtFactory.createDisplay(null); // local display
-        assertNotNull(display);
-
-        Screen screen  = NewtFactory.createScreen(display, 0); // screen 0
-        assertNotNull(screen);
-
-        window = NewtFactory.createWindow(screen, new GLCapabilities(GLProfile.getDefault()));
+        window = NewtFactory.createWindow(new GLCapabilities(GLProfile.getDefault()));
         assertNotNull(window);
 
         window.setSize(640, 480);

@@ -6,7 +6,7 @@ if [ -e $SDIR/../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh ] ; then
     . $SDIR/../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh
 fi
 
-PATH=`pwd`/../gluegen/make/lib/linux/arm-linux-gnueabi/bin:$PATH
+PATH=`pwd`/../gluegen/make/lib/linux/arm-linux-gnueabihf/bin:$PATH
 export PATH
 
 #    -Dc.compiler.debug=true 
@@ -23,22 +23,22 @@ export HOST_IP=jogamp02
 export HOST_RSYNC_ROOT=PROJECTS/JOGL
 
 export TARGET_UID=jogamp
-export TARGET_IP=panda01
+export TARGET_IP=panda02
 #export TARGET_IP=jautab02
 export TARGET_ROOT=/home/jogamp/projects-cross
 export TARGET_ANT_HOME=/usr/share/ant
 
-export TARGET_PLATFORM_LIBS=/opt-linux-armv7-eabi/lib
-export TARGET_JAVA_LIBS=/opt-linux-armv7-eabi/jre/lib/arm
+export TARGET_PLATFORM_LIBS=/opt-linux-armv6-armhf/lib
+export TARGET_JAVA_LIBS=/opt-linux-armv6-armhf/jre/lib/arm
 
-export GLUEGEN_CPPTASKS_FILE="../gluegen/make/lib/gluegen-cpptasks-linux-armv4.xml"
+export GLUEGEN_CPPTASKS_FILE="../gluegen/make/lib/gluegen-cpptasks-linux-armv6hf.xml"
 
 #export JUNIT_DISABLED="true"
 #export JUNIT_RUN_ARG0="-Dnewt.test.Screen.disableScreenMode"
 
 ant \
-    -Drootrel.build=build-linux-armv7 \
-    $* 2>&1 | tee make.jocl.all.linux-armv7-cross.log
+    -Drootrel.build=build-linux-armv6hf \
+    $* 2>&1 | tee make.jocl.all.linux-armv6hf-cross.log
 
 
 

@@ -489,9 +489,9 @@
             <syslibset dir="${opencl.lib64.dir}" libs="OpenCL"  if="opencl.lib64.dir"/>
         </linker>
 
-        <linker id="linker.cfg.linux.armv7.jocl" extends="linker.cfg.linux.armv7">
-            <syslibset dir="/usr/lib"            libs="OpenCL"  if="static.binding" unless="opencl.libarmv7.dir"/>
-            <syslibset dir="${opencl.libarmv7.dir}" libs="OpenCL"  if="opencl.libarmv7.dir"/>
+        <linker id="linker.cfg.linux.armv6.jocl" extends="linker.cfg.linux.armv6">
+            <syslibset dir="/usr/lib"            libs="OpenCL"  if="static.binding" unless="opencl.libarmv6.dir"/>
+            <syslibset dir="${opencl.libarmv6.dir}" libs="OpenCL"  if="opencl.libarmv6.dir"/>
         </linker>
 
         <linker id="linker.cfg.win32.mingw.jocl" extends="linker.cfg.win32.mingw">
@@ -514,7 +514,7 @@
     <target name="c.configure.default" depends="c.configure.os" />
     <target name="c.configure.os"      depends="c.configure.win, c.configure.linux, c.configure.macosx, c.configure.solaris" />
     <target name="c.configure.win"     depends="c.configure.win.mingw32, c.configure.win.mingw64" if="isWindows" />
-    <target name="c.configure.linux"   depends="c.configure.linux.x86, c.configure.linux.amd64, c.configure.linux.armv7" if="isLinux" />
+    <target name="c.configure.linux"   depends="c.configure.linux.x86, c.configure.linux.amd64, c.configure.linux.armv6" if="isLinux" />
     <target name="c.configure.solaris" depends="c.configure.solaris.x86, c.configure.solaris.sparc, c.configure.solaris.sparcv9, c.configure.solaris.amd64" if="isSolaris" />
 
     <target name="c.configure.win.mingw32" if="isMingW32">
@@ -537,10 +537,10 @@
         <property name="compiler.cfg.id"  value="${compiler.cfg.id.base}" />
         <property name="linker.cfg.id"    value="linker.cfg.linux.amd64.jocl" />
     </target>
-    <target name="c.configure.linux.armv7" if="isLinuxARMv7">
-        <echo message="Linux.ARMv7" />
+    <target name="c.configure.linux.armv6" if="isLinuxARMv6">
+        <echo message="Linux.ARMv6" />
         <property name="compiler.cfg.id"  value="${compiler.cfg.id.base}" />
-        <property name="linker.cfg.id"    value="linker.cfg.linux.armv7.jocl" />
+        <property name="linker.cfg.id"    value="linker.cfg.linux.armv6.jocl" />
     </target>
 
     <target name="c.configure.solaris.x86" if="isSolarisX86">
