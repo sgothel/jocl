@@ -46,7 +46,7 @@
     <target name="-post-init" depends="jogamp.env.init,gluegen.cpptasks.detect.os">
         <property name="jocl.version"      value="${jocl_base_version}-b${jocl.build.number}-${version.timestamp}" />
         <property name="jocl.version.plus" value="${jocl_base_version}-${jocl.build.branch}-b${jocl.build.number}-${jocl.build.commit}-${version.timestamp}" />
-        <property name="dist.zip.name" value="jocl-${jocl.version}-${os.and.arch}"/>
+        <property name="archive.zip.name" value="jocl-${jocl.version}-${os.and.arch}"/>
     </target>
     
     <target name="-pre-compile" depends="detect-jdk,prepare-jdk5-build,prepare-jdk7-build,generate-binding"/>
@@ -284,87 +284,74 @@
         
     </target>
 
-    <target name="-post-jar" depends="jar.natives,android.package,tag.build,package-dist,archive-dist"/>
+    <target name="-post-jar" depends="jar.natives,android.package,tag.build,create-all-jnlps,build-archive"/>
         
-    <target name="package-dist">
-        <!-- don't know how to get rid of the NetBeans readme file -->
-        <delete file="${dist.dir}/README.TXT"/>
-
+    <target name="create-all-jnlps">
         <!-- for local testing -->
-        <property name="jocl.jnlp.codebase"     value="http://jogamp.org/deployment/webstart-next"/>
-        <property name="gluegen.jnlp.codebase"  value="http://jogamp.org/deployment/webstart-next"/>
+        <property name="jocl.jnlp.codebase"     value="http://localhost/deployment/test"/>
+        <property name="gluegen.jnlp.codebase"  value="http://localhost/deployment/test"/>
 
-        <copy file="jocl.jnlp" tofile="${dist.jar.dir}/jocl.jnlp">
+        <copy file="jnlp-files/jocl.jnlp" tofile="${build.dir}/jocl.jnlp">
             <filterchain>
                 <replacestring from="JOCL_CODEBASE_TAG"     to="${jocl.jnlp.codebase}"/>
                 <replacestring from="GLUEGEN_CODEBASE_TAG"  to="${gluegen.jnlp.codebase}"/>
-                <replacestring from="jar/jocl"              to="jocl"/>
             </filterchain>
         </copy>
-        
-        <!-- add native dependencies to lib folder -->
-        <copy file="${gluegen.root}/${rootrel.build}/gluegen-rt-natives-${os.and.arch}.jar" todir="${dist.dir}/lib"/>
-        <copy file="${jogl.root}/${rootrel.build}/jogl/jogl-natives-${os.and.arch}.jar" todir="${dist.dir}/lib"/>
-        <copy file="${jogl.root}/${rootrel.build}/nativewindow/nativewindow-natives-${os.and.arch}.jar" todir="${dist.dir}/lib"/>
-        <copy file="${jogl.root}/${rootrel.build}/newt/newt-natives-${os.and.arch}.jar" todir="${dist.dir}/lib"/>
-        
     </target>
         
-    <target name="archive-dist" if="build.archiveon">
-    
+    <target name="build-archive" if="build.archiveon">
+        <!-- don't know how to get rid of the NetBeans readme file -->
+        <delete file="${build.dir}/jar/README.TXT"/>
+        <!-- what is this ? -->
+        <delete file="${build.dir}/build-jar.properties" />
+
         <!-- source zip -->
-        <zip destfile="${dist.dir}/jocl-java-src.zip" level="0">
+        <zip destfile="${build.dir}/jocl-java-src.zip" level="0">
             <fileset dir="${src.dir}"/>
             <fileset dir="${src.java.dir}"/>
             <!-- fileset dir="${build.generated.sources.dir}"/-->
         </zip>
 
         <!-- zip distribution -->
-        <mkdir dir="${dist.dir}/tmp/${dist.zip.name}"/>
+        <mkdir dir="${build.dir}/${archive.zip.name}"/>
         
-        <!-- jars and jared natives -->
-        <copy todir="${dist.dir}/tmp/${dist.zip.name}/jar" flatten="true">
-            <fileset dir="${dist.dir}" includes="jocl.jar,jocl*.apk,jocl-natives-*.jar"/>
-        </copy>
-        <copy todir="${dist.dir}/tmp/${dist.zip.name}/jnlp-files">
-            <fileset dir="." includes="*.jnlp"/>
-        </copy>
-        <copy todir="${dist.dir}/tmp/${dist.zip.name}">
-            <fileset dir="." includes="README,LICENSE"/>
-            <fileset dir="${dist.dir}" includes="*.properties,jocl-java-src.zip"/>
+        <copy todir="${build.dir}/${archive.zip.name}" >
+             <fileset dir="." includes="www/**"/>
+             <fileset dir="${build.dir}" includes="jar/**"/>
+             <fileset dir="."            includes="jnlp-files/**"/>
+             <fileset dir="${build.dir}" includes="artifact.properties,jocl-java-src.zip,README,LICENSE"/>
         </copy>
         
         <!-- native files, TODO: remove when no longer needed -->
-        <copy todir="${dist.dir}/tmp/${dist.zip.name}/lib" failonerror="false">
+        <copy todir="${build.dir}/${archive.zip.name}/lib" failonerror="false">
             <fileset dir="${basedir}/${rootrel.build}/natives/jocl" excludes="*.xml"/>
         </copy>
         
         <!-- 7z it -->
-        <archive.7z basedir="${dist.dir}/tmp" destfile="${dist.dir}/${dist.zip.name}.7z"  includes="*"/>
+        <archive.7z basedir="${build.dir}" destfile="${build.dir}/${archive.zip.name}.7z"  includes="${archive.zip.name}/**"/>
         
-        <delete dir="${dist.dir}/tmp"/>
+        <delete dir="${build.dir}/${archive.zip.name}"/>
     </target>
     
     <target name="tag.build">
-        <property file="${dist.jar.dir}/artifact.properties"/>
-        <copy file="${jogl.root}/${rootrel.build}/artifact.properties" todir="${dist.jar.dir}" overwrite="true" failonerror="false"/>
-        <echo file="${dist.jar.dir}/artifact.properties" message="jocl.build.number=${jocl.build.number}${line.separator}" append="true" />
-        <echo file="${dist.jar.dir}/artifact.properties" message="jocl.build.id=${jocl.build.id}${line.separator}" append="true" />
-        <echo file="${dist.jar.dir}/artifact.properties" message="jocl.build.branch=${jocl.build.branch}${line.separator}" append="true" />
-        <echo file="${dist.jar.dir}/artifact.properties" message="jocl.build.commit=${jocl.build.commit}${line.separator}" append="true" />
+        <copy file="${jogl.root}/${rootrel.build}/artifact.properties" todir="${build.dir}" overwrite="true" failonerror="false"/>
+        <echo file="${build.dir}/artifact.properties" message="jocl.build.number=${jocl.build.number}${line.separator}" append="true" />
+        <echo file="${build.dir}/artifact.properties" message="jocl.build.id=${jocl.build.id}${line.separator}" append="true" />
+        <echo file="${build.dir}/artifact.properties" message="jocl.build.branch=${jocl.build.branch}${line.separator}" append="true" />
+        <echo file="${build.dir}/artifact.properties" message="jocl.build.commit=${jocl.build.commit}${line.separator}" append="true" />
     </target>
 
     <target name="jar.natives" unless="c.dont.compile">
 
         <jar basedir="${natives.jocl.dir}/${namespace}" excludes="*.xml"
-             destfile="${dist.jar.dir}/jocl-natives-${os.and.arch}.jar"
+             destfile="${build.dir}/jar/jocl-natives-${os.and.arch}.jar"
              manifest="${rootrel.build}/manifest.mf" />
     </target>
 
     <target name="android.package" if="isAndroid">
         <aapt.signed 
             jarsrcdir="${src.java}"
-            jarbuilddir="${dist.jar.dir}"
+            jarbuilddir="${build.dir}/jar"
             jarbasename="jocl"
             nativebuilddir="${natives.jocl.dir}/${namespace}"
             nativebasename=""
@@ -622,7 +609,7 @@
         <mkdir dir="${dist.javadoc.dir}"/>
 
         <!-- copy gluegen and jogl doc next to the jocl doc for relative linking -->
-        <copy todir="${dist.dir}/javadoc" failonerror="false">
+        <copy todir="${build.dir}/javadoc" failonerror="false">
             <fileset dir="${gluegen.root}/build/javadoc"/>
             <fileset dir="${jogl.root}/build/javadoc"/>
         </copy>
@@ -668,7 +655,7 @@
     </target>
     
     <target name="archive-javadoc" if="build.archiveon">
-        <archive.7z basedir="${dist.dir}/javadoc" destfile="${dist.dir}/jocl-javadoc.7z" includes="jocl/*"/>
+        <archive.7z basedir="${build.dir}/javadoc" destfile="${build.dir}/jocl-javadoc.7z" includes="jocl/*"/>
     </target>
 
     <target name="test-file">
@@ -706,7 +693,9 @@
 
     <!-- overwrites default target - watch out when build-impl.xml changes -->
     <target name="-post-test-run" depends="init,compile-test,-pre-test-run,-do-test-run" if="have.tests">
-        <archive.7z basedir="${build.test.results.dir}" destfile="${dist.dir}/${dist.zip.name}-test-results-${build.node.name}.7z" includes="*"/>
+        <archive.7z destfile="${build.dir}/${archive.zip.name}-test-results-${build.node.name}.7z"
+                    basedir="." 
+                    includes="${build.test.results.dir}/**" />
         <fail if="tests.failed" unless="ignore.failing.tests">Some tests failed; see details above.</fail>
     </target>
     

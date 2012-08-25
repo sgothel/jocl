@@ -11,6 +11,7 @@ fi
 #    -Dtarget.rt.jar=/opt-share/jre1.6.0_30/lib/rt.jar \
 #    -Dbuild.archiveon=true \
 
+BUILD_ARCHIVE=true \
 ant  \
     -Dtarget.sourcelevel=1.6 \
     -Dtarget.targetlevel=1.6 \
