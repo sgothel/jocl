@@ -42,11 +42,29 @@
         <property name="javac.compilerargs" value="-bootclasspath ${target.rt.jar} -Xlint -g:${javacdebuglevel}"/>
     </target>
 
-    <!-- -post-init is after all properties are imported -->
-    <target name="-post-init" depends="jogamp.env.init,gluegen.cpptasks.detect.os">
+    <!-- overwrites default target - watch out when build-impl.xml changes -->
+    <target depends="-pre-init,-init-private,-init-libraries,-init-user" name="-init-project">
+        <property file="nbproject/configs/${config}.properties"/>
+        <property file="nbproject/project.properties"/>
+
         <property name="jocl.version"      value="${jocl_base_version}-b${jocl.build.number}-${version.timestamp}" />
         <property name="jocl.version.plus" value="${jocl_base_version}-${jocl.build.branch}-b${jocl.build.number}-${jocl.build.commit}-${version.timestamp}" />
         <property name="archive.zip.name" value="jocl-${jocl.version}-${os.and.arch}"/>
+
+        <property name="build.dir.abs" location="${build.dir}"/> <!-- absolute path -->
+
+        <copy file="${basedir}/manifest_template.mf" tofile="${build.dir.abs}/manifest.mf">
+            <filterset>
+                <filter token="SPEC_VERSION" value="${jocl_base_version}"/>
+                <filter token="VERSION"      value="${jocl.version}"/>
+                <filter token="SCM_BRANCH"   value="${jocl.build.branch}"/>
+                <filter token="SCM_COMMIT"   value="${jocl.build.commit}"/>
+            </filterset>
+        </copy>
+    </target>
+
+    <!-- -post-init is after all properties are imported -->
+    <target name="-post-init" depends="jogamp.env.init,gluegen.cpptasks.detect.os">
     </target>
     
     <target name="-pre-compile" depends="detect-jdk,prepare-jdk5-build,prepare-jdk7-build,generate-binding"/>
@@ -272,16 +290,6 @@
     <target name="-post-compile" depends="c.compile.default" />
 
     <target name="-pre-jar">
-        
-        <copy file="${basedir}/manifest_template.mf" tofile="${rootrel.build}/manifest.mf">
-            <filterset>
-                <filter token="SPEC_VERSION" value="${jocl_base_version}"/>
-                <filter token="VERSION"      value="${jocl.version}"/>
-                <filter token="SCM_BRANCH"   value="${jocl.build.branch}"/>
-                <filter token="SCM_COMMIT"   value="${jocl.build.commit}"/>
-            </filterset>
-        </copy>
-        
     </target>
 
     <target name="-post-jar" depends="jar.natives,android.package,tag.build,create-all-jnlps,build-archive"/>
@@ -342,10 +350,9 @@
     </target>
 
     <target name="jar.natives" unless="c.dont.compile">
-
         <jar basedir="${natives.jocl.dir}/${namespace}" excludes="*.xml"
              destfile="${build.dir}/jar/jocl-natives-${os.and.arch}.jar"
-             manifest="${rootrel.build}/manifest.mf" />
+             manifest="${build.dir.abs}/manifest.mf" />
     </target>
 
     <target name="android.package" if="isAndroid">
@@ -358,7 +365,7 @@
             android.abi="${android.abi}"
             androidmanifest.path="resources/android/AndroidManifest-jocl.xml"
             androidresources.path="resources/android/res-jocl"
-            jarmanifest.path="${rootrel.build}/manifest.mf"
+            jarmanifest.path="${build.dir.abs}/manifest.mf"
             version.code="${jocl_int_version}"
             version.name="${jocl.version.plus}" />
     </target>
