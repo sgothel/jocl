@@ -706,6 +706,11 @@
         <fail if="tests.failed" unless="ignore.failing.tests">Some tests failed; see details above.</fail>
     </target>
     
-    <target name="clean-jar-test" depends="clean,jar,test"/>
+    <target name="jar-test" depends="jar,test"/>
+
+    <target name="clean-jar-test">
+        <antcall target="clean"    inheritRefs="true" inheritAll="true"/>
+        <antcall target="jar-test" inheritRefs="true" inheritAll="true"/>
+    </target>
 
 </project>
