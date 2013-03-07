@@ -35,7 +35,6 @@ JOCL is licensed under the simplified BSD license.
          Jabber           conference.jabber.org room: jogamp (deprecated!)
        Repository         http://github.com/JogAmp/jocl
        Email              mediastream _at_ jogamp _dot_ org
-       JOCL project lead  Michael Bien, michael-bien.com, mbien _at_ fh-landshut _dot_ de
 
 
  JOCL uses header files from Khronos, reflecting OpenCL and OpenGL, for code generation with GlueGen.
