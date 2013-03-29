@@ -16,12 +16,7 @@
     <property name="etc.build.dir" value="${basedir}/etc/build" />
     <property name="headers.dest" value="${basedir}/resources/includes/CL" />
     
-    <tstamp>
-        <format property="version.timestamp" pattern="yyyyMMdd"/>
-    </tstamp>
-
     <property name="jocl.build.number" value="manual" />
-    <property name="jocl.build.id"     value="${version.timestamp}" />
     <property name="jocl.build.branch" value="master" />
     <property name="jocl.build.commit" value="manual" />
 
@@ -36,6 +31,11 @@
     </condition>
     
     <target name="-pre-init" depends="jogamp.env.init,gluegen.cpptasks.detect.os">
+        <property name="jocl.build.id"     value="${version.timestamp}" />
+        <property name="jocl.version"      value="${jogamp.version.base}-b${jocl.build.number}-${version.timestamp}" />
+        <property name="jocl.version.plus" value="${jogamp.version.base}-${jocl.build.branch}-b${jocl.build.number}-${jocl.build.commit}-${version.timestamp}" />
+        <property name="archive.zip.name" value="jocl-${jocl.version}-${os.and.arch}"/>
+
         <property name="javac.debug" value="${javacdebug}"/>
         <property name="javac.source" value="${target.sourcelevel}"/>
         <property name="javac.target" value="${target.targetlevel}"/>
@@ -47,18 +47,15 @@
         <property file="nbproject/configs/${config}.properties"/>
         <property file="nbproject/project.properties"/>
 
-        <property name="jocl.version"      value="${jocl_base_version}-b${jocl.build.number}-${version.timestamp}" />
-        <property name="jocl.version.plus" value="${jocl_base_version}-${jocl.build.branch}-b${jocl.build.number}-${jocl.build.commit}-${version.timestamp}" />
-        <property name="archive.zip.name" value="jocl-${jocl.version}-${os.and.arch}"/>
-
         <property name="build.dir.abs" location="${build.dir}"/> <!-- absolute path -->
 
         <copy file="${basedir}/manifest_template.mf" tofile="${build.dir.abs}/manifest.mf">
             <filterset>
-                <filter token="SPEC_VERSION" value="${jocl_base_version}"/>
-                <filter token="VERSION"      value="${jocl.version}"/>
-                <filter token="SCM_BRANCH"   value="${jocl.build.branch}"/>
-                <filter token="SCM_COMMIT"   value="${jocl.build.commit}"/>
+                <filter token="SPEC_VERSION"  value="${jogamp.version.base}"/>
+                <filter token="VERSION"       value="${jogamp.version}"/>
+                <filter token="BUILD_VERSION" value="${jocl.version}"/>
+                <filter token="SCM_BRANCH"    value="${jocl.build.branch}"/>
+                <filter token="SCM_COMMIT"    value="${jocl.build.commit}"/>
             </filterset>
         </copy>
     </target>
@@ -366,8 +363,8 @@
             androidmanifest.path="resources/android/AndroidManifest-jocl.xml"
             androidresources.path="resources/android/res-jocl"
             jarmanifest.path="${build.dir.abs}/manifest.mf"
-            version.code="${jocl_int_version}"
-            version.name="${jocl.version.plus}" />
+            version.code="${jogamp.version.int}"
+            version.name="${jogamp.version}" />
     </target>
 
     <target name="c.compile.default" depends="gluegen.cpptasks.detect.os, gluegen.cpptasks.detect.compiler, jocl.c.compile, c.rename.lib.mingw" />
