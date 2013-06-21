@@ -1,5 +1,9 @@
 #! /bin/sh
 
+if [ -e $SDIR/../../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh ] ; then
+    . $SDIR/../../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh
+fi
+
 export NODE_LABEL=.
 
 export HOST_UID=jogamp
@@ -84,6 +88,9 @@ export GLUEGEN_CPPTASKS_FILE=`pwd`/../gluegen/make/lib/gluegen-cpptasks-android-
 
 #export JUNIT_DISABLED="true"
 #export JUNIT_RUN_ARG0="-Dnewt.test.Screen.disableScreenMode"
+
+#export JOGAMP_JAR_CODEBASE="Codebase: *.jogamp.org"
+export JOGAMP_JAR_CODEBASE="Codebase: *.goethel.localnet"
 
 # BUILD_ARCHIVE=true \
 ant \

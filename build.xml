@@ -56,6 +56,7 @@
                 <filter token="BUILD_VERSION" value="${jocl.version}"/>
                 <filter token="SCM_BRANCH"    value="${jocl.build.branch}"/>
                 <filter token="SCM_COMMIT"    value="${jocl.build.commit}"/>
+                <filter token="JAR_CODEBASE_TAG" value="${jogamp.jar.codebase}"/>
             </filterset>
         </copy>
     </target>
