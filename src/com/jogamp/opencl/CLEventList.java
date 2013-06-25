@@ -100,7 +100,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
     }
     
     PointerBuffer getEventBuffer(int index) {
-        return IDs.duplicate();
+        return IDs.duplicate().position(index);
     }
 
     /**
