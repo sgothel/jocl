@@ -59,8 +59,9 @@ import static com.jogamp.opencl.CLCommandQueue.Mode.*;
  */
 public class CLCommandQueueTest {
 
+    @SuppressWarnings("deprecation")
     @Rule
-    public MethodRule methodTimeout= new Timeout(20000);
+    public MethodRule methodTimeout= (MethodRule) new Timeout(20000);
 
     @Test
     public void enumsTest() {
@@ -499,7 +500,9 @@ public class CLCommandQueueTest {
             checkIfEqual(clBufferC.buffer, clBufferD.buffer, elements);
             out.println("results are valid");
 
-        }finally{
+        } catch (Throwable t ) {
+            t.printStackTrace();
+        } finally {
             context.release();
         }
 
