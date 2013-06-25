@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -506,11 +507,14 @@ public class CLContext extends CLObjectResource {
             release(memoryObjects);
             release(samplers);
 
-            for (List<CLCommandQueue> queues : queuesMap.values()) {
-                release(queues);
+            synchronized(queuesMap) {
+                final Collection<List<CLCommandQueue>> queuesList =  queuesMap.values();
+                for( Iterator<List<CLCommandQueue>> queuesI = queuesList.iterator(); queuesI.hasNext(); ) {
+                    release(queuesI.next());
+                }
             }
 
-        }finally{
+        } finally {
             int ret = platform.getContextBinding().clReleaseContext(ID);
             checkForError(ret, "error releasing context");
         }
