@@ -630,7 +630,8 @@
             noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}"
             private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}"
             use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}"
-            windowtitle="${javadoc.windowtitle}" overview="${basedir}/src/overview.html">
+            windowtitle="${javadoc.windowtitle}" overview="${basedir}/src/overview.html"
+            stylesheetfile="${gluegen.root}/make/doc/javadoc/stylesheet.css">
 
             <arg line="${javadoc.additionalparam} -J-Dnativetaglet.mapping=${basedir}/resources/native-taglet.properties"/>
             <taglet name="net.highteq.nativetaglet.NativeTaglet" path="${gluegen.root}/${rootrel.build}/gluegen.jar"/>
@@ -656,6 +657,9 @@
             </fileset>
 
         </javadoc>
+        <copy todir="${dist.javadoc.dir}/resources" overwrite="true">
+            <fileset dir="${gluegen.root}/make/doc/javadoc/resources" includes="*" />
+        </copy>
 
     </target>
     
