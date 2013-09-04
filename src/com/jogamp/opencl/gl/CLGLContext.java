@@ -182,7 +182,7 @@ public final class CLGLContext extends CLContext {
             long cgl = CGL.getCGLContext(glID[0]);
             long group = CGL.CGLGetShareGroup(cgl);
             properties = PointerBuffer.allocateDirect(5);
-            properties.put(CL_CGL_SHAREGROUP_KHR).put(group)
+            properties.put(268435456).put(group) // CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE
                       .put(CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof EGLContext) {
 //            TODO test EGL
@@ -300,7 +300,7 @@ public final class CLGLContext extends CLContext {
     }
 
     public final <B extends Buffer> CLGLTexture3d<B> createFromGLTexture3d(B directBuffer, int target, int texture, int mipmap, int flags) {
-        CLGLTexture3d<B> buffer = CLGLTexture3d.createFromGLTexture3d(this, directBuffer, target, texture, mipmap, flags);
+        CLGLTexture3d<B> buffer = CLGLTexture3d.createFromGLTexture3d(this, directBuffer, flags, target, mipmap, texture);
         memoryObjects.add(buffer);
         return buffer;
     }
