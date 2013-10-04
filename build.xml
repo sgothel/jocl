@@ -341,6 +341,7 @@
     
     <target name="tag.build">
         <copy file="${jogl.root}/${rootrel.build}/artifact.properties" todir="${build.dir}" overwrite="true" failonerror="false"/>
+        <echo file="${build.dir}/artifact.properties" message="jocl.build.version=${jogamp.version}${line.separator}" append="true" />
         <echo file="${build.dir}/artifact.properties" message="jocl.build.number=${jocl.build.number}${line.separator}" append="true" />
         <echo file="${build.dir}/artifact.properties" message="jocl.build.id=${jocl.build.id}${line.separator}" append="true" />
         <echo file="${build.dir}/artifact.properties" message="jocl.build.branch=${jocl.build.branch}${line.separator}" append="true" />
