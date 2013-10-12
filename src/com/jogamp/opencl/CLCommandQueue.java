@@ -1208,6 +1208,16 @@ public class CLCommandQueue extends CLObjectResource {
     public ByteBuffer putMapImage(CLImage2d<?> image, CLMemory.Map flag,
                                     int offsetX, int offsetY,
                                     int rangeX, int rangeY, boolean blockingMap, CLEventList condition, CLEventList events) {
+        return putMapImage(image, flag, offsetX, offsetY, rangeX, rangeY, blockingMap, condition, events, null, null);
+    }
+    
+    /**
+     * Calls {@native clEnqueueMapImage}.
+     */
+    public ByteBuffer putMapImage(CLImage2d<?> image, CLMemory.Map flag,
+                                    int offsetX, int offsetY,
+                                    int rangeX, int rangeY, boolean blockingMap, CLEventList condition, CLEventList events, 
+                                    long[] imageRowPitch, long[] imageSlicePitch ) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1221,13 +1231,23 @@ public class CLCommandQueue extends CLObjectResource {
         // spec: CL_INVALID_VALUE if image is a 2D image object and origin[2] is not equal to 0 or region[2] is not equal to 1
         copy2NIO(ibB, offsetX, offsetY, 0);
         copy2NIO(ibC, rangeX, rangeY, 1);
+        
+        final PointerBuffer _imageRowPitch = PointerBuffer.allocateDirect(1); // size_t*
+        final PointerBuffer _imageSlicePitch = PointerBuffer.allocateDirect(1); // size_t*
 
         ByteBuffer mappedImage = cl.clEnqueueMapImage(ID, image.ID, clBoolean(blockingMap),
-                                         flag.FLAGS, ibB, ibC, null, null,
+                                         flag.FLAGS, ibB, ibC, _imageRowPitch, _imageSlicePitch,
                                          conditions, conditionIDs, events==null ? null : events.IDs, error);
         if(error.get(0) != CL_SUCCESS) {
             throw newException(error.get(0), "can not map " + image + " with: " + flag
                     + " offset: " + toStr(offsetX, offsetY) + " range: " + toStr(rangeX, rangeY) + toStr(condition, events));
+        }
+        
+        if( null != imageRowPitch ) {
+            imageRowPitch[0] = _imageRowPitch.get(0);
+        }
+        if( null != imageSlicePitch ) {
+            imageSlicePitch[0] = _imageSlicePitch.get(0);
         }
 
         if(events != null) {
