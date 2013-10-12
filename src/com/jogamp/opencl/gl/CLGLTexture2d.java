@@ -30,17 +30,16 @@ package com.jogamp.opencl.gl;
 
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.CLContext;
+import com.jogamp.opencl.CLException;
 import com.jogamp.opencl.CLImageFormat;
 import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
 import com.jogamp.opencl.llb.gl.CLGL;
-import java.nio.Buffer;
 
-import static com.jogamp.opencl.CLException.*;
-import static com.jogamp.opencl.llb.CL.*;
+import java.nio.Buffer;
 
 /**
  * 2D OpenCL image representing an 2D OpenGL texture.
- * @author Michael Bien
+ * @author Michael Bien, et.al.
  */
 public class CLGLTexture2d<B extends Buffer> extends CLGLImage2d<B> implements CLGLTexture {
 
@@ -63,15 +62,15 @@ public class CLGLTexture2d<B extends Buffer> extends CLGLImage2d<B> implements C
         CLGL clgli = (CLGL)cl;
 
         long id = clgli.clCreateFromGLTexture2D(context.ID, flags, target, mipLevel, texture, result, 0);
-        checkForError((int)id, "can not share memory with texture #"+texture+".");
+        CLException.checkForError(result[0], "can not create CLGLTexture2d from texture #"+texture+".");
 
         CLImageInfoAccessor accessor = new CLImageInfoAccessor(cl, id);
 
         CLImageFormat format = createUninitializedImageFormat();
-        accessor.getInfo(CL_IMAGE_FORMAT, CLImageFormatImpl.size(), format.getFormatImpl().getBuffer(), null);
+        accessor.getInfo(CL.CL_IMAGE_FORMAT, CLImageFormatImpl.size(), format.getFormatImpl().getBuffer(), null);
 
-        int width = (int)accessor.getLong(CL_IMAGE_WIDTH);
-        int height = (int)accessor.getLong(CL_IMAGE_HEIGHT);
+        int width = (int)accessor.getLong(CL.CL_IMAGE_WIDTH);
+        int height = (int)accessor.getLong(CL.CL_IMAGE_HEIGHT);
 
         return new CLGLTexture2d<B>(context, directBuffer, format, accessor, target, mipLevel, width, height, id, texture, flags);
 

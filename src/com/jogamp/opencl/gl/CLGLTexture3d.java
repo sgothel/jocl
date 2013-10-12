@@ -31,17 +31,18 @@ package com.jogamp.opencl.gl;
 import com.jogamp.opencl.llb.gl.CLGL;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.CLContext;
+import com.jogamp.opencl.CLException;
 import com.jogamp.opencl.CLImage3d;
 import com.jogamp.opencl.CLImageFormat;
 import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
-import java.nio.Buffer;
-import javax.media.opengl.GLContext;
 
-import static com.jogamp.opencl.llb.CL.*;
+import java.nio.Buffer;
+
+import javax.media.opengl.GLContext;
 
 /**
  * 3D OpenCL image representing an 3D OpenGL texture.
- * @author Michael Bien
+ * @author Michael Bien, et.al.
  */
 public class CLGLTexture3d<B extends Buffer> extends CLImage3d<B> implements CLGLObject, CLGLTexture {
 
@@ -70,15 +71,16 @@ public class CLGLTexture3d<B extends Buffer> extends CLImage3d<B> implements CLG
         CLGL clgli = (CLGL)cl;
 
         long id = clgli.clCreateFromGLTexture3D(context.ID, flags, target, mipLevel, texture, result, 0);
+        CLException.checkForError(result[0], "can not create CLGLTexture3d from texture #"+texture+".");
 
         CLImageInfoAccessor accessor = new CLImageInfoAccessor(cl, id);
 
         CLImageFormat format = createUninitializedImageFormat();
-        accessor.getInfo(CL_IMAGE_FORMAT, CLImageFormatImpl.size(), format.getFormatImpl().getBuffer(), null);
+        accessor.getInfo(CL.CL_IMAGE_FORMAT, CLImageFormatImpl.size(), format.getFormatImpl().getBuffer(), null);
 
-        int width = (int)accessor.getLong(CL_IMAGE_WIDTH);
-        int height = (int)accessor.getLong(CL_IMAGE_HEIGHT);
-        int depth = (int)accessor.getLong(CL_IMAGE_DEPTH);
+        int width = (int)accessor.getLong(CL.CL_IMAGE_WIDTH);
+        int height = (int)accessor.getLong(CL.CL_IMAGE_HEIGHT);
+        int depth = (int)accessor.getLong(CL.CL_IMAGE_DEPTH);
 
         return new CLGLTexture3d<B>(context, directBuffer, format, accessor, target, mipLevel, width, height, depth, id, texture, flags);
     }

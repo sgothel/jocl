@@ -40,7 +40,7 @@ import javax.media.opengl.GLContext;
 
 /**
  * Shared buffer between OpenGL and OpenCL contexts.
- * @author Michael Bien
+ * @author Michael Bien, et.al.
  */
 public final class CLGLBuffer<B extends Buffer> extends CLBuffer<B> implements CLGLObject {
 
@@ -56,16 +56,16 @@ public final class CLGLBuffer<B extends Buffer> extends CLBuffer<B> implements C
     }
 
 
-    static <B extends Buffer> CLGLBuffer<B> create(CLContext context, B directBuffer, long size, int flags, int glObject) {
+    static <B extends Buffer> CLGLBuffer<B> create(CLContext context, B directBuffer, long size, int flags, int glBuffer) {
         checkBuffer(directBuffer, flags);
         
         CLGL clgli = (CLGL)getCL(context);
         
         int[] result = new int[1];
-        long id = clgli.clCreateFromGLBuffer(context.ID, flags, glObject, result, 0);
-        CLException.checkForError(result[0], "can not create CLGLObject from #"+glObject);
+        long id = clgli.clCreateFromGLBuffer(context.ID, flags, glBuffer, result, 0);
+        CLException.checkForError(result[0], "can not create CLGLObject from glBuffer #"+glBuffer);
 
-        return new CLGLBuffer<B>(context, directBuffer, id, glObject, size, flags);
+        return new CLGLBuffer<B>(context, directBuffer, id, glBuffer, size, flags);
     }
 
     static <B extends Buffer> void checkBuffer(B directBuffer, int flags) throws IllegalArgumentException {
