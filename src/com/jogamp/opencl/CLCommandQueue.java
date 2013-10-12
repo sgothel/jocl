@@ -28,11 +28,13 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.common.nio.CachedBufferFactory;
-import com.jogamp.opencl.llb.gl.CLGL;
-import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.opencl.gl.CLGLObject;
-import com.jogamp.opencl.llb.CLCommandQueueBinding;
+import static com.jogamp.opencl.CLException.checkForError;
+import static com.jogamp.opencl.CLException.newException;
+import static com.jogamp.opencl.llb.CL.CL_SUCCESS;
+import static com.jogamp.opencl.llb.CLCommandQueueBinding.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE;
+import static com.jogamp.opencl.llb.CLCommandQueueBinding.CL_QUEUE_PROFILING_ENABLE;
+import static com.jogamp.opencl.util.CLUtil.clBoolean;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -41,9 +43,11 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
-import static com.jogamp.opencl.CLException.*;
-import static com.jogamp.opencl.llb.CL.*;
-import static com.jogamp.opencl.util.CLUtil.*;
+import com.jogamp.common.nio.CachedBufferFactory;
+import com.jogamp.common.nio.PointerBuffer;
+import com.jogamp.opencl.gl.CLGLObject;
+import com.jogamp.opencl.llb.CLCommandQueueBinding;
+import com.jogamp.opencl.llb.gl.CLGL;
 
 /**
  * The command queue is used to queue a set of operations for a specific {@link CLDevice}.
