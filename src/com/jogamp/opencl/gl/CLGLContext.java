@@ -28,22 +28,23 @@
 
 package com.jogamp.opencl.gl;
 
-import com.jogamp.opencl.llb.gl.CLGL;
-import com.jogamp.opencl.CLContext;
-import com.jogamp.opencl.CLDevice;
 import java.nio.Buffer;
-import com.jogamp.opencl.CLMemory.Mem;
-import com.jogamp.opencl.CLPlatform;
-import com.jogamp.common.nio.PointerBuffer;
-import jogamp.opengl.GLContextImpl;
-import jogamp.opengl.egl.EGLContext;
-import jogamp.opengl.macosx.cgl.MacOSXCGLContext;
-import jogamp.opengl.macosx.cgl.CGL;
-import jogamp.opengl.windows.wgl.WindowsWGLContext;
-import jogamp.opengl.x11.glx.X11GLXContext;
+
 import javax.media.opengl.GLContext;
 
-import static com.jogamp.opencl.llb.gl.CLGL.*;
+import jogamp.opengl.GLContextImpl;
+import jogamp.opengl.egl.EGLContext;
+import jogamp.opengl.macosx.cgl.CGL;
+import jogamp.opengl.macosx.cgl.MacOSXCGLContext;
+import jogamp.opengl.windows.wgl.WindowsWGLContext;
+import jogamp.opengl.x11.glx.X11GLXContext;
+
+import com.jogamp.common.nio.PointerBuffer;
+import com.jogamp.opencl.CLContext;
+import com.jogamp.opencl.CLDevice;
+import com.jogamp.opencl.CLMemory.Mem;
+import com.jogamp.opencl.CLPlatform;
+import com.jogamp.opencl.llb.gl.CLGL;
 
 /**
  * OpenCL Context supporting JOGL-JOCL interoperablity.
@@ -162,9 +163,9 @@ public final class CLGLContext extends CLContext {
 //          create the OpenGL context."
             properties = PointerBuffer.allocateDirect(7);
             long displayHandle = ctxImpl.getDrawableImpl().getNativeSurface().getDisplayHandle();
-            properties.put(CL_GL_CONTEXT_KHR).put(glID[0])
-                      .put(CL_GLX_DISPLAY_KHR).put(displayHandle)
-                      .put(CL_CONTEXT_PLATFORM).put(platform.ID);
+            properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
+                      .put(CLGL.CL_GLX_DISPLAY_KHR).put(displayHandle)
+                      .put(CLGL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof WindowsWGLContext) {
 //          spec: "When the WGL binding API is supported, the attribute
 //          CL_GL_CONTEXT_KHR should be set to an HGLRC handle to an OpenGL
@@ -172,18 +173,25 @@ public final class CLGLContext extends CLContext {
 //          HDC handle of the display used to create the OpenGL context."
             properties = PointerBuffer.allocateDirect(7);
             long surfaceHandle = ctxImpl.getDrawableImpl().getNativeSurface().getSurfaceHandle();
-            properties.put(CL_GL_CONTEXT_KHR).put(glID[0])
-                      .put(CL_WGL_HDC_KHR).put(surfaceHandle)
-                      .put(CL_CONTEXT_PLATFORM).put(platform.ID);
+            properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
+                      .put(CLGL.CL_WGL_HDC_KHR).put(surfaceHandle)
+                      .put(CLGL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof MacOSXCGLContext) {
 //          spec: "When the CGL binding API is supported, the attribute
 //          CL_CGL_SHAREGROUP_KHR should be set to a CGLShareGroup handle to
 //          a CGL share group object."
+            /**
+             * FIXME: For all Mac OSX Versions ??? 
+             * CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE used to specify the GL sharing group ID 
+             * on Mac OSX 10.8.4 works. 
+             * Using the std. CL_CGL_SHAREGROUP_KHR on Mac OSX 10.8.4 causes the context creation 
+             * to throw a CL_INVALID_VALUE error.
+             */
             long cgl = CGL.getCGLContext(glID[0]);
             long group = CGL.CGLGetShareGroup(cgl);
             properties = PointerBuffer.allocateDirect(5);
-            properties.put(268435456).put(group) // CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE
-                      .put(CL_CONTEXT_PLATFORM).put(platform.ID);
+            properties.put(CLGL.CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE).put(group)
+                      .put(CLGL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof EGLContext) {
 //            TODO test EGL
 //          spec: "When the EGL binding API is supported, the attribute
@@ -193,16 +201,16 @@ public final class CLGLContext extends CLContext {
 //          display used to create the OpenGL ES or OpenGL context."
             properties = PointerBuffer.allocateDirect(7);
             long displayHandle = ctxImpl.getDrawableImpl().getNativeSurface().getDisplayHandle();
-            properties.put(CL_GL_CONTEXT_KHR).put(glID[0])
-                      .put(CL_EGL_DISPLAY_KHR).put(displayHandle)
-                      .put(CL_CONTEXT_PLATFORM).put(platform.ID);
+            properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
+                      .put(CLGL.CL_EGL_DISPLAY_KHR).put(displayHandle)
+                      .put(CLGL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else{
             throw new RuntimeException("unsupported GLContext: "+glContext);
         }
 
         return properties.put(0).rewind(); // 0 terminated array
     }
-
+    
     // Buffers
     /**
      * Creates a CLGLBuffer for memory sharing with the specified OpenGL buffer.

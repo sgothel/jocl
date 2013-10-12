@@ -37,9 +37,7 @@ import com.jogamp.opencl.CLCommandQueue;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
 import com.jogamp.opencl.CLDevice;
-import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
-import com.jogamp.newt.Screen;
 import com.jogamp.newt.Window;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opencl.CLContext;
@@ -51,10 +49,7 @@ import java.nio.IntBuffer;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.GLContext;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.rules.Timeout;
 
 import static com.jogamp.opencl.util.CLPlatformFilters.*;
 import static org.junit.Assert.*;
@@ -65,9 +60,6 @@ import static java.lang.System.*;
  * @author Michael Bien
  */
 public class CLGLTest {
-
-    @Rule
-    public MethodRule methodTimeout= new Timeout(15000);
 
     private static GLContext glcontext;
     private static GLWindow glWindow;
@@ -101,7 +93,7 @@ public class CLGLTest {
         window = null;
     }
 
-    @Test
+    @Test(timeout=15000)
     public void createContextTest() {
 
         initGL();
@@ -143,7 +135,7 @@ public class CLGLTest {
 
     }
     
-    @Test
+    @Test(timeout=15000)
     public void vboSharing() {
         
         out.println(" - - - glcl; vboSharing - - - ");
