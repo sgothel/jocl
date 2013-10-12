@@ -206,7 +206,7 @@ public class CLCommandQueue extends CLObjectResource {
      * Calls {@native clEnqueueCopyBuffer}.
      */
     public CLCommandQueue putCopyBuffer(CLBuffer<?> src, CLBuffer<?> dest, int srcOffset, int destOffset, long bytesToCopy, CLEventList events) {
-        return putCopyBuffer(src, dest, 0, 0, bytesToCopy, null, events);
+        return putCopyBuffer(src, dest, srcOffset, destOffset, bytesToCopy, null, events);
     }
 
     /**
