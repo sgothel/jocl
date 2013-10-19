@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -36,11 +36,8 @@ import com.jogamp.opencl.llb.CLImageBinding;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.impl.CLTLAccessorFactory;
 import com.jogamp.common.nio.Buffers;
-import com.jogamp.common.os.DynamicLookupHelper;
 import com.jogamp.common.JogampRuntimeException;
-import com.jogamp.common.os.NativeLibrary;
 import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.gluegen.runtime.FunctionAddressResolver;
 import com.jogamp.opencl.llb.CLBufferBinding;
 import com.jogamp.opencl.llb.CLCommandQueueBinding;
 import com.jogamp.opencl.llb.CLContextBinding;
@@ -50,7 +47,6 @@ import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.opencl.spi.CLPlatformInfoAccessor;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.opencl.llb.impl.CLImpl;
-import com.jogamp.opencl.llb.impl.CLProcAddressTable;
 import com.jogamp.opencl.spi.CLAccessorFactory;
 import com.jogamp.opencl.util.Filter;
 import com.jogamp.opencl.util.JOCLVersion;
@@ -63,15 +59,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.security.PrivilegedAction;
 
-import static java.security.AccessController.*;
 import static com.jogamp.opencl.CLException.*;
 import static com.jogamp.opencl.llb.CL.*;
 
 /**
  * CLPlatfrorm representing a OpenCL implementation (e.g. graphics driver).
- * 
+ *
  * optional eager initialization:
  * <p><pre>
  *     try{
@@ -80,15 +74,15 @@ import static com.jogamp.opencl.llb.CL.*;
  *          throw new RuntimeException("could not load Java OpenCL Binding");
  *     }
  * </pre></p>
- * 
+ *
  * Example initialization:
  * <p><pre>
  *     CLPlatform platform = CLPlatform.getDefault(type(GPU));
- *      
+ *
  *     if(platform == null) {
  *          throw new RuntimeException("please update your graphics drivers");
  *     }
- * 
+ *
  *     CLContext context = CLContext.create(platform.getMaxFlopsDevice());
  *     try {
  *          // use it
@@ -98,7 +92,7 @@ import static com.jogamp.opencl.llb.CL.*;
  * </pre></p>
  * concurrency:<br/>
  * CLPlatform is threadsafe.
- * 
+ *
  * @author Michael Bien, et al.
  * @see #initialize()
  * @see #getDefault()
@@ -159,7 +153,7 @@ public class CLPlatform {
         if(cl != null) {
             return;
         }
-        
+
         if(defaultFactory == null) {
             if(factory == null) {
                 defaultFactory = new CLTLAccessorFactory();
@@ -169,49 +163,10 @@ public class CLPlatform {
         }
 
         try {
-
-            final CLProcAddressTable table = new CLProcAddressTable(new FunctionAddressResolver() {
-                @Override
-                public long resolve(String name, DynamicLookupHelper lookup) {
-
-                    //FIXME workaround to fix a gluegen issue
-                    if(name.endsWith("Impl")) {
-                        name = name.substring(0, name.length() - "Impl".length());
-                    }
-
-                    if(name.endsWith("KHR") || name.endsWith("EXT")) {
-                        long address = ((CLImpl) cl).clGetExtensionFunctionAddress(name);
-                        if(address != 0) {
-                            return address;
-                        }
-                    }
-
-                    return lookup.dynamicLookupFunction(name);
-                }
-            });
-
-            cl = new CLImpl(table);
-
-            //load JOCL and init table
-            doPrivileged(new PrivilegedAction<Object>() {
-                @Override
-                public Object run() {
-
-                    NativeLibrary libOpenCL = JOCLJNILibLoader.loadOpenCL();
-                    if(libOpenCL == null) {
-                        throw new JogampRuntimeException("OpenCL library not found.");
-                    }
-
-                    //eagerly init function to query extension addresses (used in reset())
-                    table.initEntry("clGetExtensionFunctionAddressImpl", libOpenCL);
-                    table.reset(libOpenCL);
-                    return null;
-                }
-            });
-
-//            System.out.println("\n"+table);
-//            System.out.println("unavailable functions: "+table.getNullPointerFunctions());
-
+            if( null == CLImpl.getCLProcAddressTable() ) {
+                throw new JogampRuntimeException("JOCL ProcAddressTable is NULL");
+            }
+            cl = new CLImpl();
         }catch(UnsatisfiedLinkError ex) {
             System.err.println(JOCLVersion.getAllVersions());
             throw ex;
@@ -321,7 +276,7 @@ public class CLPlatform {
         initialize();
 
         List<CLDevice> list = new ArrayList<CLDevice>();
-        
+
         for(int t = 0; t < types.length; t++) {
             CLDevice.Type type = types[t];
 
@@ -344,7 +299,7 @@ public class CLPlatform {
         initialize();
 
         List<CLDevice> list = new ArrayList<CLDevice>();
-        
+
         long[] deviceIDs = info.getDeviceIDs(CL_DEVICE_TYPE_ALL);
 
         //add device to list
@@ -381,7 +336,7 @@ public class CLPlatform {
     static CLDevice findMaxFlopsDevice(CLDevice[] devices) {
         return findMaxFlopsDevice(devices, null);
     }
-    
+
     static CLDevice findMaxFlopsDevice(CLDevice[] devices, CLDevice.Type type) {
         initialize();
 
@@ -470,7 +425,7 @@ public class CLPlatform {
     }
 
     /**
-     * @see CLVersion#isAtLeast(int, int) 
+     * @see CLVersion#isAtLeast(int, int)
      */
     public boolean isAtLeast(int major, int minor) {
         return version.isAtLeast(major, minor);

@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -50,8 +50,8 @@ public class CLImpl extends CLAbstractImpl {
     //maps the context id to its error handler's global object pointer
     private final LongLongHashMap contextCallbackMap;
 
-    public CLImpl(CLProcAddressTable addressTable) {
-        super(addressTable);
+    public CLImpl() {
+        super();
         this.contextCallbackMap = new LongLongHashMap();
         this.contextCallbackMap.setKeyNotFoundValue(0);
     }
@@ -252,20 +252,6 @@ public class CLImpl extends CLAbstractImpl {
             int image_row_pitch_byte_offset, Object image_slice_pitch, int image_slice_pitch_byte_offset,
             int num_events_in_wait_list, Object event_wait_list, int event_wait_list_byte_offset, Object event,
             int event_byte_offset, Object errcode_ret, int errcode_ret_byte_offset);
-
-    /**
-     * Returns the extension function address for the given function name.
-     */
-    public long clGetExtensionFunctionAddress(String name) {
-        ByteBuffer res = super.clGetExtensionFunctionAddressImpl(name);
-        if(res == null) {
-            return 0;
-        }else if (Platform.is32Bit()) {
-            return res.getInt();
-        } else {
-            return res.getLong();
-        }
-    }
 
     public CLProcAddressTable getAddressTable() {
         return addressTable;
