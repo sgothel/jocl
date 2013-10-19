@@ -40,7 +40,9 @@ import java.security.PrivilegedAction;
 import java.util.*;
 
 public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInfo  {
+    private static final boolean isAndroid;
     private static final List<String> glueLibNames;
+
     static {
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
@@ -53,6 +55,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
                 return null;
             }
         });
+        isAndroid = Platform.OSType.ANDROID == Platform.OS_TYPE;
 
         glueLibNames = new ArrayList<String>();
         glueLibNames.add("jocl");
@@ -77,7 +80,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
      */
     @Override
     public final boolean shallLookupGlobal() {
-        if ( Platform.OSType.ANDROID == Platform.OS_TYPE ) {
+        if ( isAndroid ) {
             // Android requires global symbol lookup
             return true;
         }
@@ -100,8 +103,13 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
             libCL.add("libOpenCL.so.1"); // unix
             libCL.add("OpenCL"); // windows, OSX
 
-            // try this one as well, if spec fails
-            libCL.add("libGL.so.1");
+            if( isAndroid ) {
+                libCL.add("libPVROCL.so");
+                libCL.add("/system/vendor/lib/libPVROCL.so");
+            } else {
+                // try this one as well, if spec fails
+                libCL.add("libGL.so.1");
+            }
 
             // ES2: This is the default lib name, according to the spec
             libCL.add("libGLESv2.so.2");
