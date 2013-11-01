@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+Application-Name: Java Bindings for OpenCL
 Implementation-Title: Java Bindings for OpenCL
 Specification-Title: Java Bindings for OpenCL
 Implementation-URL: http://jocl.jogamp.org/
