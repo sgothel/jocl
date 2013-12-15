@@ -16,7 +16,6 @@ import java.nio.IntBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.junit.Rule;
-import org.junit.rules.MethodRule;
 import org.junit.rules.Timeout;
 import com.jogamp.opencl.util.CLMultiContext;
 import java.nio.Buffer;
@@ -34,7 +33,7 @@ import static java.lang.System.*;
 public class CLMultiContextTest {
 
     @Rule
-    public MethodRule methodTimeout= new Timeout(10000);
+    public Timeout methodTimeout= new Timeout(10000);
 
     @Test
     public void createMultiContextTest() {

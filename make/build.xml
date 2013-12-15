@@ -1,0 +1,897 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   - Ant build for JOCL.  This build has been tested with ANT 1.8.0.  The
+   - optional.jar that contains the optional ANT tasks must be in the ANT
+   - classpath (typically the ant/lib directory).
+   -
+   - A clean download of JOCL is required for this build.
+   -
+   - This build has no dependence on environment variables; the needed
+   - ones (e.g. java.home, ANT_HOME) are all set by the Ant wrapper shell
+   - script, by the virtual machine, or elsewhere. However, on all platforms,
+   - the C compiler and linker should be in the path. All other paths that
+   - need to be set are in host.properties.
+   -
+   - NOTE:  because the GlueGen config files have their own relative paths
+   -        which cannot be overridden by GlueGen, GlueGen MUST be run from
+   -        the "make" directory. This also means that this build.xml MUST
+   -        be run from the "make" directory.
+   -
+   - Public targets:
+   -   all: (default; autodetects OS and chooses C compiler from jocl.properties)
+   -   clean:        clean all built
+   -   javadoc:      create the standard developer Javadoc
+   -
+   - Thanks to Rob Grzywinski and Artur Biesiadowski for the bulk of the
+   - ANT build, including the GlueGen and StaticGLInfo tasks, the building of
+   - the Java generated sources, the first and second phase Java compiles, and
+   - the building of the jar file. Thanks to Alex Radeski for the bulk of the
+   - port to the ant-contrib CPPTask framework. Thanks to Athomas Goldberg for
+   - the original OS detection code.
+   -->
+<project name="JOCL" basedir="." default="all">
+
+    <property name="project.root"  value=".." />
+
+    <condition property="rootrel.build" value="build">
+        <not>
+            <isset property="rootrel.build"/>
+        </not>
+    </condition>
+    <property name="build"                value="${project.root}/${rootrel.build}" />
+
+    <property name="gluegen.root"  value="${project.root}/../gluegen" />
+    <property name="gluegen.build" value="${gluegen.root}/${rootrel.build}" />
+
+    <!-- This is the version of JOCL you are building -->
+    <property name="jocl.build.number" value="manual-build"/>
+    <mkdir dir="${build}" />
+    <exec dir="." executable="git" logError="true" failonerror="false" failifexecutionfails="false"
+              output="${build}/localbranch.raw">
+        <arg line="branch --no-color"/>
+    </exec>
+    <exec dir="." executable="sed" logError="true" failonerror="false" failifexecutionfails="false"
+              outputproperty="jocl.build.branch">
+        <arg line="-e '/^[^*]/d' -e 's/* \(.*\)/\1/' ${build}/localbranch.raw"/>
+    </exec>
+    <property name="jocl.build.branch" value="manual"/> <!-- fallback -->
+    <exec dir="${project.root}" executable="git" logError="true" failonerror="false" failifexecutionfails="false"
+              outputproperty="jocl.build.commit">
+        <arg line="rev-parse HEAD"/>
+    </exec>
+    <property name="jocl.build.commit" value="manual"/> <!-- fallback -->
+
+    <!-- Pull in GlueGen cpptasks build file -->
+    <import file="${gluegen.root}/make/gluegen-cpptasks.xml" />
+    <import file="${gluegen.root}/make/jogamp-archivetasks.xml" />
+    <import file="${gluegen.root}/make/jogamp-androidtasks.xml" />
+    <import file="${gluegen.root}/make/jogamp-env.xml" />
+
+    <!-- ================================================================== -->
+    <!--
+       - Load user properties which override build defaults.
+      -->
+    <target name="load.user.properties">
+        <property name="user.properties.file" value="${user.home}/jocl.properties" />
+        <property file="${user.properties.file}" />
+        <echo message="Loaded ${user.properties.file}. (optionally)" />
+
+        <property file="${user.home}/gluegen.properties" />
+        <echo message="Loaded ${user.home}/gluegen.properties." />
+    </target>
+
+    <!-- ================================================================== -->
+    <!--
+       - Declare all paths and user defined variables.
+      -->
+    <target name="init" depends="jogamp.env.init, gluegen.cpptasks.detect.os">
+
+        <property name="jocl.build.id"     value="${version.timestamp}"/>
+        <property name="jocl.version"      value="${jogamp.version.base}-${version.timestamp}" />
+
+        <!-- The location and name of the configuration ANT file that will
+           - validate to ensure that all user-define variables are set. -->
+        <property name="validate.user.properties" value="${make}/validate-properties.xml" />
+
+        <!-- GlueGen properties. -->
+        <!-- NOTE that these require a checked-out GlueGen workspace as a -->
+        <!-- sibling of the JOCL workspace. -->
+        <property name="gluegen.make.dir" value="${gluegen.root}/make" />
+        <property name="gluegen.build.xml" value="${gluegen.make.dir}/build.xml" />
+        <property name="gluegen.jar" value="${gluegen.build}/gluegen.jar" />
+        <property name="gluegen-rt.jar" value="${gluegen.build}/gluegen-rt.jar" />
+
+        <property name="jogl.build" value="${project.root}/../jogl/build" />
+        <property name="jogl-all.jar" value="${jogl.build}/jar/jogl-all.jar" />
+
+        <!-- Create the classpath that includes GlueGen and
+           - ANTLR. This requires the user-defined "antlr.jar"
+           - property. -->
+        <path id="gluegen.classpath">
+            <pathelement location="${gluegen.jar}" />
+            <pathelement location="${antlr.jar}" />
+        </path>
+
+    	<path id="javac.classpath">
+            <pathelement location="${gluegen.jar}" />
+            <pathelement location="${jogl-all.jar}" />
+        </path>
+
+        <!-- Names of directories relative to the project root.
+             Some of these are used in FileMappers later for dependence information
+             and need exact string matching, which is why they use file.separator
+             instead of "/". -->
+        <property name="rootrel.src" value="src" />
+        <!--property name="rootrel.src.java" value="${rootrel.src}/java" /-->
+        <property name="rootrel.src.java" value="${rootrel.src}" />
+        <!---property name="rootrel.src.c" value="${rootrel.src}/native" /-->
+        <property name="rootrel.src.c" value="resources" />
+        <property name="rootrel.src.generated" value="${rootrel.build}/gensrc" />
+        <property name="rootrel.generated.java" value="${rootrel.src.generated}/classes" />
+        <property name="rootrel.generated.c.jocl" value="${rootrel.src.generated}/native" />
+        <property name="rootrel.obj" value="${rootrel.build}/obj" />
+        <property name="rootrel.obj.jocl" value="${rootrel.obj}/jocl" />
+
+        <!-- The source directories. -->
+        <property name="src"   value="${project.root}/${rootrel.src}" />
+        <property name="src.c" value="${project.root}/${rootrel.src.c}" />
+        <property name="src.java" value="${project.root}/${rootrel.src.java}" />
+        <property name="build" value="${project.root}/${rootrel.build}" />
+        <property name="tempdir" value="${project.root}/build-temp" />
+        <mkdir dir="${tempdir}" />
+
+        <!-- The generated source directories. -->
+        <property name="src.generated" value="${build}/gensrc" />
+        <property name="src.generated.java" value="${src.generated}/java" />
+        <property name="src.generated.c" value="${src.generated}/native/jocl" />
+
+        <!-- The compiler output directories. -->
+        <property name="classes" value="${build}/classes" />
+        <property name="obj"      value="${project.root}/${rootrel.obj}" />
+        <property name="obj.jocl" value="${project.root}/${rootrel.obj.jocl}" />
+
+        <!-- Directories used for OpenCL header file preprocessing. -->
+        <property name="etc.build.dir" value="${build}/etc" />
+        <property name="headers.orig" value="${basedir}/resources/includes/CL_orig" />
+        <property name="headers.dest" value="${basedir}/resources/includes/CL" />
+
+    	<!-- The headers from which Java files are generated -->
+        <property name="config" value="${project.root}/make/resources" />
+        <property name="stub.includes" value="${config}/includes" />
+        <property name="stub.includes.opencl" value="${config}" />
+        <property name="stub.includes.dir" value="resources" /> <!-- NOTE:  this MUST be relative for FileSet -->
+        <dirset id="stub.includes.fileset.all" dir=".">
+            <include name="${stub.includes.dir}/includes"/>
+            <include name="${stub.includes.dir}/stubs_includes/jvm"/>
+            <include name="${stub.includes.dir}/stubs_includes/gl"/>
+            <include name="${stub.includes.dir}/stubs_includes/common"/>
+        </dirset>
+    	<fileset id="stub.includes.dependencies.fileset.1" dir="${stub.includes.dir}">
+            <include name="includes/CL/**" />
+            <include name="includes/GL3/**" />
+        </fileset>
+        <fileset id="stub.includes.dependencies.fileset.2" file="${gluegen.jar}" />
+        <fileset id="stub.includes.dependencies.fileset.3" dir=".">
+            <include name="*.cfg" />
+            <include name="*.java" />
+            <include name="*.c" />
+        </fileset>
+        <!--property name="stub.includes.gluegen.gg"  value="${gluegen.root}/make/stub_includes/gluegen" /-->
+        <property name="stub.includes.gluegen.cc"  value="${gluegen.root}/make/stub_includes/platform" />
+
+        <!-- The resulting jocl.jar. -->
+        <property name="jocl.jar" value="${build}/jocl.jar" />
+        <property name="jocl-android.jar" value="${build}/jocl-android.jar" />
+        <property name="jocl-android.apk" value="${build}/jocl-android-${android.abi}.apk" />
+
+        <path id="jocl_all.classpath">
+            <pathelement location="${gluegen-rt.jar}" />
+            <pathelement location="${jocl.jar}" />
+        </path>
+
+        <!-- Create the required output directories. -->
+        <mkdir dir="${src.generated.java}" />
+        <mkdir dir="${src.generated.c}" />
+        <mkdir dir="${classes}" />
+        <mkdir dir="${obj}" />
+        <mkdir dir="${obj.jocl}" />
+
+        <property name="archive.name"        value="jocl-${jocl.version}-${os.and.arch}" />
+        <property name="archive"             value="${build}/${archive.name}" />
+
+        <condition property="useLinuxARMv6SFOptions">
+            <and>
+                <isset property="isLinuxARMv6"/>
+                <isset property="isAbiEabiGnuArmel"/>
+                <isset property="isCrosscompilation"/>
+            </and>
+        </condition>
+        <condition property="useLinuxARMv6HFOptions">
+            <and>
+                <isset property="isLinuxARMv6"/>
+                <isset property="isAbiEabiGnuArmhf"/>
+                <isset property="isCrosscompilation"/>
+            </and>
+        </condition>
+        <condition property="isCLANG.i386">
+            <and>
+                <isset property="isCLANG"/>
+                <isset property="isI386"/>
+            </and>
+        </condition>
+        <echo message="useLinuxARMv6SFOptions ${useLinuxARMv6SFOptions}" />
+        <echo message="useLinuxARMv6HFOptions ${useLinuxARMv6HFOptions}" />
+        <condition property="enable.jdk7.features">
+        	<or>
+                <equals arg1="${target.targetlevel}" arg2="1.7"/>
+                <equals arg1="${target.targetlevel}" arg2="1.8"/>
+            </or>
+        </condition>
+        <echo message="enable.jdk7.features ${enable.jdk7.features}" />
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- GlueGen and BuildStaticGLInfo creation, task setup and Java file generation -->
+    <!--
+       - Build GlueGen
+      -->
+    <target name="build.gluegen" depends="init" unless="common.gluegen.build.done">
+        <property name="common.gluegen.build.done" value="true" />
+
+        <!-- Run the GlueGen build to ensure that the GlueGen ANT task
+           - has been built. -->
+        <ant antfile="${gluegen.build.xml}" dir="${gluegen.make.dir}" target="base.compile" inheritAll="false" />
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- Java file generation -->
+    <!--
+       - Check to see whether we need to rebuild the generated sources.
+      -->
+
+    <target name="java.generate.check">
+        <!-- Blow away all target files if any dependencies are violated
+             (the uptodate task doesn't allow arbitrary source and target filesets but should) -->
+        <dependset>
+            <srcfileset refid="stub.includes.dependencies.fileset.1" />
+            <srcfileset refid="stub.includes.dependencies.fileset.2" />
+            <srcfileset refid="stub.includes.dependencies.fileset.3" />
+            <targetfileset dir=".">
+                <include name="${src.generated.java}/**/*.java" />
+                <include name="${src.generated.c}/**/*.c" />
+            </targetfileset>
+        </dependset>
+
+        <!-- Now check for the presence of one well-known file -->
+        <uptodate property="java.generate.skip"
+                  targetfile="${src.generated.java}/com/jogamp/opencl/llb/CL.java">
+            <srcfiles refid="stub.includes.dependencies.fileset.1" />
+            <srcfiles refid="stub.includes.dependencies.fileset.2" />
+            <srcfiles refid="stub.includes.dependencies.fileset.3" />
+        </uptodate>
+    </target>
+
+    <target name="java.generate.copy2temp">
+        <copy todir="${tempdir}">
+            <fileset dir="${build}"
+                     includes="gensrc/classes/**" />
+        </copy>
+    </target>
+
+    <target name="generate.jdk7.autocloseable" if="${enable.jdk7.features}">
+        <echo message="Generating JDK7+ AutoCloseable"/>
+        <copy file="${project.root}/src/com/jogamp/common/AutoCloseable.jtemplate"
+            tofile="${build}/gensrc/java/com/jogamp/common/AutoCloseable.java" overwrite="true">
+            <filterchain>
+                <replaceregex pattern="/\*extends java.lang.AutoCloseable\*/" replace="extends java.lang.AutoCloseable"/>
+            </filterchain>
+        </copy>       
+    </target>
+
+    <target name="generate.jdk6.autocloseable" unless="${enable.jdk7.features}">
+        <echo message="Generating JDK6 AutoCloseable"/>
+        <copy file="${project.root}/src/com/jogamp/common/AutoCloseable.jtemplate"
+            tofile="${build}/gensrc/java/com/jogamp/common/AutoCloseable.java" overwrite="true">
+        </copy>      
+    </target>
+
+    <target name="make-build-utilities" depends="init">
+
+        <!--compile build utilities-->
+        <mkdir dir="${etc.build.dir}"/>
+
+        <javac destdir="${etc.build.dir}" 
+               classpath="${ant.core.lib}" 
+               fork="yes"
+               includeAntRuntime="false"
+               memoryMaximumSize="${javac.memorymax}"
+               source="${target.sourcelevel}" 
+               target="${target.targetlevel}" 
+               bootclasspath="${target.rt.jar}"
+               debug="${javacdebug}" debuglevel="${javacdebuglevel}">
+            <src path="${basedir}/../etc/src"/>
+        </javac>
+
+        <taskdef name="update-headers"            classname="com.jogamp.ant.HeaderFileDownloader"     classpath="${etc.build.dir}"/>
+        <taskdef name="uncomment-function-params" classname="com.jogamp.ant.FunctionParamUncommenter" classpath="${etc.build.dir}"/>
+    </target>
+
+	<target name="update-opencl-headers" depends="make-build-utilities">
+        <property name="registry.url" value="http://www.khronos.org/registry/cl/api/1.1/"/>
+
+        <!-- download new headers from OpenCL registry if necessary -->
+        <update-headers header="${headers.orig}/cl.h" url="${registry.url}cl.h"/>
+        <update-headers header="${headers.orig}/cl_gl.h" url="${registry.url}cl_gl.h"/>
+        <update-headers header="${headers.orig}/cl_gl_ext.h" url="${registry.url}cl_gl_ext.h"/>
+        <update-headers header="${headers.orig}/cl_ext.h" url="${registry.url}cl_ext.h"/>
+        <update-headers header="${headers.orig}/cl_platform.h" url="${registry.url}cl_platform.h"/>
+    </target>
+
+    <target name="preprocess-opencl-headers" depends="make-build-utilities">
+        <mkdir dir="${headers.dest}"/>
+
+        <!--uncomment function names in c headers and copy modified files into include path-->
+        <uncomment-function-params src="${headers.orig}/cl.h" dest="${headers.dest}/cl.h"/>
+        <uncomment-function-params src="${headers.orig}/cl_gl.h" dest="${headers.dest}/cl_gl.h"/>
+
+        <!--nothing to uncomment in this headers-->
+        <copy file="${headers.orig}/cl_platform.h" toDir="${headers.dest}" overwrite="true"/>
+        <copy file="${headers.orig}/cl_ext.h" toDir="${headers.dest}" overwrite="true"/>
+        <copy file="${headers.orig}/cl_gl_ext.h" toDir="${headers.dest}" overwrite="true"/>
+        <copy file="${headers.orig}/cl_vendor_ext.h" toDir="${headers.dest}" overwrite="true"/>
+    </target>
+
+	<!--
+       - Setup the generating ANT tasks and use it to generate the Java files
+       - from the C OpenCL headers.  This involves setting the taskdef and creating
+       - the classpath reference id then running the task on each header.
+      -->
+    <target name="java.generate" depends="build.gluegen, generate.jdk6.autocloseable, generate.jdk7.autocloseable, java.generate.check, preprocess-opencl-headers" unless="java.generate.skip">
+        <!-- Add the GlueGen task to ANT -->
+        <taskdef name="gluegen" classname="com.jogamp.gluegen.ant.GlueGenTask"
+                 classpathref="gluegen.classpath" />
+
+        <!-- Use the GlueGen task to generate the Java files -->
+
+        <echo message="context..."/>
+    	<echo message="incl path ${toString:stub.includes.fileset.all}"/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-context-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="program..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-program-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="kernel..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-kernel-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="queue..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-queue-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="device..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-device-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="memobj..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-mem-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="image..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-image-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="buffer..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-buffer-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="sampler..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-sampler-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="event..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-event-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="platform..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-platform-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="CL..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 dumpCPP="false"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="CLGL..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/clgl-if.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.JavaEmitter"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>
+
+        <echo message="GLImpl..."/>
+        <gluegen src="${stub.includes.opencl}/opencl.h"
+                 outputRootDir="${build}"
+                 config="${config}/cl-impl.cfg"
+                 includeRefid="stub.includes.fileset.all"
+                 emitter="com.jogamp.gluegen.procaddress.ProcAddressEmitter"
+                 debug="false">
+            <classpath refid="gluegen.classpath" />
+        </gluegen>    	
+
+        <!-- Inform the user that the generators have successfully created
+           - the necessary Java files -->
+        <echo message="" />
+        <echo message="GlueGen has successfully generated files." />
+
+    </target>
+
+    <!-- ================================================================== -->
+    <!--
+       - Compile the original and generated source.
+      -->
+    <target name="java.compile" depends="java.generate">
+        <javac destdir="${classes}" 
+               includeantruntime="false"
+               memoryMaximumSize="${javac.memorymax}"
+               encoding="UTF-8"
+               source="${target.sourcelevel}" 
+               target="${target.targetlevel}" 
+               bootclasspath="${target.rt.jar}"
+               debug="${javacdebug}" debuglevel="${javacdebuglevel}">
+        	<classpath refid="javac.classpath"/>
+        	<src path="${src.java}" />
+            <src path="${src.generated.java}" />
+        </javac>
+    </target>
+
+    <!-- ================================================================== -->
+    <!--
+       - Compile the native C code for JOCL.
+      -->
+
+    <target name="rename.mingw.dll" if="isMingW">
+        <move file="${src}" tofile="${dest}" />
+    </target>
+
+    <target name="rename.dylib" if="isOSX">
+        <move file="${src}" tofile="${dest}" />
+    </target>
+
+    <macrodef name="c.build">
+        <attribute name="compiler.cfg.id" />
+        <attribute name="linker.cfg.id" />
+        <attribute name="output.lib.name" />
+        <attribute name="c.compiler.use-jawt" default="false"/>
+        <sequential>
+            <echo message="Output lib name = @{output.lib.name}" />
+
+            <echo message="compiler.cfg.id.base: @{compiler.cfg.id}"/>
+            <echo message="linker.cfg.id.base: @{linker.cfg.id}"/>
+
+            <!-- NOTE: the value of the debug and optimise attributes will not be overridden if already set externally -->
+            <property name="c.compiler.debug"     value="false" />
+            <!-- Optimise flags one of { none, size, speed, minimal, full, aggressive, extreme, unsafe } -->
+            <property name="c.compiler.optimise"  value="none" />
+
+            <condition property="c.compiler.use-debug">
+                <istrue value="${c.compiler.debug}"/>
+            </condition>
+
+            <patternset id="c.src.files">
+                <include name="${rootrel.generated.c.jocl}/*.c"/>
+            </patternset>
+
+            <echo message="Compiling @{output.lib.name}" />
+
+            <cc outtype="shared" 
+            objdir="${obj}" 
+            outfile="${obj}/@{output.lib.name}"
+            optimize="${c.compiler.optimise}" 
+            debug="${c.compiler.debug}"
+            multithreaded="true" 
+            exceptions="false" 
+            rtti="false">
+
+                <fileset dir="${project.root}">
+                    <patternset refid="c.src.files"/>
+                </fileset>
+
+                <compiler extends="@{compiler.cfg.id}" >
+                    <sysincludepath path="${java.includes.dir}"/>
+                    <sysincludepath path="${java.includes.dir.platform}"/>
+                    <sysincludepath path="${stub.includes.gluegen.cc}"/>
+                    <includepath path="resources/includes"/>
+                    <!-- This is for the generated headers for handwritten C code -->
+                    <includepath path="${src.generated.c}" />
+                    <includepath path="${src.c}"/>
+
+                    <!-- This must come last to not override real include paths -->
+                    <!-- includepath path="stub_includes/macosx" if="isOSX" / -->
+                </compiler>
+
+                <linker extends="@{linker.cfg.id}" />
+            </cc>
+
+            <antcall target="rename.dylib" inheritRefs="true">
+                <param name="src"  value="${obj}/lib@{output.lib.name}.dylib" />
+                <param name="dest" value="${obj}/lib@{output.lib.name}.jnilib" />
+            </antcall>
+
+            <antcall target="rename.mingw.dll" inheritRefs="true">
+                <param name="src"  value="${obj}/lib@{output.lib.name}.so" />
+                <param name="dest" value="${obj}/@{output.lib.name}.dll" />
+            </antcall>
+        </sequential>
+    </macrodef>
+
+    <target name="c.build.jocl" depends="init, gluegen.cpptasks.detect.os, gluegen.cpptasks.setup.compiler">
+        <echo message="compiler.cfg.id.base: ${compiler.cfg.id.base}"/>
+        <echo message="linker.cfg.id.base: ${linker.cfg.id.base}"/>
+        <c.build compiler.cfg.id="${compiler.cfg.id.base}"
+               output.lib.name="jocl"
+               linker.cfg.id="${linker.cfg.id.base}"/>
+
+        <antcall target="gluegen.cpptasks.striplibs" inheritRefs="true">
+            <param name="libdir" value="../${rootrel.build}/obj"/>
+        </antcall>
+
+        <!-- Create Java Web Start jar file from built file -->
+        <jar destfile="${build}/jocl-natives-${os.and.arch}.jar">
+            <fileset dir="../${rootrel.build}/obj">
+                <include name="*jocl.${native.library.suffix}" />
+                <include name="*soft_oal.${native.library.suffix}" />
+                <include name="*openal.${native.library.suffix}" />
+                <exclude name="*openal*.1*.${native.library.suffix}" />
+            </fileset>
+        </jar>
+    </target>
+
+    <!-- ================================================================== -->
+    <!--
+       - Build the jocl.jar file.
+      -->
+    <target name="jar" depends="init">
+        <!-- Prepare the manifest -->
+        <copy file="joclversion"
+          tofile="tempversion"
+          overwrite="true">
+            <filterset>
+                <filter token="VERSION" value="${jogamp.version}"/>
+                <filter token="BUILD_VERSION" value="${jocl.version}"/>
+                <filter token="SCM_BRANCH" value="${jocl.build.branch}"/>
+                <filter token="SCM_COMMIT" value="${jocl.build.commit}"/>
+                <filter token="BASEVERSION" value="${jogamp.version.base}" />
+                <filter token="JAR_CODEBASE_TAG" value="${jogamp.jar.codebase}"/>
+            </filterset>
+        </copy>
+
+        <!-- Build the jar excluding any build specific classes. -->
+        <jar manifest="tempversion" destfile="${jocl.jar}">
+            <fileset dir="${classes}">
+                <include name="com/jogamp/common/**" />
+                <include name="com/jogamp/opencl/**" />
+            </fileset>
+        </jar>
+        <copy file="${jocl.jar}" tofile="${jocl-android.jar}"/>
+
+        <antcall target="android.package" inheritRefs="true" />
+
+        <delete file="tempversion"/>
+    </target>
+
+    <target name="android.package" depends="init" if="isAndroid">
+        <aapt.signed 
+            jarsrcdir="${src.java}"
+            jarbuilddir="${build}"
+            jarbasename="jocl-android"
+            nativebuilddir="../${rootrel.build}/obj"
+            nativebasename=""
+            android.abi="${android.abi}"
+            androidmanifest.path="resources/android/AndroidManifest-jocl.xml"
+            androidresources.path="resources/android/res-jocl"
+            jarmanifest.path="tempversion"
+            version.code="${jogamp.version.int}"
+            version.name="${jogamp.version}" />
+    </target>
+
+    <!-- ================================================================== -->
+    <!--
+       - Build the Javadocs for the sources.
+       - NOTE:  these are not entirely correct as the javadocs targets depend
+       -        on the platform specific build targets.  To circumvent any
+       -        errors, ensure that the source is built first.
+      -->
+    <target name="javadoc" depends="init, javadoc.init, javadoc.public, javadoc.dev, javadoc.zip"/>
+
+    <!-- copies ${gluegen-javadoc.path}/** to ${javadoc.root.path}/gluegen/ 
+         gluegen-javadoc.path is the parent folder of package-list:
+            gluegen-javadoc.path := build/javadoc/gluegen 
+            with build/javadoc/gluegen/javadoc/package-list
+      -->
+    <target name="javadoc.gluegen" depends="init" if="gluegen-javadoc.path">
+        <delete dir="${javadoc.root.path}/gluegen" includeEmptyDirs="true" quiet="true" failonerror="false" />
+        <mkdir dir="${javadoc.root.path}/gluegen" />
+
+        <copy todir="${javadoc.root.path}/gluegen" failonerror="false">
+            <fileset dir="${gluegen-javadoc.path}" includes="**" />
+        </copy>
+    </target>
+
+    <target name="javadoc.init" depends="init">
+        <!-- property name="javadoc.link" value="http://java.sun.com/j2se/1.4.2/docs/api/" /-->
+        <!-- property name="javadoc.link" value="http://download.oracle.com/javase/1.5.0/docs/api/" /-->
+        <property name="javadoc.link" value="http://docs.oracle.com/javase/6/docs/api/" />
+
+        <!-- Link offline with relative URLs does not work.
+             Link online with relative URLs works, 
+             so we have to assume the same relative online folder structure:
+
+                 http://jogamp.org/deployment/jogamp-next/javadoc/gluegen/javadoc/
+                 http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc/
+                 http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc_dev/
+                 http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc_jogl_spec/
+                 http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc_nativewindow_spec/
+
+             gluegen rel URL: ../../gluegen/javadoc
+
+             build structure:
+
+                 jogl.root:    build/javadoc/jogl/<javadoc-type>  (we have javadoc, javadoc_dev and javadoc_jogl_spec, ..)
+                 gluegen.root: build/javadoc/gluegen/javadoc
+
+            to match the online gluegen rel URL, we need:
+
+                 jogl.root:    build/javadoc/gluegen/javadoc
+          -->
+        <property name="gluegen.link" value="../../gluegen/javadoc" />
+        <property name="javadoc.root.path" value="${build}/javadoc" />
+        <property name="javadoc.jocl.public.path" value="${javadoc.root.path}/jocl/javadoc" />
+        <property name="javadoc.jocl.dev.path"    value="${javadoc.root.path}/jocl/javadoc_dev" />
+
+        <property name="javadoc.packagenames" value="com.jogamp.openal,com.jogamp.openal.util,com.jogamp.openal.sound3d" />
+        <property name="javadoc.dev.packagenames" value="${javadoc.packagenames},jogamp.openal" />
+
+        <!-- if gluegen-javadoc.path is not set, check in default location, 
+             ${gluegen.root}/${rootrel.build}/javadoc/gluegen -->
+        <available file="${gluegen.build}/javadoc/gluegen/javadoc/package-list" 
+                   type="file"
+                   property="gluegen-javadoc.path"
+                   value="${gluegen.build}/javadoc/gluegen" />
+        <antcall target="javadoc.gluegen" inheritRefs="true" />
+    </target>
+
+    <target name="javadoc.zip" depends="javadoc.init">
+        <archive.7z destfile="${build}/javadoc.7z"
+                    basedir="${javadoc.root.path}"
+                    includes="jocl/**" />
+    </target>
+
+    <target name="javadoc.public" depends="javadoc.init">
+        <javadoc packagenames="${javadoc.packagenames}"
+                 sourcepath="${src.java};${src.generated.java}"
+                 destdir="${javadoc.jocl.public.path}" windowtitle="JOCL API"
+                 encoding="UTF-8"
+                 source="${target.sourcelevel}"
+                 maxmemory="${javac.memorymax}"
+                 stylesheetfile="${gluegen.make.dir}/doc/javadoc/stylesheet.css">
+            <classpath refid="jocl_all.classpath"/>
+            <link offline="true" href="${javadoc.link}" packagelistLoc="${gluegen.root}/make/142-packages" />
+            <link offline="false" href="${gluegen.link}" />
+        </javadoc>
+        <copy todir="${javadoc.jocl.public.path}/resources" overwrite="true">
+            <fileset dir="${gluegen.make.dir}/doc/javadoc/resources" includes="*" />
+        </copy>
+    </target>
+
+    <target name="javadoc.dev" depends="javadoc.init">
+        <!-- Build the internal developer Javadoc -->
+        <javadoc packagenames="${javadoc.dev.packagenames},${javadoc.dev.packagenames.platform}"
+                 sourcepath="${src.java};${src.generated.java}"
+                 destdir="${javadoc.jocl.dev.path}" windowtitle="JOCL API"
+                 encoding="UTF-8"
+                 source="${target.sourcelevel}"
+                 maxmemory="${javac.memorymax}"
+                 stylesheetfile="${gluegen.make.dir}/doc/javadoc/stylesheet.css">
+            <classpath refid="jocl_all.classpath"/>
+            <link offline="true" href="${javadoc.link}" packagelistLoc="${gluegen.root}/make/142-packages" />
+            <link offline="false" href="${gluegen.link}" />
+        </javadoc>
+        <copy todir="${javadoc.jocl.dev.path}/resources" overwrite="true">
+            <fileset dir="${gluegen.make.dir}/doc/javadoc/resources" includes="*" />
+        </copy>
+    </target>
+
+    <target name="developer-src-zip" depends="init">
+        <!--delete includeEmptyDirs="true" quiet="true" failonerror="false">
+            <fileset dir="${build}" includes="jocl-java-src.zip" />
+        </delete-->
+        <zip destfile="${build}/jocl-java-src.zip">
+            <fileset dir="${src.java}"/>
+            <fileset dir="${build}/gensrc"/>
+        </zip>
+    </target>
+
+    <!-- Build binary zip archives for developers -->
+    <target name="developer-zip-archive" depends="init,developer-src-zip" if="build.archiveon">
+        <!-- Clean up and create temporary directory -->
+        <delete includeEmptyDirs="true" quiet="true" dir="${archive}" failonerror="false" />
+        <mkdir dir="${archive}" />
+        <copy file="${build}/artifact.properties" todir="${archive}"/>
+        <mkdir dir="${archive}/jar" />
+        <copy todir="${archive}/jar">
+            <fileset dir="${build}" includes="jocl*.jar"/>
+            <fileset dir="${build}" includes="jocl*.apk"/>
+        </copy>
+        <mkdir dir="${archive}/lib" />
+        <copy todir="${archive}/lib">
+            <fileset dir="${build}/obj" includes="*.${native.library.suffix}"/>
+        </copy>
+        <mkdir dir="${archive}/jnlp-files" />
+        <copy todir="${archive}/jnlp-files">
+            <fileset dir="${project.root}/jnlp-files" includes="*" />
+        </copy>
+        <mkdir dir="${archive}/www" />
+        <copy todir="${archive}/www">
+            <fileset dir="${project.root}/www" includes="*" />
+        </copy>
+        <copy file="../README.txt" todir="${archive}"/>
+        <copy file="../LICENSE.txt" todir="${archive}"/>
+        <copy todir="${archive}" file="${build}/jocl-java-src.zip"/>
+        <archive.7z destfile="${build}/${archive.name}.7z"
+             basedir="${build}"
+             includes="${archive.name}/**" />
+        <!-- Clean up after ourselves -->
+        <delete includeEmptyDirs="true" quiet="true" dir="${archive}" failonerror="false" />
+    </target>
+
+    <!-- ================================================================== -->
+    <!--
+       - Clean up all that is built.
+      -->
+    <target name="clean" depends="init">
+        <delete includeEmptyDirs="true" quiet="true">
+            <fileset dir="${build}" />
+        	<fileset dir="${tempdir}" />
+            <fileset dir="${javadoc}" />
+            <fileset dir="${javadoc.dev}" />
+            <fileset dir="${headers.dest}" />
+        </delete>
+        <ant antfile="build-test.xml" target="clean"/>
+    </target>
+
+    <!-- ================================================================== -->
+    <!--
+       - Build everything.
+      -->
+    <target name="all" depends="jocl.build, test.compile, tag.build, developer-zip-archive"/>
+
+    <target name="jocl.build" depends="init">
+        <!-- Generate and compile the Java sources. -->
+        <antcall target="java.compile" inheritRefs="true" />
+
+        <!-- Compile the native C sources . -->
+        <antcall target="c.build.jocl" inheritRefs="true" />
+
+        <!-- build the jar/apk -->
+        <antcall target="jar" inheritRefs="true" />
+    </target>
+
+    <target name="tag.build" depends="init">
+        <copy file="${gluegen.build}/artifact.properties" todir="${build}" overwrite="true" failonerror="false"/>
+        <echo message='jocl.build.version=${jogamp.version}${line.separator}'   file="${build}/artifact.properties" append="true"/>
+        <echo message='jocl.build.number=${jocl.build.number}${line.separator}' file="${build}/artifact.properties" append="true"/>
+        <echo message='jocl.build.id=${jocl.build.id}${line.separator}'         file="${build}/artifact.properties" append="true"/>
+        <echo message='jocl.build.branch=${jocl.build.branch}${line.separator}' file="${build}/artifact.properties" append="true"/>
+        <echo message='jocl.build.commit=${jocl.build.commit}${line.separator}' file="${build}/artifact.properties" append="true"/>
+    </target>
+
+    <!-- ================================================================== -->
+    <!--
+       - unit tests
+      -->
+
+    <target name="test.compile" depends="jocl.build">
+        <ant antfile="build-test.xml" target="test.compile" inheritRefs="true" inheritAll="true"/>
+    </target>
+
+    <target name="test.auto.run" depends="test.compile">
+        <ant antfile="build-test.xml" target="test.auto.run" inheritRefs="true" inheritAll="true"/>
+    </target>
+
+    <target name="junit.run" depends="test.compile">
+        <ant antfile="build-test.xml" target="junit.run" inheritRefs="true" inheritAll="true"/>
+    </target>
+
+    <target name="test.manual.run" depends="test.compile">
+        <ant antfile="build-test.xml" target="test.manual.run" inheritRefs="true" inheritAll="true"/>
+    </target>
+
+</project>
