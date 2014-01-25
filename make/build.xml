@@ -44,7 +44,6 @@
     <property name="gluegen.build" value="${gluegen.root}/${rootrel.build}" />
 
     <!-- This is the version of JOCL you are building -->
-    <property name="jocl.build.number" value="manual-build"/>
     <mkdir dir="${build}" />
     <exec dir="." executable="git" logError="true" failonerror="false" failifexecutionfails="false"
               output="${build}/localbranch.raw">
@@ -86,8 +85,9 @@
       -->
     <target name="init" depends="jogamp.env.init, gluegen.cpptasks.detect.os">
 
+        <property name="jocl.build.number" value="manual"/>
         <property name="jocl.build.id"     value="${version.timestamp}"/>
-        <property name="jocl.version"      value="${jogamp.version.base}-${version.timestamp}" />
+        <property name="jocl.version"      value="${jogamp.version.base}-b${jocl.build.number}-${version.timestamp}" />
 
         <!-- The location and name of the configuration ANT file that will
            - validate to ensure that all user-define variables are set. -->
@@ -180,9 +180,9 @@
         <property name="stub.includes.gluegen.cc"  value="${gluegen.root}/make/stub_includes/platform" />
 
         <!-- The resulting jocl.jar. -->
-        <property name="jocl.jar" value="${build}/jocl.jar" />
-        <property name="jocl-android.jar" value="${build}/jocl-android.jar" />
-        <property name="jocl-android.apk" value="${build}/jocl-android-${android.abi}.apk" />
+        <property name="jocl.jar" value="${build}/jar/jocl.jar" />
+        <property name="jocl-android.jar" value="${build}/jar/jocl-android.jar" />
+        <property name="jocl-android.apk" value="${build}/jar/jocl-android-${android.abi}.apk" />
 
         <path id="jocl_all.classpath">
             <pathelement location="${gluegen-rt.jar}" />
@@ -624,7 +624,7 @@
         </antcall>
 
         <!-- Create Java Web Start jar file from built file -->
-        <jar destfile="${build}/jocl-natives-${os.and.arch}.jar">
+        <jar destfile="${build}/jar/jocl-natives-${os.and.arch}.jar">
             <fileset dir="../${rootrel.build}/obj">
                 <include name="*jocl.${native.library.suffix}" />
                 <include name="*soft_oal.${native.library.suffix}" />
@@ -656,7 +656,6 @@
         <!-- Build the jar excluding any build specific classes. -->
         <jar manifest="tempversion" destfile="${jocl.jar}">
             <fileset dir="${classes}">
-                <include name="com/jogamp/common/**" />
                 <include name="com/jogamp/opencl/**" />
             </fileset>
         </jar>
@@ -670,7 +669,7 @@
     <target name="android.package" depends="init" if="isAndroid">
         <aapt.signed 
             jarsrcdir="${src.java}"
-            jarbuilddir="${build}"
+            jarbuilddir="${build}/jar"
             jarbasename="jocl-android"
             nativebuilddir="../${rootrel.build}/obj"
             nativebasename=""
@@ -807,8 +806,8 @@
         <copy file="${build}/artifact.properties" todir="${archive}"/>
         <mkdir dir="${archive}/jar" />
         <copy todir="${archive}/jar">
-            <fileset dir="${build}" includes="jocl*.jar"/>
-            <fileset dir="${build}" includes="jocl*.apk"/>
+            <fileset dir="${build}/jar" includes="jocl*.jar"/>
+            <fileset dir="${build}/jar" includes="jocl*.apk"/>
         </copy>
         <mkdir dir="${archive}/lib" />
         <copy todir="${archive}/lib">
