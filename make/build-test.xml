@@ -1,0 +1,411 @@
+<?xml version="1.0"?>
+
+<!--
+* Copyright (c) 2003 Sun Microsystems, Inc. All  Rights Reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* -Redistribution of source code must retain the above copyright notice, 
+* this list of conditions and the following disclaimer.
+*
+* -Redistribution in binary form must reproduce the above copyright notice, 
+* this list of conditions and the following disclaimer in the documentation
+* and/or other materials provided with the distribution.
+*
+* Neither the name of Sun Microsystems, Inc. or the names of contributors may 
+* be used to endorse or promote products derived from this software without 
+* specific prior written permission.
+* 
+* This software is provided "AS IS," without a warranty of any kind.
+* ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
+* ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR
+* NON-INFRINGEMENT, ARE HEREBY EXCLUDED. SUN MIDROSYSTEMS, INC. ("SUN") AND ITS
+* LICENSORS SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY LICENSEE AS A
+* RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES.
+* IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST REVENUE, PROFIT
+* OR DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL OR
+* PUNITIVE DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY,
+* ARISING OUT OF THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF SUN HAS
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+*
+* You acknowledge that this software is not designed or intended for use in the
+* design, construction, operation or maintenance of any nuclear facility.
+-->
+
+<project name="JOCLTest" basedir="." default="all">
+
+    <description>JUNIT Tests JOCL</description>
+
+    <property name="gluegen.basename" value="gluegen" /> <!-- if differs, ie jenkins jobname, must be set properly first -->
+    <property name="jocl.basename" value="jocl" /> <!-- if differs, ie jenkins jobname, must be set properly first -->
+    <echo message="gluegen.basename: ${gluegen.basename}"/>
+    <echo message="jocl.basename: ${jocl.basename}"/>
+
+    <property name="ant-contrib.jar"  value="${gluegen.root}/make/lib/ant-contrib-1.0b3.jar" />
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+      <classpath> <pathelement location="${ant-contrib.jar}"/> </classpath>
+    </taskdef>
+
+    <import file="${gluegen.root}/make/jogamp-env.xml" />
+    <import file="${gluegen.root}/make/gluegen-cpptasks.xml" />
+
+    <target name="declare.common" depends="jogamp.env.init, gluegen.cpptasks.detect.os">
+        <property name="jocl.version"         value="${jogamp.version.base}-${version.timestamp}" />
+
+        <property name="project.root"         value=".." />
+        <property name="build"                value="${project.root}/${rootrel.build}" />
+
+        <property name="rootrel.src.test"     value="test" />
+        <property name="src.test"             value="${project.root}/${rootrel.src.test}" />
+
+        <property name="results.test"         value="${build}/test/results" />
+        <property name="build.test"           value="${build}/test/build" />
+        <property name="obj.test"             value="${build.test}/obj"/>
+
+        <property name="classes.test"         value="${build.test}/classes" />
+        <property name="classes.test.path"    location="${classes.test}"/> <!-- absolute path -->
+
+        <property name="java.dir.test"        value="com/jogamp/opencl"/>
+        <property name="java.part.test.all"   value="${java.dir.test}/**"/>
+        <property name="java.part.test.android" value="${java.dir.test}/android/**"/>
+        <property name="java.dir.junit"       value="${java.dir.test}"/>
+        <property name="java.dir.manual"      value="${java.dir.test}/manual"/>
+
+        <property name="gluegen-rt-android.jar" value="${gluegen.build}/gluegen-rt-android.jar" />
+
+        <property name="obj.all.paths"        value="${gluegen.build}/obj${path.separator}${jogl.build}/lib${path.separator}${obj}${path.separator}lib/${os.and.arch}"/>
+        <property name="classpath.test"       value="${junit.jar}${path.separator}${gluegen-rt.jar}${path.separator}${jogl-all.jar}${path.separator}${build}/jocl.jar${path.separator}${build}/jocl-test.jar"/>
+        <property name="classpath.test.remote" value="${junit.jar}${path.separator}${env.TARGET_ANT_HOME}/lib/ant.jar${path.separator}${env.TARGET_ANT_HOME}/lib/ant-junit.jar${path.separator}${gluegen-rt.jar}${path.separator}${build}/jocl.jar${path.separator}${build}/jocl-test.jar"/>
+
+        <property name="test.archive.name"    value="${archive.name}-test-results-${build.node.name}"/>
+
+        <property name="batchtest.timeout"    value="1800000"/> <!-- 30 min -->
+
+        <mkdir dir="${classes.test}"/>
+    </target>
+
+    <target name="test.compile.javase" depends="declare.common" >
+        <javac destdir="${classes.test}" 
+               excludes="${java.part.test.android}"
+               fork="yes"
+               includeantruntime="false"
+               srcdir="${src.test}" 
+               classpath="${gluegen-rt.jar};${build}/jocl.jar;${junit.jar};${jogl-all.jar}"
+               memoryMaximumSize="${javac.memorymax}"
+               encoding="UTF-8"
+               source="${target.sourcelevel}" 
+               target="${target.targetlevel}" 
+               bootclasspath="${target.rt.jar}"
+               debug="${javacdebug}" debuglevel="${javacdebuglevel}"/>
+        <copy file="joclversion-test"
+            tofile="${build.test}/manifest-test.mf"
+            overwrite="true">
+            <filterset>
+                <filter token="VERSION" value="${jogamp.version}"/>
+                <filter token="BUILD_VERSION" value="${jocl.version}"/>
+                <filter token="SCM_BRANCH" value="${jocl.build.branch}"/>
+                <filter token="SCM_COMMIT" value="${jocl.build.commit}"/>
+                <filter token="BASEVERSION" value="${jogamp.version.base}"/>
+            </filterset>
+        </copy>
+        <jar manifest="${build.test}/manifest-test.mf" destfile="${build}/jocl-test.jar">
+            <!-- get all class files, but skip any resource files that external tools
+                 might have copied into the class directory (otherwise, it's possible
+                 to get the same resource file twice in the jar) -->
+            <fileset dir="${classes.test}"
+                     includes="${java.part.test.all}"
+                     excludes="${java.part.test.android}"/>
+        </jar>
+    </target>
+    
+    <target name="test.compile.android" depends="declare.common" if="android-jars.available">
+        <!-- Perform the junit pass Java Android compile -->
+        <javac destdir="${classes.test}" 
+               fork="yes"
+               includeAntRuntime="false"
+               classpath="${android.jar};${gluegen-rt-android.jar};${build}/jocl.jar;${junit.jar}"
+               memoryMaximumSize="${javac.memorymax}"
+               encoding="UTF-8"
+               source="${target.sourcelevel}" 
+               target="${target.targetlevel}" 
+               bootclasspath="${target.rt.jar}"
+               debug="${javacdebug}" debuglevel="${javacdebuglevel}">
+            <src path="${src.test}" />
+        </javac>
+        <copy file="joclversion-test-android"
+            tofile="${build.test}/manifest-test-android.mf"
+            overwrite="true">
+            <filterset>
+                <filter token="VERSION" value="${jogamp.version}"/>
+                <filter token="BUILD_VERSION" value="${jocl.version}"/>
+                <filter token="SCM_BRANCH" value="${jocl.build.branch}"/>
+                <filter token="SCM_COMMIT" value="${jocl.build.commit}"/>
+                <filter token="BASEVERSION" value="${jogamp.version.base}"/>
+            </filterset>
+        </copy>
+        <jar manifest="${build.test}/manifest-test-android.mf" destfile="${build}/jocl-test-android.jar" filesonly="true">
+            <!-- get all class files, but skip any resource files that external tools
+                 might have copied into the class directory (otherwise, it's possible
+                 to get the same resource file twice in the jar) -->
+            <fileset dir="${classes.test}" 
+                     includes="${java.part.test.all}"/>
+        </jar>
+    </target>
+
+    <target name="test.package.android" depends="test.compile.android" if="isAndroid">
+        <aapt.signed 
+            assetsdir="resources/assets-test"
+            jarsrcdir="${src.test}"
+            jarbuilddir="${build}"
+            jarbasename="jocl-test-android"
+            nativebuilddir="../${rootrel.build}/obj"
+            nativebasename="non-existing"
+            androidmanifest.path="resources/android/AndroidManifest-test.xml"
+            androidresources.path="resources/android/res-test"
+            jarmanifest.path="${build.test}/manifest-test-android.mf"
+            version.code="${jogamp.version.int}"
+            version.name="${jogamp.version}" />
+    </target>
+
+    <target name="test.compile" depends="declare.common" unless="test.compile.skip">
+        <!-- include any resource files that tests may require -->
+        <copy todir="${classes.test}">
+            <fileset dir="${src.test}">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <antcall target="test.compile.javase" inheritRefs="true" inheritAll="true"/>
+        <antcall target="test.package.android" inheritRefs="true" inheritAll="true"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.test}"/>
+    </target>
+    
+    <target name="clean.results">
+        <!-- Clean the results -->
+        <delete quiet="true">
+            <fileset dir="${results.test}" includes="**"/>
+            <fileset file="${build}/${test.archive.name}.7z"/>
+        </delete>
+        <mkdir dir="${results.test}"/>
+    </target>
+
+    <target name="junit.run.local" depends="clean.results, test.compile" unless="isCrosscompilation">
+        <junit forkmode="perTest" showoutput="true" fork="true" haltonerror="off" includeAntRuntime="true">
+            <env key="${system.env.library.path}" path="${obj.all.paths}"/>
+            <jvmarg value="${jvmDataModel.arg}"/>
+            <jvmarg value="-Djava.library.path=${obj.all.paths}"/>
+            <!--
+            <jvmarg value="-Djogamp.debug=all"/>
+            <jvmarg value="-Djogamp.debug.NativeLibrary=true"/>
+            <jvmarg value="-Djogamp.debug.NativeLibrary.Lookup=true"/>
+            <jvmarg value="-Djogamp.debug.ProcAddressHelper=true"/> -->
+            <jvmarg value="-Djocl.debug.Factory"/>
+            <batchtest todir="${results.test}">
+                <fileset dir="${classes.test}">
+                    <include name="${java.dir.junit}/**/*Test.class"/>
+                </fileset>
+                <formatter usefile="false" type="plain"/>
+                <formatter usefile="true" type="xml"/>
+            </batchtest>
+            <classpath>
+                <path path="${classpath.test}"/>
+            </classpath>
+        </junit>
+    </target>
+    
+    <target name="test.manual.run" depends="clean.results, test.compile">
+        <for param="test.class.path.m" keepgoing="true">
+            <!-- results in absolute path -->
+            <fileset dir="${classes.test}">
+                <include name="${java.dir.manual}/**/*Test.class"/>
+                <exclude name="**/*$$*"/>
+            </fileset>
+          <sequential>
+            <var name="test.class.path" unset="true"/>
+            <property name="test.class.path" basedir="${classes.test}" relative="true" location="@{test.class.path.m}"/>
+            <var name="test.class.fqn" unset="true"/>
+            <pathconvert property="test.class.fqn">
+              <fileset file="${classes.test}${file.separator}${test.class.path}"/>
+              <chainedmapper>
+                  <globmapper    from="${classes.test.path}${file.separator}*" to="*"/> <!-- rel. -->
+                  <packagemapper from="*.class"           to="*"/> <!-- FQCN -->
+              </chainedmapper>
+            </pathconvert>
+            <var name="test.class.result.file" value="${results.test}/TEST-${test.class.fqn}.log"/>
+            <echo message="Testing ${test.class.fqn} -- ${test.class.result.file}"/>
+            <apply dir="." executable="${java.home}/bin/java" 
+                 parallel="false" 
+                 timeout="${batchtest.timeout}"
+                 vmlauncher="false"
+                 relative="true"
+                 failonerror="false"
+                 output="${test.class.result.file}">
+                <env key="${system.env.library.path}" path="${obj.all.paths}"/>
+                <env key="CLASSPATH" value="${classpath.test}"/>
+                <arg line="${jvmDataModel.arg}"/>
+                <arg value="-Djava.library.path=${obj.all.paths}"/>
+                <!--
+                <arg line="-Djogamp.debug=all"/>
+                <arg line="-Djogamp.debug.NativeLibrary=true"/>
+                <arg line="-Djogamp.debug.NativeLibrary.Lookup=true"/>
+                <arg line="-Djogamp.debug.ProcAddressHelper=true"/> -->
+                <arg line="-Djocl.debug.Factory"/>
+                <srcfile/>
+                <mappedresources>
+                    <fileset dir="${classes.test}" includes="${test.class.path}"/>
+                    <packagemapper from="*.class" to="*"/>
+                </mappedresources>
+            </apply>
+          </sequential>
+        </for>
+    </target>
+
+    <target name="junit.run.remote.ssh" if="isCrosscompilation" unless="isAndroid">
+        <echo message="#! /bin/sh${line.separator}" append="false" file="${build.test}/targetcommand.sh" />
+        <echo message="${line.separator}
+rsync -av --delete --delete-after --delete-excluded \${line.separator}
+      --exclude 'build-x86*/' --exclude 'build-linux-x*/' --exclude 'build-android*/' --exclude 'build-win*/' --exclude 'build-mac*/' \${line.separator}
+      --exclude 'classes/' --exclude 'src/' --exclude '.git/' --exclude '*-java-src.zip' \${line.separator}
+      ${env.HOST_UID}@${env.HOST_IP}::${env.HOST_RSYNC_ROOT}/${jocl.basename} ${env.TARGET_ROOT} ${line.separator}
+cd ${env.TARGET_ROOT}/${jocl.basename}/${env.NODE_LABEL}/make ${line.separator}
+" append="true" file="${build.test}/targetcommand.sh" />
+
+        <for param="test.class.path.m" keepgoing="true">
+            <!-- results in absolute path -->
+            <fileset dir="${classes.test}">
+                <include name="${java.dir.junit}/**/*Test.class"/>
+                <exclude name="**/*$$*"/>
+            </fileset>
+          <sequential>
+            <var name="test.class.path" unset="true"/>
+            <property name="test.class.path" basedir="${classes.test}" relative="true" location="@{test.class.path.m}"/>
+            <var name="test.class.fqn" unset="true"/>
+            <pathconvert property="test.class.fqn">
+              <fileset file="${classes.test}${file.separator}${test.class.path}"/>
+              <chainedmapper>
+                  <globmapper    from="${classes.test.path}${file.separator}*" to="*"/> <!-- rel. -->
+                  <packagemapper from="*.class"           to="*"/> <!-- FQCN -->
+              </chainedmapper>
+            </pathconvert>
+            <var name="test.class.result.file" value="${results.test}/TEST-${test.class.fqn}.xml"/>
+            <echo message="Testing ${test.class.fqn} -- ${test.class.result.file}"/>
+            <echo message="${line.separator}
+export DISPLAY=:0.0${line.separator}
+java \${line.separator}
+${junit.run.arg0}\${line.separator}
+${junit.run.arg1}\${line.separator}
+${jvmDataModel.arg}\${line.separator}
+-cp ${classpath.test.remote}\${line.separator}
+org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner \${line.separator}
+${test.class.fqn} \${line.separator}
+filtertrace=true \${line.separator}
+haltOnError=false \${line.separator}
+haltOnFailure=false \${line.separator}
+showoutput=true \${line.separator}
+outputtoformatters=true \${line.separator}
+logfailedtests=true \${line.separator}
+logtestlistenerevents=true \${line.separator}
+formatter=org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter \${line.separator}
+formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,${test.class.result.file} ${line.separator}
+${line.separator}
+" append="true" file="${build.test}/targetcommand.sh" />
+          </sequential>
+        </for>
+        <exec dir="." executable="sh" logError="true" failonerror="true" failifexecutionfails="true">
+            <arg line='-x -c "
+            chmod 0755 ${build.test}/targetcommand.sh ;
+            scp ${build.test}/targetcommand.sh ${env.TARGET_UID}@${env.TARGET_IP}:${env.TARGET_ROOT}/jocl-targetcommand.sh ;
+            ssh -x ${env.TARGET_UID}@${env.TARGET_IP} ${env.TARGET_ROOT}/jocl-targetcommand.sh ;
+            scp -pr ${env.TARGET_UID}@${env.TARGET_IP}:${env.TARGET_ROOT}/${jocl.basename}/${env.NODE_LABEL}/make/${results.test}/* ${results.test}/ "'/>
+        </exec>
+    </target>
+
+    <target name="junit.run.remote.adb" if="isAndroidARMv7">
+        <echo message="#! /system/bin/sh${line.separator}" append="false" file="${build.test}/targetcommand.sh" />
+        <echo message="${line.separator}
+rsync -av --delete --delete-after --delete-excluded \${line.separator}
+      --exclude 'build-x86*/' --exclude 'build-linux*/' --exclude 'build-win*/' --exclude 'build-mac*/' \${line.separator}
+      --exclude 'classes/' --exclude 'src/' --exclude '.git/' --exclude '*-java-src.zip' \${line.separator}
+      ${env.HOST_UID}@${env.HOST_IP}::${env.HOST_RSYNC_ROOT}/${jocl.basename} ${env.TARGET_ROOT} ${line.separator}
+cd ${env.TARGET_ROOT}/${jocl.basename}/${env.NODE_LABEL}/make ${line.separator}
+export ${system.env.library.path}=/system/lib:${env.TARGET_ROOT}/${gluegen.basename}/${rootrel.build}/obj:${env.TARGET_ROOT}/${gluegen.basename}/${rootrel.build}/test/build/natives ${line.separator}
+export BOOTCLASSPATH=/system/framework/core.jar:/system/framework/bouncycastle.jar:/system/framework/ext.jar:/system/framework/framework.jar:/system/framework/android.policy.jar:/system/framework/services.jar ${line.separator}
+" append="true" file="${build.test}/targetcommand.sh" />
+
+        <for param="test.class.path.m" keepgoing="true">
+            <!-- results in absolute path -->
+            <fileset dir="${build_t.java}">
+                <include name="${test.junit.rel}/**/*Test.class"/>
+                <exclude name="**/*$$*"/>
+            </fileset>
+          <sequential>
+            <var name="test.class.path" unset="true"/>
+            <property name="test.class.path" basedir="${build_t.java}" relative="true" location="@{test.class.path.m}"/>
+            <var name="test.class.fqn" unset="true"/>
+            <pathconvert property="test.class.fqn">
+              <fileset file="${build_t.java}${file.separator}${test.class.path}"/>
+              <chainedmapper>
+                  <globmapper    from="${build_t.java.path}${file.separator}*" to="*"/> <!-- rel. -->
+                  <packagemapper from="*.class"           to="*"/> <!-- FQCN -->
+              </chainedmapper>
+            </pathconvert>
+            <var name="test.class.result.file" value="${results}/TEST-${test.class.fqn}.xml"/>
+            <echo message="Testing ${test.class.fqn} -- ${test.class.result.file}"/>
+            <echo message="${line.separator}
+dalvikvm \${line.separator}
+-Xjnigreflimit:2000 \${line.separator}
+-cp ${junit.run.remote.apks} \${line.separator}
+-Dgluegen.root=${gluegen.root} \${line.separator}
+-Drootrel.build=${rootrel.build} \${line.separator}
+com.android.internal.util.WithFramework \${line.separator}
+org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner \${line.separator}
+${test.class.fqn} \${line.separator}
+filtertrace=true \${line.separator}
+haltOnError=false \${line.separator}
+haltOnFailure=false \${line.separator}
+showoutput=true \${line.separator}
+outputtoformatters=true \${line.separator}
+logfailedtests=true \${line.separator}
+logtestlistenerevents=true \${line.separator}
+formatter=org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter \${line.separator}
+formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,${test.class.result.file} ${line.separator}
+${line.separator}
+" append="true" file="${build_t}/targetcommand.sh" />
+          </sequential>
+        </for>
+        <exec dir="." executable="sh" logError="true" failonerror="true" failifexecutionfails="true">
+            <arg line='-x -c "
+            chmod 0755 ${build_t}/targetcommand.sh ;
+            adb push ${build_t}/targetcommand.sh ${env.TARGET_ROOT}/jocl-targetcommand.sh ;
+            adb shell ${env.TARGET_ROOT}/jocl-targetcommand.sh ;
+            adb pull ${env.TARGET_ROOT}/${jocl.basename}/${env.NODE_LABEL}/make/${results}/ ${results}/ "'/>
+        </exec>
+    </target>
+
+    <target name="junit.run.tests" depends="junit.run.local, junit.run.remote.ssh"/>
+
+    <target name="junit.run.if.enabled" unless="junit.is.disabled">
+        <antcall target="junit.run.tests" inheritRefs="true" inheritAll="true"/>
+    </target>
+    <target name="junit.run.if.disabled" if="junit.is.disabled">
+        <copy todir="${results.test}" file="${gluegen.root}/make/lib/TEST-com.jogamp.junit.DisabledTest.xml"/>
+    </target>
+
+    <target name="junit.run" depends="declare.common, junit.run.if.enabled, junit.run.if.disabled">
+        <antcall target="test-zip-archive" inheritRefs="true" inheritAll="true"/>
+    </target>
+
+    <target name="test.auto.run" depends="junit.run"/>
+
+    <!-- updates / create the test results zip file -->
+    <target name="test-zip-archive" depends="declare.common">
+        <archive.7z destfile="${build}/${test.archive.name}.7z"
+                    basedir="${results.test}" 
+                    includes="**" />
+    </target>
+
+</project>

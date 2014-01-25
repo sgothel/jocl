@@ -29,7 +29,6 @@
 package com.jogamp.opencl;
 
 import org.junit.Rule;
-import org.junit.rules.MethodRule;
 import org.junit.rules.Timeout;
 import java.util.concurrent.CountDownLatch;
 import com.jogamp.opencl.util.MultiQueueBarrier;
@@ -59,9 +58,8 @@ import static com.jogamp.opencl.CLCommandQueue.Mode.*;
  */
 public class CLCommandQueueTest {
 
-    @SuppressWarnings("deprecation")
     @Rule
-    public MethodRule methodTimeout= (MethodRule) new Timeout(20000);
+    public Timeout methodTimeout = new Timeout(20000);
 
     @Test
     public void enumsTest() {

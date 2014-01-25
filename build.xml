@@ -39,7 +39,7 @@
         <property name="javac.debug" value="${javacdebug}"/>
         <property name="javac.source" value="${target.sourcelevel}"/>
         <property name="javac.target" value="${target.targetlevel}"/>
-        <property name="javac.compilerargs" value="-bootclasspath ${target.rt.jar} -Xlint -g:${javacdebuglevel}"/>
+        <property name="javac.compilerargs" value="-bootclasspath '${target.rt.jar}' -Xlint -g:${javacdebuglevel}"/>
     </target>
 
     <!-- overwrites default target - watch out when build-impl.xml changes -->
