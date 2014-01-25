@@ -28,7 +28,6 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.common.AutoCloseable;
 import com.jogamp.common.nio.CachedBufferFactory;
 import com.jogamp.common.nio.PointerBuffer;
 import java.util.Iterator;

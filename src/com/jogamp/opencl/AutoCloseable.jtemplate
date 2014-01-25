@@ -26,7 +26,7 @@
  * or implied, of JogAmp Community.
  */
 
-package com.jogamp.common;
+package com.jogamp.opencl;
 
 /**
  * import of JDK7's ARM interface allowing JDK6 backwards compatibility.

@@ -31,8 +31,6 @@
  */
 package com.jogamp.opencl;
 
-import com.jogamp.common.AutoCloseable;
-
 /**
  * Releasable resource with an CL object ID.
  * @author Michael Bien, et al.

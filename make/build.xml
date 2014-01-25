@@ -280,8 +280,8 @@
 
     <target name="generate.jdk7.autocloseable" if="${enable.jdk7.features}">
         <echo message="Generating JDK7+ AutoCloseable"/>
-        <copy file="${project.root}/src/com/jogamp/common/AutoCloseable.jtemplate"
-            tofile="${build}/gensrc/java/com/jogamp/common/AutoCloseable.java" overwrite="true">
+        <copy file="${project.root}/src/com/jogamp/opencl/AutoCloseable.jtemplate"
+            tofile="${build}/gensrc/java/com/jogamp/opencl/AutoCloseable.java" overwrite="true">
             <filterchain>
                 <replaceregex pattern="/\*extends java.lang.AutoCloseable\*/" replace="extends java.lang.AutoCloseable"/>
             </filterchain>
@@ -290,8 +290,8 @@
 
     <target name="generate.jdk6.autocloseable" unless="${enable.jdk7.features}">
         <echo message="Generating JDK6 AutoCloseable"/>
-        <copy file="${project.root}/src/com/jogamp/common/AutoCloseable.jtemplate"
-            tofile="${build}/gensrc/java/com/jogamp/common/AutoCloseable.java" overwrite="true">
+        <copy file="${project.root}/src/com/jogamp/opencl/AutoCloseable.jtemplate"
+            tofile="${build}/gensrc/java/com/jogamp/opencl/AutoCloseable.java" overwrite="true">
         </copy>      
     </target>
 
