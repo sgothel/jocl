@@ -101,8 +101,9 @@
         <property name="gluegen.jar" value="${gluegen.build}/gluegen.jar" />
         <property name="gluegen-rt.jar" value="${gluegen.build}/gluegen-rt.jar" />
 
-        <property name="jogl.build" value="${project.root}/../jogl/build" />
-        <property name="jogl-all.jar" value="${jogl.build}/jar/jogl-all.jar" />
+        <property name="jogl.root"     value="${project.root}/../jogl" />
+        <property name="jogl.build"    value="${jogl.root}/${rootrel.build}" />
+        <property name="jogl-all.jar"  value="${jogl.build}/jar/jogl-all.jar" />
 
         <!-- Create the classpath that includes GlueGen and
            - ANTLR. This requires the user-defined "antlr.jar"
