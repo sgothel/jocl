@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -28,11 +28,13 @@
 
 package com.jogamp.opencl;
 
+import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.opencl.util.CLBuildConfiguration;
 import com.jogamp.opencl.util.CLProgramConfiguration;
 import com.jogamp.opencl.CLProgram.Status;
 import com.jogamp.opencl.util.CLBuildListener;
 import com.jogamp.opencl.llb.CL;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -41,9 +43,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runners.MethodSorters;
 
 import static org.junit.Assert.*;
 import static java.lang.System.*;
@@ -51,9 +56,10 @@ import static com.jogamp.opencl.CLProgram.CompilerOptions.*;
 
 /**
  *
- * @author Michael Bien
+ * @author Michael Bien, et.al
  */
-public class CLProgramTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class CLProgramTest extends UITestCase {
 
     @Rule
     public TemporaryFolder tmpFolder = new TemporaryFolder();
@@ -300,7 +306,7 @@ public class CLProgramTest {
 
             kernel.putArg((short)3);
             assertEquals(3, kernel.position());
-            
+
             try{
                 kernel.putArg(3);
                 fail("exception not thrown");
@@ -313,11 +319,11 @@ public class CLProgramTest {
             context.release();
         }
 
-    } 
+    }
 
     @Test
     public void createAllKernelsTest() {
-        
+
         String source = "kernel void foo(int a) { }\n"+
                         "kernel void bar(float b) { }\n";
 
@@ -351,6 +357,11 @@ public class CLProgramTest {
             builderTest();
             programBinariesTest();
         }
+    }
+
+    public static void main(String[] args) throws IOException {
+        String tstname = CLProgramTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
     }
 
 }

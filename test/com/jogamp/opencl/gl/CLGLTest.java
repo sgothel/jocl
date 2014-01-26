@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -34,8 +34,10 @@ package com.jogamp.opencl.gl;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opencl.CLCommandQueue;
+
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
+
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Window;
@@ -43,13 +45,20 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLPlatform;
+import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.opencl.util.CLDeviceFilters;
 import com.jogamp.opencl.util.CLPlatformFilters;
+
+import java.io.IOException;
 import java.nio.IntBuffer;
+
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.GLContext;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import static com.jogamp.opencl.util.CLPlatformFilters.*;
 import static org.junit.Assert.*;
@@ -57,9 +66,10 @@ import static java.lang.System.*;
 
 /**
  * Test testing the JOGL - JOCL interoperability.
- * @author Michael Bien
+ * @author Michael Bien, et.al
  */
-public class CLGLTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class CLGLTest extends UITestCase {
 
     private static GLContext glcontext;
     private static GLWindow glWindow;
@@ -87,7 +97,7 @@ public class CLGLTest {
         glcontext.release();
         glWindow.destroy();
         window.destroy();
-        
+
         glcontext = null;
         glWindow = null;
         window = null;
@@ -111,11 +121,11 @@ public class CLGLTest {
         }
 
         out.println(device.getPlatform());
-        
+
         assertNotNull(glcontext);
         makeGLCurrent();
         assertTrue(glcontext.isCurrent());
-        
+
         CLContext context = CLGLContext.create(glcontext, device);
         assertNotNull(context);
 
@@ -129,40 +139,40 @@ public class CLGLTest {
         }finally{
             // destroy cl context, gl context still current
             context.release();
-            
+
             deinitGL();
         }
 
     }
-    
+
     @Test(timeout=15000)
     public void vboSharing() {
-        
+
         out.println(" - - - glcl; vboSharing - - - ");
-        
+
         initGL();
         makeGLCurrent();
         assertTrue(glcontext.isCurrent());
-        
+
         CLPlatform platform = CLPlatform.getDefault(glSharing(glcontext));
         if(platform == null) {
             out.println("test aborted");
             return;
         }
-        
+
         CLDevice theChosenOne = platform.getMaxFlopsDevice(CLDeviceFilters.glSharing());
         out.println(theChosenOne);
-        
+
         CLGLContext context = CLGLContext.create(glcontext, theChosenOne);
-        
+
         try{
             out.println(context);
-            
+
             GL2 gl = glcontext.getGL().getGL2();
-            
+
             int[] id = new int[1];
             gl.glGenBuffers(id.length, id, 0);
-            
+
             IntBuffer glData = Buffers.newDirectIntBuffer(new int[] {0,1,2,3,4,5,6,7,8});
             glData.rewind();
 
@@ -173,16 +183,16 @@ public class CLGLTest {
                 gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
             gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
             gl.glFinish();
-            
+
 
             // create CLGL buffer
             IntBuffer clData = Buffers.newDirectIntBuffer(9);
             CLGLBuffer<IntBuffer> clBuffer = context.createFromGLBuffer(clData, id[0], glData.capacity()*4, Mem.READ_ONLY);
-            
+
             assertEquals(glData.capacity(), clBuffer.getCLCapacity());
             assertEquals(glData.capacity()*4, clBuffer.getCLSize());
-                
-            
+
+
             CLCommandQueue queue = theChosenOne.createCommandQueue();
 
             // read gl buffer into cl nio buffer
@@ -197,14 +207,14 @@ public class CLGLTest {
             out.println(clBuffer);
 
             clBuffer.release();
-            
+
             gl.glDeleteBuffers(1, id, 0);
-            
+
         }finally{
             context.release();
             deinitGL();
         }
-        
+
     }
 
     private void makeGLCurrent() {
@@ -222,5 +232,9 @@ public class CLGLTest {
         }
     }
 
+    public static void main(String[] args) throws IOException {
+        String tstname = CLGLTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
+    }
 
 }

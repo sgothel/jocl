@@ -10,17 +10,26 @@ import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLPlatform;
+import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.opencl.util.concurrent.CLQueueContext.CLSimpleQueueContext;
 import com.jogamp.opencl.util.concurrent.CLQueueContextFactory.CLSimpleContextFactory;
+
+import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
+import org.junit.runners.MethodSorters;
+
 import com.jogamp.opencl.util.CLMultiContext;
+
 import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -28,9 +37,10 @@ import static java.lang.System.*;
 
 /**
  *
- * @author Michael Bien
+ * @author Michael Bien, et.al
  */
-public class CLMultiContextTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class CLMultiContextTest extends UITestCase {
 
     @Rule
     public Timeout methodTimeout= new Timeout(10000);
@@ -78,7 +88,7 @@ public class CLMultiContextTest {
         }
 
         public Buffer execute(CLSimpleQueueContext qc) {
-            
+
             CLCommandQueue queue = qc.getQueue();
             CLContext context = qc.getCLContext();
             CLKernel kernel = qc.getKernel("compute");
@@ -119,7 +129,7 @@ public class CLMultiContextTest {
             final int slice = 64;
             final int tasksPerQueue = 10;
             final int taskCount = pool.getSize() * tasksPerQueue;
-            
+
             IntBuffer data = Buffers.newDirectIntBuffer(slice*taskCount);
 
             List<CLTestTask> tasks = new ArrayList<CLTestTask>(taskCount);
@@ -166,6 +176,11 @@ public class CLMultiContextTest {
             assertEquals(expected, data.get());
         }
         data.rewind();
+    }
+
+    public static void main(String[] args) throws IOException {
+        String tstname = CLMultiContextTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
     }
 
 }

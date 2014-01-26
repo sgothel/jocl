@@ -30,7 +30,10 @@ package com.jogamp.opencl;
 
 import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLMemory.Map;
+import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.common.nio.Buffers;
+
+import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
@@ -41,7 +44,10 @@ import java.nio.ShortBuffer;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import static org.junit.Assert.*;
 import static java.lang.System.*;
@@ -51,11 +57,10 @@ import static com.jogamp.opencl.util.CLPlatformFilters.*;
 import static com.jogamp.opencl.CLVersion.*;
 
 /**
- *
- * @author Michael Bien
+ * @author Michael Bien, et.al.
  */
-public class CLBufferTest {
-
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class CLBufferTest extends UITestCase {
 
     @Test
     public void createBufferTest() {
@@ -94,7 +99,7 @@ public class CLBufferTest {
                 assertEquals(buffer.getNIOSize(), buffer.getCLSize());
                 assertEquals(sizeOfBufferElem(nio), buffer.getElementSize());
                 assertEquals(nio.capacity() * sizeOfBufferElem(nio), buffer.getCLSize());
-                
+
                 CLBuffer<ByteBuffer> clone = buffer.cloneWith(anotherNIO);
 
                 assertEquals(buffer.ID, clone.ID);
@@ -341,5 +346,8 @@ public class CLBufferTest {
 
     }
 
-
+    public static void main(String[] args) throws IOException {
+        String tstname = CLBufferTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
+    }
 }

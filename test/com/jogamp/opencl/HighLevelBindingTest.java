@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -40,14 +40,19 @@ import com.jogamp.opencl.CLDevice.LocalMemType;
 import com.jogamp.opencl.CLDevice.Type;
 import com.jogamp.opencl.CLDevice.Capabilities;
 import com.jogamp.opencl.llb.CL;
+import com.jogamp.opencl.test.util.UITestCase;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Map;
+
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import static org.junit.Assert.*;
 import static java.lang.System.*;
@@ -59,9 +64,10 @@ import static com.jogamp.common.nio.Buffers.*;
 
 /**
  * Test testing the high level bindings.
- * @author Michael Bien
+ * @author Michael Bien, et.al
  */
-public class HighLevelBindingTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class HighLevelBindingTest extends UITestCase {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -73,7 +79,7 @@ public class HighLevelBindingTest {
 
     @Test
     public void enumsTest() {
-        
+
         // enum tests
         final EnumSet<FPConfig> singleFPConfig = FPConfig.valuesOf(CL.CL_FP_DENORM | CL.CL_FP_ROUND_TO_INF);
         assertEquals(0, FPConfig.valuesOf(0).size());
@@ -201,7 +207,7 @@ public class HighLevelBindingTest {
 
         CLPlatform platformGPU = CLPlatform.getDefault(version(CL_1_0), type(GPU));
         CLPlatform platformCPU = CLPlatform.getDefault(version(CL_1_0), type(CPU));
-        
+
         if(platformGPU != null) {
             assertTrue(platformGPU.listCLDevices(GPU).length > 0);
         }else if(platformCPU != null) {
@@ -362,5 +368,9 @@ public class HighLevelBindingTest {
 
         context.release();
     }
-    
+    public static void main(String[] args) throws IOException {
+        String tstname = HighLevelBindingTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
+    }
+
 }

@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -32,9 +32,16 @@ package com.jogamp.opencl;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.IntBuffer;
+
 import javax.imageio.ImageIO;
+
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
+
+import com.jogamp.opencl.test.util.UITestCase;
+
 import static org.junit.Assert.*;
 import static java.lang.System.*;
 import static com.jogamp.common.nio.Buffers.*;
@@ -43,9 +50,10 @@ import static com.jogamp.opencl.CLImageFormat.ChannelType.*;
 
 /**
  * Test testing CLImage API.
- * @author Michael Bien
+ * @author Michael Bien, et.al
  */
-public class CLImageTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class CLImageTest extends UITestCase {
 
     private static int[] pixels;
 
@@ -94,7 +102,7 @@ public class CLImageTest {
         }
 
     }
-    
+
     @Test
     public void image2dCopyTest() throws IOException {
 
@@ -110,14 +118,14 @@ public class CLImageTest {
         try{
 
             CLImageFormat format = new CLImageFormat(RGBA, UNSIGNED_INT32);
-            
+
             CLImage2d<IntBuffer> imageA = context.createImage2d(newDirectIntBuffer(pixels), 128, 128, format);
             CLImage2d<IntBuffer> imageB = context.createImage2d(newDirectIntBuffer(pixels.length), 128, 128, format);
 
             queue.putWriteImage(imageA, false)
                  .putCopyImage(imageA, imageB)
                  .putReadImage(imageB, true);
-            
+
             IntBuffer bufferA = imageA.getBuffer();
             IntBuffer bufferB = imageB.getBuffer();
 
@@ -176,6 +184,10 @@ public class CLImageTest {
             context.release();
         }
 
+    }
+    public static void main(String[] args) throws IOException {
+        String tstname = CLImageTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
     }
 
 }

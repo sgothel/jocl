@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -29,10 +29,13 @@
 package com.jogamp.opencl;
 
 import java.util.Random;
+
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.impl.BuildProgramCallback;
 import com.jogamp.opencl.llb.CL;
+import com.jogamp.opencl.test.util.UITestCase;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -46,7 +49,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import static java.lang.System.*;
 import static org.junit.Assert.*;
@@ -59,7 +64,8 @@ import static com.jogamp.opencl.TestUtils.*;
  * Test testing the low level bindings.
  * @author Michael Bien, et al.
  */
-public class LowLevelBindingTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class LowLevelBindingTest extends UITestCase {
 
     private final static String programSource =
               " // OpenCL Kernel Function for element by element vector addition                                  \n"
@@ -256,7 +262,7 @@ public class LowLevelBindingTest {
         out.println("using device# " + offset);
         offset *= (is32Bit() ? 4 : 8);
         long device = is32Bit()?bb.getInt(offset):bb.getLong(offset);
-        
+
         ret = cl.clGetDeviceInfo(device, CL.CL_DEVICE_MAX_WORK_GROUP_SIZE, bb.capacity(), bb, null);
         checkError("on clGetDeviceInfo", ret);
         int maxWGS = bb.getInt();
@@ -438,7 +444,7 @@ public class LowLevelBindingTest {
                 }
             });
         }
-        
+
         for (Future<Object> future : pool.invokeAll(tasks)) {
             try {
                 future.get();
@@ -465,5 +471,9 @@ public class LowLevelBindingTest {
             throw CLException.newException(ret, msg);
     }
 
+    public static void main(String[] args) throws IOException {
+        String tstname = LowLevelBindingTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
+    }
 
 }

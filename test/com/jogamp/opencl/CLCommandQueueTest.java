@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -28,20 +28,27 @@
 
 package com.jogamp.opencl;
 
+import org.junit.FixMethodOrder;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
+import org.junit.runners.MethodSorters;
+
 import java.util.concurrent.CountDownLatch;
+
+import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.opencl.util.MultiQueueBarrier;
 import com.jogamp.opencl.CLCommandQueue.Mode;
 import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.util.CLDeviceFilters;
 import com.jogamp.opencl.util.CLPlatformFilters;
 import com.jogamp.opencl.llb.CL;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -53,10 +60,10 @@ import static com.jogamp.common.nio.Buffers.*;
 import static com.jogamp.opencl.CLCommandQueue.Mode.*;
 
 /**
- *
- * @author Michael Bien
+ * @author Michael Bien, et.al.
  */
-public class CLCommandQueueTest {
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+public class CLCommandQueueTest extends UITestCase {
 
     @Rule
     public Timeout methodTimeout = new Timeout(20000);
@@ -100,7 +107,7 @@ public class CLCommandQueueTest {
         try{
             CLDevice device = context.getDevices()[0];
             int groupSize = device.getMaxWorkItemSizes()[0];
-            
+
             final int elements = roundUp(groupSize, ONE_MB / SIZEOF_INT * 5); // 5MB per buffer
 
             CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
@@ -145,10 +152,10 @@ public class CLCommandQueueTest {
                  .putWaitForEvent(events, 1, true);
 
             events.release();
-            
+
             queue.putReadBuffer(clBufferC, false, events)
                  .putReadBuffer(clBufferD, false, events);
-            
+
             queue.putWaitForEvents(events, true);
 
             events.release();
@@ -159,14 +166,14 @@ public class CLCommandQueueTest {
             context.release();
         }
     }
-    
+
     @Test
     public void eventConditionsTest() throws IOException {
-        
+
         out.println(" - - - event conditions test - - - ");
 
         CLPlatform platform = CLPlatform.getDefault(CLPlatformFilters.queueMode(OUT_OF_ORDER_MODE));
-        
+
         CLDevice device = null;
         // we can still test this with in-order queues
         if(platform == null) {
@@ -174,17 +181,17 @@ public class CLCommandQueueTest {
         }else{
             device = platform.getMaxFlopsDevice(CLDeviceFilters.queueMode(OUT_OF_ORDER_MODE));
         }
-        
+
         CLContext context = CLContext.create(device);
-        
+
         try{
-            
+
             CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
-            
+
             CLBuffer<IntBuffer> buffer = context.createBuffer(newDirectIntBuffer(new int[]{ 1,1,1, 1,1,1, 1,1,1 }));
-            
+
             int elements = buffer.getNIOCapacity();
-            
+
             CLCommandQueue queue;
             if(device.getQueueProperties().contains(OUT_OF_ORDER_MODE)) {
                 queue = device.createCommandQueue(OUT_OF_ORDER_MODE);
@@ -194,30 +201,30 @@ public class CLCommandQueueTest {
 
             // simulate in-order queue by accumulating events of prior commands
             CLEventList events = new CLEventList(3);
-            
+
             // (1+1)*2 = 4; conditions enforce propper order
             CLKernel addKernel = program.createCLKernel("add").putArg(buffer).putArg(1).putArg(elements);
             CLKernel mulKernel = program.createCLKernel("mul").putArg(buffer).putArg(2).putArg(elements);
-            
+
             queue.putWriteBuffer(buffer, false, events);
-            
+
             queue.put1DRangeKernel(addKernel, 0, elements, 1, events, events);
             queue.put1DRangeKernel(mulKernel, 0, elements, 1, events, events);
-            
+
             queue.putReadBuffer(buffer, false, events, null);
-            
+
             queue.finish();
-            
+
             events.release();
-            
+
             for (int i = 0; i < elements; i++) {
                 assertEquals(4, buffer.getBuffer().get(i));
             }
-            
+
         }finally{
             context.release();
         }
-        
+
     }
 
     @Test
@@ -504,5 +511,9 @@ public class CLCommandQueueTest {
             context.release();
         }
 
+    }
+    public static void main(String[] args) throws IOException {
+        String tstname = CLCommandQueueTest.class.getName();
+        org.junit.runner.JUnitCore.main(tstname);
     }
 }
