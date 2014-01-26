@@ -40,9 +40,9 @@ import static org.junit.Assert.*;
 public class MiscUtils {
 
     //decrease this value on systems with few memory.
-    final static int ONE_MB = 1048576;
+    public final static int ONE_MB = 1048576;
 
-    final static int NUM_ELEMENTS = 10000000;
+    public final static int NUM_ELEMENTS = 10000000;
 
     public static final void fillBuffer(ByteBuffer buffer, int seed) {
 
