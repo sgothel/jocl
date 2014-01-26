@@ -26,16 +26,10 @@
  * or implied, of JogAmp Community.
  */
 
-package com.jogamp.opencl;
+package com.jogamp.opencl.test.util;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Random;
-
-import org.junit.FixMethodOrder;
-import org.junit.runners.MethodSorters;
-
-import com.jogamp.opencl.test.util.UITestCase;
 
 import static java.lang.System.*;
 import static org.junit.Assert.*;
@@ -43,8 +37,7 @@ import static org.junit.Assert.*;
 /**
  * @author Michael Bien, et.al
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class TestUtils extends UITestCase {
+public class MiscUtils {
 
     //decrease this value on systems with few memory.
     final static int ONE_MB = 1048576;
@@ -83,10 +76,5 @@ public class TestUtils extends UITestCase {
         }
         a.rewind();
         b.rewind();
-    }
-
-    public static void main(String[] args) throws IOException {
-        String tstname = TestUtils.class.getName();
-        org.junit.runner.JUnitCore.main(tstname);
     }
 }

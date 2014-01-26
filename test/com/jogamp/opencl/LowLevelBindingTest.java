@@ -57,8 +57,8 @@ import static java.lang.System.*;
 import static org.junit.Assert.*;
 import static com.jogamp.common.nio.Buffers.*;
 import static com.jogamp.common.os.Platform.*;
+import static com.jogamp.opencl.test.util.MiscUtils.*;
 import static com.jogamp.opencl.util.CLUtil.*;
-import static com.jogamp.opencl.TestUtils.*;
 
 /**
  * Test testing the low level bindings.

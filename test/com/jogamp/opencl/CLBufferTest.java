@@ -51,8 +51,8 @@ import org.junit.runners.MethodSorters;
 
 import static org.junit.Assert.*;
 import static java.lang.System.*;
-import static com.jogamp.opencl.TestUtils.*;
 import static com.jogamp.common.nio.Buffers.*;
+import static com.jogamp.opencl.test.util.MiscUtils.*;
 import static com.jogamp.opencl.util.CLPlatformFilters.*;
 import static com.jogamp.opencl.CLVersion.*;
 
