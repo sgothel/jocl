@@ -107,5 +107,6 @@ function testawt() {
 #
 # Version
 #
-testnoawt com.jogamp.opencl.JoclVersion $*
+#testnoawt com.jogamp.opencl.JoclVersion $*
+testnoawt com.jogamp.opencl.TestJoclVersion $*
 

@@ -99,7 +99,7 @@ if [ -z "$ANT_PATH" ] ; then
 fi
 ANT_JARS=$ANT_PATH/lib/ant.jar:$ANT_PATH/lib/ant-junit.jar
 
-JOCL_JAR="$JOCL_BUILDDIR"/jar/jocl.jar
+JOCL_JAR="$JOCL_BUILDDIR"/jar/jocl.jar:"$JOCL_BUILDDIR"/jar/jocl-test.jar
 
 echo GLUEGEN BUILDDIR: "$GLUEGEN_BUILDDIR"
 echo JOAL BUILDDIR: "$JOAL_BUILDDIR"
