@@ -49,7 +49,6 @@ import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.opencl.llb.impl.CLImpl;
 import com.jogamp.opencl.spi.CLAccessorFactory;
 import com.jogamp.opencl.util.Filter;
-import com.jogamp.opencl.util.JOCLVersion;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -168,10 +167,10 @@ public class CLPlatform {
             }
             cl = new CLImpl();
         }catch(UnsatisfiedLinkError ex) {
-            System.err.println(JOCLVersion.getAllVersions());
+            System.err.println(JoclVersion.getInstance().getAllVersions(null).toString());
             throw ex;
         }catch(Exception ex) {
-            System.err.println(JOCLVersion.getAllVersions());
+            System.err.println(JoclVersion.getInstance().getAllVersions(null).toString());
             throw new JogampRuntimeException("JOCL initialization error.", ex);
         }
 

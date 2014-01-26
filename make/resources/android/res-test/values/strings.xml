@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Jocl Test</string>
+    <string name="app_name">Jocl Tests</string>
+    <string name="app_descr">Launches Jocl Tests</string>
+    <string name="activity_opencltest1_name">JOCLTST1</string>
+    <string name="activity_opencltest1_descr">JOCLTST1</string>
+</resources>

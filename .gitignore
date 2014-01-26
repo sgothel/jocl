@@ -1,6 +1,5 @@
 build
 dist
-make/resources/includes/CL
+make/stub_includes/CL
 .idea/workspace.xml
 **~
-nbproject/private

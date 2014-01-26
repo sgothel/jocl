@@ -83,8 +83,7 @@
     <!--
        - Declare all paths and user defined variables.
       -->
-    <target name="init" depends="jogamp.env.init, gluegen.cpptasks.detect.os">
-
+    <target name="init.base" depends="jogamp.env.init,gluegen.properties.load.user,gluegen.cpptasks.detect.os">
         <property name="jocl.build.number" value="manual"/>
         <property name="jocl.build.id"     value="${version.timestamp}"/>
         <property name="jocl.version"      value="${jogamp.version.base}-b${jocl.build.number}-${version.timestamp}" />
@@ -104,20 +103,19 @@
         <property name="jogl.root"     value="${project.root}/../jogl" />
         <property name="jogl.build"    value="${jogl.root}/${rootrel.build}" />
         <property name="jogl-all.jar"  value="${jogl.build}/jar/jogl-all.jar" />
+    </target>
 
-        <!-- Create the classpath that includes GlueGen and
-           - ANTLR. This requires the user-defined "antlr.jar"
-           - property. -->
-        <path id="gluegen.classpath">
-            <pathelement location="${gluegen.jar}" />
-            <pathelement location="${antlr.jar}" />
-        </path>
+    <target name="init.android" if="android-jars.available" >
+        <property name="gluegen-rt-android.jar" value="${gluegen.build}/gluegen-rt-android.jar" />
 
-    	<path id="javac.classpath">
-            <pathelement location="${gluegen.jar}" />
+    	<path id="javac.android.classpath">
+            <pathelement location="${android-min.jar}"/>
+            <pathelement location="${gluegen-rt-android.jar}" />
             <pathelement location="${jogl-all.jar}" />
         </path>
+    </target>
 
+    <target name="init" depends="init.base, init.android">
         <!-- Names of directories relative to the project root.
              Some of these are used in FileMappers later for dependence information
              and need exact string matching, which is why they use file.separator
@@ -151,28 +149,41 @@
         <property name="obj"      value="${project.root}/${rootrel.obj}" />
         <property name="obj.jocl" value="${project.root}/${rootrel.obj.jocl}" />
 
+        <!-- Create the classpath that includes GlueGen and
+           - ANTLR. This requires the user-defined "antlr.jar"
+           - property. -->
+        <path id="gluegen.classpath">
+            <pathelement location="${gluegen.jar}" />
+            <pathelement location="${antlr.jar}" />
+        </path>
+
+    	<path id="javac.classpath">
+            <pathelement location="${gluegen.jar}" />
+            <pathelement location="${jogl-all.jar}" />
+        </path>
+
+        <property name="config" value="${project.root}/make/config" />
+        <property name="stub.includes" value="${project.root}/make/stub_includes" />
+        <property name="stub.includes.dir" value="stub_includes" /> <!-- NOTE:  this MUST be relative for FileSet -->
+
         <!-- Directories used for OpenCL header file preprocessing. -->
         <property name="etc.build.dir" value="${build}/etc" />
-        <property name="headers.orig" value="${basedir}/resources/includes/CL_orig" />
-        <property name="headers.dest" value="${basedir}/resources/includes/CL" />
+        <property name="headers.orig" value="${stub.includes}/CL_orig" />
+        <property name="headers.dest" value="${build}/includes/CL" />
 
     	<!-- The headers from which Java files are generated -->
-        <property name="config" value="${project.root}/make/resources" />
-        <property name="stub.includes" value="${config}/includes" />
-        <property name="stub.includes.opencl" value="${config}" />
-        <property name="stub.includes.dir" value="resources" /> <!-- NOTE:  this MUST be relative for FileSet -->
         <dirset id="stub.includes.fileset.all" dir=".">
-            <include name="${stub.includes.dir}/includes"/>
-            <include name="${stub.includes.dir}/stubs_includes/jvm"/>
-            <include name="${stub.includes.dir}/stubs_includes/gl"/>
-            <include name="${stub.includes.dir}/stubs_includes/common"/>
+            <include name="${stub.includes.dir}"/>
+            <include name="${stub.includes.dir}/jvm"/>
+            <include name="${stub.includes.dir}/gl"/>
+            <include name="${stub.includes.dir}/common"/>
         </dirset>
     	<fileset id="stub.includes.dependencies.fileset.1" dir="${stub.includes.dir}">
-            <include name="includes/CL/**" />
-            <include name="includes/GL3/**" />
+            <include name="CL/**" />
+            <include name="GL3/**" />
         </fileset>
         <fileset id="stub.includes.dependencies.fileset.2" file="${gluegen.jar}" />
-        <fileset id="stub.includes.dependencies.fileset.3" dir=".">
+        <fileset id="stub.includes.dependencies.fileset.3" dir="config">
             <include name="*.cfg" />
             <include name="*.java" />
             <include name="*.c" />
@@ -196,9 +207,13 @@
         <mkdir dir="${classes}" />
         <mkdir dir="${obj}" />
         <mkdir dir="${obj.jocl}" />
+        <mkdir dir="${build}/includes" />
 
         <property name="archive.name"        value="jocl-${jocl.version}-${os.and.arch}" />
         <property name="archive"             value="${build}/${archive.name}" />
+
+        <!-- optional android classes - if android -->
+        <property name="java.part.android" value="jogamp/opencl/os/android/**"/>
 
         <condition property="useLinuxARMv6SFOptions">
             <and>
@@ -356,7 +371,7 @@
 
         <echo message="context..."/>
     	<echo message="incl path ${toString:stub.includes.fileset.all}"/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-context-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -367,7 +382,7 @@
         </gluegen>
 
         <echo message="program..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-program-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -378,7 +393,7 @@
         </gluegen>
 
         <echo message="kernel..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-kernel-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -389,7 +404,7 @@
         </gluegen>
 
         <echo message="queue..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-queue-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -400,7 +415,7 @@
         </gluegen>
 
         <echo message="device..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-device-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -411,7 +426,7 @@
         </gluegen>
 
         <echo message="memobj..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-mem-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -422,7 +437,7 @@
         </gluegen>
 
         <echo message="image..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-image-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -433,7 +448,7 @@
         </gluegen>
 
         <echo message="buffer..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-buffer-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -444,7 +459,7 @@
         </gluegen>
 
         <echo message="sampler..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-sampler-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -455,7 +470,7 @@
         </gluegen>
 
         <echo message="event..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-event-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -466,7 +481,7 @@
         </gluegen>
 
         <echo message="platform..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-platform-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -477,7 +492,7 @@
         </gluegen>
 
         <echo message="CL..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -488,7 +503,7 @@
         </gluegen>
 
         <echo message="CLGL..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/clgl-if.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -498,7 +513,7 @@
         </gluegen>
 
         <echo message="GLImpl..."/>
-        <gluegen src="${stub.includes.opencl}/opencl.h"
+        <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl.cfg"
                  includeRefid="stub.includes.fileset.all"
@@ -521,6 +536,7 @@
     <target name="java.compile" depends="java.generate">
         <javac destdir="${classes}" 
                includeantruntime="false"
+               excludes="${java.part.android}"
                memoryMaximumSize="${javac.memorymax}"
                encoding="UTF-8"
                source="${target.sourcelevel}" 
@@ -528,6 +544,22 @@
                bootclasspath="${target.rt.jar}"
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
         	<classpath refid="javac.classpath"/>
+        	<src path="${src.java}" />
+            <src path="${src.generated.java}" />
+        </javac>
+    </target>
+
+    <target name="android.compile" if="android-jars.available">
+        <!--compile gluegen-rt-android last-->
+        <javac destdir="${classes}" 
+               includeantruntime="false"
+               memoryMaximumSize="${javac.memorymax}"
+               encoding="UTF-8"
+               source="${target.sourcelevel}" 
+               target="${target.targetlevel}" 
+               bootclasspath="${target.rt.jar}"
+               debug="${javacdebug}" debuglevel="${javacdebuglevel}">
+        	<classpath refid="javac.android.classpath"/>
         	<src path="${src.java}" />
             <src path="${src.generated.java}" />
         </javac>
@@ -589,7 +621,7 @@
                     <sysincludepath path="${java.includes.dir}"/>
                     <sysincludepath path="${java.includes.dir.platform}"/>
                     <sysincludepath path="${stub.includes.gluegen.cc}"/>
-                    <includepath path="resources/includes"/>
+                    <includepath path="${stub.includes.dir}"/>
                     <!-- This is for the generated headers for handwritten C code -->
                     <includepath path="${src.generated.c}" />
                     <includepath path="${src.c}"/>
@@ -658,22 +690,46 @@
         <jar manifest="tempversion" destfile="${jocl.jar}">
             <fileset dir="${classes}">
                 <include name="com/jogamp/opencl/**" />
+                <include name="jogamp/opencl/**" />
+                <exclude name="${java.part.android}" />
+            </fileset>
+            <fileset dir="resources/assets">
+                <include name="**" />
             </fileset>
         </jar>
-        <copy file="${jocl.jar}" tofile="${jocl-android.jar}"/>
+
+        <jar manifest="tempversion" destfile="${jocl-android.jar}">
+            <fileset dir="${classes}">
+                <include name="com/jogamp/opencl/**" />
+                <include name="jogamp/opencl/**" />
+            </fileset>
+            <fileset dir="resources/assets">
+                <include name="**" />
+            </fileset>
+        </jar>
 
         <antcall target="android.package" inheritRefs="true" />
 
         <delete file="tempversion"/>
     </target>
 
-    <target name="android.package" depends="init" if="isAndroid">
+    <target name="jocl.build.check.aapt" depends="init">
+        <uptodate property="jocl.build.skip.aapt">
+          <srcfiles dir= "."                includes="*.xml"/>
+          <srcfiles dir= "${src.java}"      includes="**"/>
+          <srcfiles dir= "${src.generated}" includes="**"/>
+          <mapper type="merge" to="${build}/jar/jocl-android-${android.abi}.apk"/>
+        </uptodate>
+    </target>
+
+    <target name="android.package" depends="init,jocl.build.check.aapt" if="isAndroid" unless="jocl.build.skip.aapt" >
         <aapt.signed 
+            assetsdir="resources/assets"
             jarsrcdir="${src.java}"
             jarbuilddir="${build}/jar"
             jarbasename="jocl-android"
             nativebuilddir="../${rootrel.build}/obj"
-            nativebasename=""
+            nativebasename="jocl"
             android.abi="${android.abi}"
             androidmanifest.path="resources/android/AndroidManifest-jocl.xml"
             androidresources.path="resources/android/res-jocl"
@@ -856,6 +912,7 @@
     <target name="jocl.build" depends="init">
         <!-- Generate and compile the Java sources. -->
         <antcall target="java.compile" inheritRefs="true" />
+        <antcall target="android.compile" inheritRefs="true" />
 
         <!-- Compile the native C sources . -->
         <antcall target="c.build.jocl" inheritRefs="true" />

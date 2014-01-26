@@ -14,6 +14,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gluegen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jogl"/>
+	<classpathentry kind="lib" path="/gluegen/make/lib/android-sdk/15/android.jar" sourcepath="/gluegen/make/lib/android-sdk/15/android-java-src.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

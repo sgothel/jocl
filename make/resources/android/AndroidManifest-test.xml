@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       sharedUserId="com.jogamp.Community" 
-      package="com.jogamp.opencl">
+      package="com.jogamp.opencl.test">
 
     <uses-library android:name="com.jogamp.common" android:required="true" />
     <uses-library android:name="javax.media.opengl" android:required="true" />
+    <uses-library android:name="com.jogamp.opencl" android:required="true" />
+    <uses-library android:name="jogamp.android.launcher" android:required="true" />
 
     <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="14"/>
 
@@ -13,17 +15,6 @@
                  android:description="@string/app_descr"
                  android:persistent="false"
                  >
-        <activity android:name="jogamp.opencl.os.android.JoclVersionActivityLauncher"
-                  android:finishOnTaskLaunch="true"
-                  android:launchMode="singleTop"
-                  android:label="@string/activity_v_name"
-                  android:description="@string/activity_v_descr"
-                  >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>
