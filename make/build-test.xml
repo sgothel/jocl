@@ -208,7 +208,9 @@
             <jvmarg value="-Djocl.debug.Factory"/>
             <batchtest todir="${results.test}">
                 <fileset dir="${classes.test}">
+                    <include name="${java.dir.junit}/**/Test*"/>
                     <include name="${java.dir.junit}/**/*Test.class"/>
+                    <exclude name="**/*$$*"/>
                 </fileset>
                 <formatter usefile="false" type="plain"/>
                 <formatter usefile="true" type="xml"/>
