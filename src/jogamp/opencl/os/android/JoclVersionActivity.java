@@ -66,6 +66,7 @@ public class JoclVersionActivity extends JoclBaseActivity {
                             GlueGenVersion.getInstance()+Platform.NEWLINE+
                             joclVersion.toString()+Platform.NEWLINE+
                             joclVersion.getOpenCLTextInfo(null).toString()+Platform.NEWLINE;
+       System.err.println(info1);
        tv.setText(info1);
 
        Log.d(MD.TAG, "onCreate - X");
