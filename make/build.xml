@@ -801,8 +801,8 @@
         <property name="javadoc.jocl.public.path" value="${javadoc.root.path}/jocl/javadoc" />
         <property name="javadoc.jocl.dev.path"    value="${javadoc.root.path}/jocl/javadoc_dev" />
 
-        <property name="javadoc.packagenames" value="com.jogamp.openal,com.jogamp.openal.util,com.jogamp.openal.sound3d" />
-        <property name="javadoc.dev.packagenames" value="${javadoc.packagenames},jogamp.openal" />
+        <property name="javadoc.packagenames" value="com.jogamp.opencl.*" />
+        <property name="javadoc.dev.packagenames" value="${javadoc.packagenames},jogamp.opencl.*" />
 
         <!-- if gluegen-javadoc.path is not set, check in default location, 
              ${gluegen.root}/${rootrel.build}/javadoc/gluegen -->
