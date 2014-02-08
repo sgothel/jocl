@@ -70,6 +70,8 @@ public class CLProgram extends CLObjectResource {
 
     private boolean executable;
     private boolean released;
+    /** Set if program created from binary, or else getting source can crash the driver on Macs. */
+    private boolean noSource;
 
     private CLProgram(CLContext context, long id) {
         super(context, id);
@@ -592,10 +594,20 @@ public class CLProgram extends CLObjectResource {
     }
 
     /**
+     * Must set this if the program is created from binary so we know not to call getSource(),
+     * which can SIGSEGV on Macs if there is no source.
+     */
+    public void setNoSource() {
+        noSource = true;
+    }
+
+    /**
      * Returns the source code of this program. Note: sources are not cached,
      * each call of this method calls into Open
      */
     public String getSource() {
+        if(noSource)
+            return "";
         // some drivers return IVE codes if the program haven't been built from source.
         try{
             return getProgramInfoString(CL_PROGRAM_SOURCE);
@@ -810,7 +822,7 @@ public class CLProgram extends CLObjectResource {
         public final static String UNSAFE_MATH = "-cl-unsafe-math-optimizations";
 
         /**
-         * Allow optimizations for floating-point arithmetic that assume that arguments and results are not NaNs or ±∞.
+         * Allow optimizations for floating-point arithmetic that assume that arguments and results are not NaNs or plus/minus infinity.
          * This option may violate the OpenCL numerical compliance requirements defined in in section 7.4 for
          * single-precision floating-point, section 9.3.9 for double-precision floating-point, and edge case behavior in section 7.5.
          */

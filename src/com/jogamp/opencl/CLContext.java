@@ -287,6 +287,7 @@ public class CLContext extends CLObjectResource {
      */
     public CLProgram createProgram(Map<CLDevice, byte[]> binaries) {
         CLProgram program = CLProgram.create(this, binaries);
+        program.setNoSource();
         programs.add(program);
         return program;
     }
@@ -486,11 +487,8 @@ public class CLContext extends CLObjectResource {
     
     private void release(Collection<? extends CLResource> resources) {
         // resources remove themselves when released, see above
-        if(!resources.isEmpty()) {
-            CLResource[] array = resources.toArray(new CLResource[resources.size()]);
-            for (CLResource resource : array) {
-                resource.release();
-            }
+        while(!resources.isEmpty()) {
+            resources.iterator().next().release();
         }
     }
 
@@ -509,9 +507,8 @@ public class CLContext extends CLObjectResource {
 
             synchronized(queuesMap) {
                 final Collection<List<CLCommandQueue>> queuesList =  queuesMap.values();
-                for( Iterator<List<CLCommandQueue>> queuesI = queuesList.iterator(); queuesI.hasNext(); ) {
-                    release(queuesI.next());
-                }
+                while(!queuesList.isEmpty())
+                    release(queuesList.iterator().next());
             }
 
         } finally {

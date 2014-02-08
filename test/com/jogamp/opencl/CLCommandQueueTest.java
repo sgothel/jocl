@@ -474,7 +474,9 @@ public class CLCommandQueueTest extends UITestCase {
                 @Override
                 public void run() {
 
-                    int groupSize = queue2.getDevice().getMaxWorkItemSizes()[0];
+                    int maxWorkItemSize = queue2.getDevice().getMaxWorkItemSizes()[0];
+                    int kernelWorkGroupSize = (int)vectorAddKernel2.getWorkGroupSize( queue2.getDevice() );
+                    int localWorkSize = Math.min( maxWorkItemSize, kernelWorkGroupSize );
 
                     fillBuffer(clBufferA2.buffer, 12345);
                     fillBuffer(clBufferB2.buffer, 67890);
@@ -488,7 +490,7 @@ public class CLCommandQueueTest extends UITestCase {
 
     //                System.out.println("D kernels");
                     CLEventList events2 = new CLEventList(2);
-                    queue2.put1DRangeKernel(vectorAddKernel2, 0, elements, groupSize, events2);
+                    queue2.put1DRangeKernel(vectorAddKernel2, 0, elements, localWorkSize, events2);
                     queue2.putReadBuffer(clBufferD, false, events2);
 
                     barrier.waitFor(queue2, events2);

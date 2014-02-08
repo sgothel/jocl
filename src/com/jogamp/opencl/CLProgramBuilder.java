@@ -276,14 +276,16 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
 
-        String suffix = null;
+        String suffix = "";
 
         if(!binariesMap.isEmpty()) {
-            CLPlatform platform = binariesMap.keySet().iterator().next().getPlatform();
-            suffix = platform.getICDSuffix();
+            CLDevice device = binariesMap.keySet().iterator().next();
+            if(device.isICDAvailable())
+                suffix = device.getPlatform().getICDSuffix();
         }
         
-        out.writeUTF(suffix);               // null if we have no binaries or no devices specified
+        // empty string if we have no binaries or no devices specified, or if cl_khr_icd isn't supported
+        out.writeUTF(suffix);
         out.writeInt(binariesMap.size());   // may be 0
 
         for (Map.Entry<CLDevice, byte[]> entry : binariesMap.entrySet()) {
@@ -299,22 +301,22 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
-        String suffix = in.readUTF();
+        String suffix = in.readUTF();  // empty string means no suffix was written; just picks first platform
         CLPlatform platform = null;
         for (CLPlatform p : CLPlatform.listCLPlatforms()) {
-            if(p.getICDSuffix().equals(suffix)) {
+            if(suffix.isEmpty() || p.getICDSuffix().equals(suffix)) {
                 platform = p;
                 break;
             }
         }
-        
+
         this.binariesMap = new LinkedHashMap<CLDevice, byte[]>();
         
         List<CLDevice> devices;
         if(platform != null) {
-            devices = new ArrayList(Arrays.asList(platform.listCLDevices()));
+            devices = new ArrayList<CLDevice>(Arrays.asList(platform.listCLDevices()));
         }else{
-            devices = Collections.EMPTY_LIST;
+            devices = Collections.emptyList();
         }
         
         int mapSize = in.readInt();

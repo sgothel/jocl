@@ -635,6 +635,15 @@ public class CLDevice extends CLObject {
     }
 
     /**
+     * Returns {@link #isExtensionAvailable}("cl_khr_icd").
+     * @see #getExtensions()
+     */
+    @CLProperty("cl_khr_icd")
+    public boolean isICDAvailable() {
+        return isExtensionAvailable("cl_khr_icd");
+    }
+
+    /**
      * Returns {@link #isExtensionAvailable}("cl_khr_gl_sharing") || {@link #isExtensionAvailable}("cl_APPLE_gl_sharing").
      * @see #getExtensions()
      */
@@ -850,7 +859,7 @@ public class CLDevice extends CLObject {
         ROUND_TO_NEAREST(CL_FP_ROUND_TO_NEAREST),
 
         /**
-         * round to +ve and –ve infinity rounding modes supported.
+         * round to positive and negative infinity rounding modes supported.
          */
         ROUND_TO_INF(CL_FP_ROUND_TO_INF),
 
