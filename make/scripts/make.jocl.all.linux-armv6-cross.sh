@@ -1,12 +1,12 @@
 #! /bin/sh
 
-SDIR=`dirname $0` 
+SDIR=`dirname $0`
 
-if [ -e $SDIR/../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh ] ; then
-    . $SDIR/../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh
+if [ -e $SDIR/../../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh ] ; then
+    . $SDIR/../../../gluegen/make/scripts/setenv-build-jogl-x86_64.sh
 fi
 
-PATH=`pwd`/../gluegen/make/lib/toolchain/armsf-linux-gnueabi/bin:$PATH
+PATH=`pwd`/../../gluegen/make/lib/toolchain/armsf-linux-gnueabi/bin:$PATH
 export PATH
 
 #    -Dc.compiler.debug=true 
@@ -31,7 +31,7 @@ export TARGET_ANT_HOME=/usr/share/ant
 export TARGET_PLATFORM_LIBS=/opt-linux-armv6-eabi/lib
 export TARGET_JAVA_LIBS=/opt-linux-armv6-eabi/jre/lib/arm
 
-export GLUEGEN_CPPTASKS_FILE="../gluegen/make/lib/gluegen-cpptasks-linux-armv6.xml"
+export GLUEGEN_CPPTASKS_FILE="../../gluegen/make/lib/gluegen-cpptasks-linux-armv6.xml"
 
 #export JUNIT_DISABLED="true"
 #export JUNIT_RUN_ARG0="-Dnewt.test.Screen.disableScreenMode"

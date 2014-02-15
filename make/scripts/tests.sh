@@ -107,7 +107,7 @@ function testawt() {
 #
 # Version
 #
-#testnoawt com.jogamp.opencl.JoclVersion $*
+testnoawt com.jogamp.opencl.JoclVersion $*
 
 #
 #
@@ -120,7 +120,7 @@ function testawt() {
 #testnoawt com.jogamp.opencl.LowLevelBindingTest $*
 #testnoawt com.jogamp.opencl.TestJoclVersion $*
 #testnoawt com.jogamp.opencl.TestUtils $*
-testnoawt com.jogamp.opencl.gl.CLGLTest $*
+#testnoawt com.jogamp.opencl.gl.CLGLTest $*
 #testnoawt com.jogamp.opencl.util.concurrent.CLMultiContextTest $*
 
 
