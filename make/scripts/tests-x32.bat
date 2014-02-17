@@ -21,8 +21,14 @@ set BLD_DIR=..\%BLD_SUB%
 REM set LIB_DIR=..\..\gluegen\%BLD_SUB%\obj;%BLD_DIR%\lib
 set LIB_DIR=
 
-set CP_ALL=.;%BLD_DIR%\jar\jogl-all.jar;%BLD_DIR%\jar\jogl-test.jar;..\..\gluegen\%BLD_SUB%\gluegen-rt.jar;..\..\gluegen\make\lib\junit.jar;%ANT_PATH%\lib\ant.jar;%ANT_PATH%\lib\ant-junit.jar;%BLD_DIR%\..\make\lib\swt\win32-win32-x86\swt-debug.jar
+set CP_ALL=.;%BLD_DIR%\jar\jocl.jar;%BLD_DIR%\jar\jocl-test.jar;..\..\jogl\%BLD_SUB%\jar\jogl-all.jar;..\..\joal\%BLD_SUB%\jar\joal.jar;..\..\gluegen\%BLD_SUB%\gluegen-rt.jar;..\..\gluegen\make\lib\junit.jar;%ANT_PATH%\lib\ant.jar;%ANT_PATH%\lib\ant-junit.jar;%BLD_DIR%\..\make\lib\swt\win32-win32-x86\swt-debug.jar
 
 echo CP_ALL %CP_ALL%
+
+REM set D_ARGS="-Djogamp.debug=all" "-Djocl.debug=all"
+REM set D_ARGS="-Djogamp.debug.ProcAddressHelper" "-Djogamp.debug.NativeLibrary" "-Djogamp.debug.NativeLibrary.Lookup" "-Djogamp.debug.JNILibLoader" "-Djogamp.debug.TempJarCache" "-Djogamp.debug.JarUtil" "-Djocl.debug=all"
+set D_ARGS="-Djogamp.debug.ProcAddressHelper" "-Djogamp.debug.NativeLibrary" "-Djogamp.debug.NativeLibrary.Lookup" "-Djogamp.debug.JNILibLoader"
+
+REM set X_ARGS="-Dsun.java2d.noddraw=true" "-Dsun.awt.noerasebackground=true"
 
 scripts\tests-win.bat %*
