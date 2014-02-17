@@ -128,7 +128,7 @@
         <property name="rootrel.src.c" value="resources" />
         <property name="rootrel.src.generated" value="${rootrel.build}/gensrc" />
         <property name="rootrel.generated.java" value="${rootrel.src.generated}/classes" />
-        <property name="rootrel.generated.c.jocl" value="${rootrel.src.generated}/native" />
+        <property name="rootrel.generated.c.jocl" value="${rootrel.src.generated}/native/jocl" />
         <property name="rootrel.obj" value="${rootrel.build}/obj" />
         <property name="rootrel.obj.jocl" value="${rootrel.obj}/jocl" />
 
@@ -288,7 +288,7 @@
 
         <!-- Now check for the presence of one well-known file -->
         <uptodate property="java.generate.skip"
-                  targetfile="${src.generated.java}/com/jogamp/opencl/llb/CL.java">
+                  targetfile="${src.generated.c}/CLAbstractImpl_JNI.c">
             <srcfiles refid="stub.includes.dependencies.fileset.1" />
             <srcfiles refid="stub.includes.dependencies.fileset.2" />
             <srcfiles refid="stub.includes.dependencies.fileset.3" />
@@ -371,7 +371,12 @@
        - from the C OpenCL headers.  This involves setting the taskdef and creating
        - the classpath reference id then running the task on each header.
       -->
-    <target name="java.generate" depends="build.gluegen, generate.jdk6.autocloseable, generate.jdk7.autocloseable, java.generate.check, preprocess-opencl-headers" unless="java.generate.skip">
+    <target name="java.generate" depends="build.gluegen, java.generate.check" unless="java.generate.skip">
+        <antcall target="java.generate.impl"     inheritRefs="true" />
+    </target>
+
+    <target name="java.generate.impl" depends="preprocess-opencl-headers">
+
         <!-- Add the GlueGen task to ANT -->
         <taskdef name="gluegen" classname="com.jogamp.gluegen.ant.GlueGenTask"
                  classpathref="gluegen.classpath" />
