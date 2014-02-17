@@ -116,7 +116,7 @@ CL_CALLBACK void memObjDestructorCallback(cl_mem mem, void * object) {
 
 JNIEXPORT jlong JNICALL
 Java_com_jogamp_opencl_llb_impl_CLAbstractImpl_dispatch_1clGetExtensionFunctionAddressStatic(JNIEnv *env, jclass _unused, jstring fname, jlong procAddress) {
-  typedef void* (CL_API_ENTRY*_local_LPCLGETPROCADDRESS)(const char *  fname);
+  typedef void* (CL_API_CALL * _local_LPCLGETPROCADDRESS)(const char *  fname);
   _local_LPCLGETPROCADDRESS ptr_clGetExtensionFunctionAddress;
   const char* _strchars_fname = NULL;
   void* _res;
@@ -130,7 +130,7 @@ Java_com_jogamp_opencl_llb_impl_CLAbstractImpl_dispatch_1clGetExtensionFunctionA
   }
   ptr_clGetExtensionFunctionAddress = (_local_LPCLGETPROCADDRESS) (intptr_t) procAddress;
   assert(ptr_clGetExtensionFunctionAddress != NULL);
-  _res = (* ptr_clGetExtensionFunctionAddress) ((char *) _strchars_fname);
+  _res = (* ptr_clGetExtensionFunctionAddress) (_strchars_fname);
   if ( NULL != fname ) {
     (*env)->ReleaseStringUTFChars(env, fname, _strchars_fname);
   }
@@ -210,7 +210,7 @@ Java_com_jogamp_opencl_llb_impl_CLImpl_clCreateContext0(JNIEnv *env, jobject _un
     cccallback _pfn_notify = NULL;
     jobject globalCB = NULL;
 
-    typedef cl_context (*function)(cl_context_properties *, cl_uint, const cl_device_id *, void (*pfn_notify)(const char *, const void *, size_t, void *), void *, cl_int *);
+    typedef cl_context (CL_API_CALL * function)(cl_context_properties *, cl_uint, const cl_device_id *, void (*pfn_notify)(const char *, const void *, size_t, void *), void *, cl_int *);
     function clCreateContext = (function)(intptr_t) procAddress;
 
     if (props != NULL) {
@@ -286,7 +286,7 @@ Java_com_jogamp_opencl_llb_impl_CLImpl_clBuildProgram0(JNIEnv *env, jobject _unu
     bpcallback _pfn_notify = NULL;
     jobject globalCB = NULL;
 
-    typedef cl_int (*function)(cl_program, cl_uint, const cl_device_id *, const char *, void (CL_CALLBACK *)(cl_program, void *), void *);
+    typedef cl_int (CL_API_CALL * function)(cl_program, cl_uint, const cl_device_id *, const char *, void (CL_CALLBACK *)(cl_program, void *), void *);
     function clBuildProgram = (function)(intptr_t)procAddress;
 
     if (options != NULL) {

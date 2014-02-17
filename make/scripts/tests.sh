@@ -60,8 +60,12 @@ function jrun() {
     #D_ARGS="-Dnativewindow.debug=all"
     #D_ARGS="-Djogl.debug=all"
     #D_ARGS="-Dnewt.debug=all"
-    #D_ARGS="-Djocl=all"
+    #D_ARGS="-Djocl.debug=all"
+    #D_ARGS="-Djogamp.debug=all -Djocl.debug=all"
+    #D_ARGS="-Djogamp.debug.ProcAddressHelper -Djogamp.debug.NativeLibrary -Djogamp.debug.NativeLibrary.Lookup -Djogamp.debug.JNILibLoader -Djogamp.debug.TempJarCache -Djogamp.debug.JarUtil -Djocl.debug=all"
+    D_ARGS="-Djogamp.debug.ProcAddressHelper -Djogamp.debug.NativeLibrary -Djogamp.debug.NativeLibrary.Lookup -Djogamp.debug.JNILibLoader"
 
+    #X_ARGS="-Dsun.java2d.noddraw=true -Dsun.awt.noerasebackground=true"
     #X_ARGS="-verbose:jni"
     #X_ARGS="-Xrs"
 
@@ -107,11 +111,11 @@ function testawt() {
 #
 # Version
 #
-testnoawt com.jogamp.opencl.JoclVersion $*
+#testnoawt com.jogamp.opencl.JoclVersion $*
 
 #
 #
-#testnoawt com.jogamp.opencl.CLBufferTest $*
+testnoawt com.jogamp.opencl.CLBufferTest $*
 #testnoawt com.jogamp.opencl.CLCommandQueueTest $*
 #testnoawt com.jogamp.opencl.CLExceptionTest $*
 #testnoawt com.jogamp.opencl.CLImageTest $*

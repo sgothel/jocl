@@ -135,12 +135,12 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
     private static int Impl_len = Impl_str.length();
 
     @Override
-    public final long toolGetProcAddress(long toolGetProcAddressHandle, String funcName) {
+    public final long toolGetProcAddress(final long toolGetProcAddressHandle, String funcName) {
         //FIXME workaround to fix a gluegen issue
         if( funcName.endsWith(Impl_str) ) {
             funcName = funcName.substring(0, funcName.length() - Impl_len);
         }
-        if(funcName.endsWith("KHR") || funcName.endsWith("EXT")) {
+        if( funcName.endsWith("KHR") || funcName.endsWith("EXT") ) {
             return CLImpl.clGetExtensionFunctionAddress(toolGetProcAddressHandle, funcName);
         }
         return 0; // on libs ..
