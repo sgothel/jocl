@@ -45,6 +45,7 @@
 
     <!-- This is the version of JOCL you are building -->
     <mkdir dir="${build}" />
+
     <exec dir="." executable="git" logError="true" failonerror="false" failifexecutionfails="false"
               output="${build}/localbranch.raw">
         <arg line="branch --no-color"/>
@@ -298,7 +299,7 @@
     <target name="java.generate.copy2temp">
         <copy todir="${tempdir}">
             <fileset dir="${build}"
-                     includes="gensrc/classes/**" />
+                     includes="gensrc/java/**" />
         </copy>
     </target>
 
@@ -500,6 +501,7 @@
         </gluegen>
 
         <echo message="CL..."/>
+        <antcall target="java.generate.copy2temp" inheritRefs="true" />
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-if.cfg"
