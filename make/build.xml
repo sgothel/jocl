@@ -375,7 +375,7 @@
         <antcall target="java.generate.impl"     inheritRefs="true" />
     </target>
 
-    <target name="java.generate.impl" depends="preprocess-opencl-headers">
+    <target name="java.generate.impl" depends="generate.jdk6.autocloseable, generate.jdk7.autocloseable, preprocess-opencl-headers">
 
         <!-- Add the GlueGen task to ANT -->
         <taskdef name="gluegen" classname="com.jogamp.gluegen.ant.GlueGenTask"
