@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -29,16 +29,16 @@
 package com.jogamp.opencl;
 
 import com.jogamp.common.nio.Buffers;
+
 import java.util.List;
+
 import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.llb.CLBufferBinding;
+
 import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import static com.jogamp.opencl.CLException.*;
 
 /**
  * OpenCL buffer object wrapping an optional NIO buffer.
@@ -56,17 +56,17 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
         super(context, directBuffer, size, id, flags);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     static CLBuffer<?> create(CLContext context, int size, int flags) {
 
         if(isHostPointerFlag(flags)) {
             throw new IllegalArgumentException("no host pointer defined");
         }
 
-        CLBufferBinding binding = context.getPlatform().getBufferBinding();
-        int[] result = new int[1];
-        long id = binding.clCreateBuffer(context.ID, flags, size, null, result, 0);
-        checkForError(result[0], "can not create cl buffer");
+        final CLBufferBinding binding = context.getPlatform().getBufferBinding();
+        final int[] result = new int[1];
+        final long id = binding.clCreateBuffer(context.ID, flags, size, null, result, 0);
+        CLException.checkForError(result[0], "can not create cl buffer");
 
         return new CLBuffer(context, size, id, flags);
     }
@@ -85,8 +85,8 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
         int[] result = new int[1];
         int size = Buffers.sizeOfBufferElem(directBuffer) * directBuffer.capacity();
         long id = binding.clCreateBuffer(context.ID, flags, size, host_ptr, result, 0);
-        checkForError(result[0], "can not create cl buffer");
-        
+        CLException.checkForError(result[0], "can not create cl buffer");
+
         return new CLBuffer<B>(context, directBuffer, size, id, flags);
     }
 
@@ -101,24 +101,27 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
      */
     public CLSubBuffer<B> createSubBuffer(int offset, int size, Mem... flags) {
 
-        B slice = null;
+        final B slice;
         if(buffer != null) {
             slice = Buffers.slice(buffer, offset, size);
             int elemSize = Buffers.sizeOfBufferElem(buffer);
             offset *= elemSize;
             size *= elemSize;
+        } else {
+            slice = null;
         }
 
-        PointerBuffer info = PointerBuffer.allocateDirect(2);
-        info.put(offset).put(size).rewind();
-        int bitset = Mem.flagsToInt(flags);
-        
-        CLBufferBinding binding = getPlatform().getBufferBinding();
-        int[] err = new int[1];
-        long subID = binding.clCreateSubBuffer(ID, bitset, CL.CL_BUFFER_CREATE_TYPE_REGION, info.getBuffer(), err, 0);
-        checkForError(err[0], "can not create sub buffer");
+        final PointerBuffer info = PointerBuffer.allocateDirect(2);
+        info.put(0, offset);
+        info.put(1, size);
+        final int bitset = Mem.flagsToInt(flags);
 
-        CLSubBuffer<B> clSubBuffer = new CLSubBuffer<B>(this, offset, size, slice, subID, bitset);
+        final CLBufferBinding binding = getPlatform().getBufferBinding();
+        final int[] err = new int[1];
+        final long subID = binding.clCreateSubBuffer(ID, bitset, CL.CL_BUFFER_CREATE_TYPE_REGION, info.getBuffer(), err, 0);
+        CLException.checkForError(err[0], "can not create sub buffer");
+
+        final CLSubBuffer<B> clSubBuffer = new CLSubBuffer<B>(this, offset, size, slice, subID, bitset);
         if(childs == null) {
             childs = new ArrayList<CLSubBuffer<B>>();
         }
@@ -136,7 +139,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
         super.release();
     }
 
-    void onReleaseSubBuffer(CLSubBuffer sub) {
+    void onReleaseSubBuffer(CLSubBuffer<?> sub) {
         childs.remove(sub);
     }
 
@@ -158,7 +161,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
     public boolean isSubBuffer() {
         return false;
     }
-    
+
     @Override
     public <T extends Buffer> CLBuffer<T> cloneWith(T directBuffer) {
         return new CLBuffer<T>(context, directBuffer, size, ID, FLAGS);

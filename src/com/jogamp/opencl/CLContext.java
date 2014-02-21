@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -28,14 +28,6 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.opencl.llb.CL;
-import com.jogamp.common.nio.Buffers;
-import com.jogamp.opencl.CLDevice.Type;
-import com.jogamp.opencl.CLSampler.AddressingMode;
-import com.jogamp.opencl.CLSampler.FilteringMode;
-import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.opencl.llb.CLContextBinding;
-import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,22 +39,25 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import static java.lang.System.*;
-import static com.jogamp.opencl.CLException.*;
-import static com.jogamp.common.nio.Buffers.*;
-import static com.jogamp.common.os.Platform.*;
-import static com.jogamp.opencl.llb.CL.*;
-import static com.jogamp.opencl.CLBuffer.*;
-import static java.util.Collections.*;
+
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.common.nio.PointerBuffer;
+import com.jogamp.common.os.Platform;
+import com.jogamp.opencl.CLDevice.Type;
+import com.jogamp.opencl.CLMemory.Mem;
+import com.jogamp.opencl.CLSampler.AddressingMode;
+import com.jogamp.opencl.CLSampler.FilteringMode;
+import com.jogamp.opencl.llb.CL;
+import com.jogamp.opencl.llb.CLContextBinding;
+import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
 
 /**
  * CLContext is responsible for managing objects such as command-queues, memory,
@@ -76,10 +71,10 @@ import static java.util.Collections.*;
  * <p>
  *  For a code example see {@link CLPlatform}.
  * <p/>
- * 
+ *
  * concurrency:<br/>
  * CLContext is threadsafe.
- * 
+ *
  * @author Michael Bien, et al.
  */
 public class CLContext extends CLObjectResource {
@@ -89,23 +84,23 @@ public class CLContext extends CLObjectResource {
     protected final Set<CLProgram> programs;
     protected final Set<CLSampler> samplers;
     protected final Set<CLMemory<? extends Buffer>> memoryObjects;
-    
+
     protected final Map<CLDevice, List<CLCommandQueue>> queuesMap;
 
     protected final CLPlatform platform;
-    
+
     private final ErrorDispatcher errorHandler;
 
     protected CLContext(CLPlatform platform, long contextID, ErrorDispatcher dispatcher) {
         super(contextID);
         this.platform = platform;
-        
-        this.programs = synchronizedSet(new HashSet<CLProgram>());
-        this.samplers = synchronizedSet(new HashSet<CLSampler>());
-        this.memoryObjects = synchronizedSet(new HashSet<CLMemory<? extends Buffer>>());
-        
+
+        this.programs = Collections.synchronizedSet(new HashSet<CLProgram>());
+        this.samplers = Collections.synchronizedSet(new HashSet<CLSampler>());
+        this.memoryObjects = Collections.synchronizedSet(new HashSet<CLMemory<? extends Buffer>>());
+
         this.queuesMap = new HashMap<CLDevice, List<CLCommandQueue>>();
-        
+
         this.errorHandler = dispatcher;
 
         /*
@@ -115,25 +110,25 @@ public class CLContext extends CLObjectResource {
             }
         });
         */
-        
+
     }
 
     private synchronized void initDevices(CLContextBinding cl) {
-        
+
         if (devices == null) {
 
-            PointerBuffer deviceCount = PointerBuffer.allocateDirect(1);
+            final PointerBuffer deviceCount = PointerBuffer.allocateDirect(1);
 
-            int ret = cl.clGetContextInfo(ID, CL_CONTEXT_DEVICES, 0, null, deviceCount);
-            checkForError(ret, "can not enumerate devices");
+            int ret = cl.clGetContextInfo(ID, CL.CL_CONTEXT_DEVICES, 0, null, deviceCount);
+            CLException.checkForError(ret, "can not enumerate devices");
 
             ByteBuffer deviceIDs = Buffers.newDirectByteBuffer((int)deviceCount.get());
-            ret = cl.clGetContextInfo(ID, CL_CONTEXT_DEVICES, deviceIDs.capacity(), deviceIDs, null);
-            checkForError(ret, "can not enumerate devices");
+            ret = cl.clGetContextInfo(ID, CL.CL_CONTEXT_DEVICES, deviceIDs.capacity(), deviceIDs, null);
+            CLException.checkForError(ret, "can not enumerate devices");
 
-            devices = new CLDevice[deviceIDs.capacity() / (is32Bit() ? 4 : 8)];
+            devices = new CLDevice[deviceIDs.capacity() / (Platform.is32Bit() ? 4 : 8)];
             for (int i = 0; i < devices.length; i++) {
-                devices[i] = new CLDevice(this, is32Bit() ? deviceIDs.getInt() : deviceIDs.getLong());
+                devices[i] = new CLDevice(this, Platform.is32Bit() ? deviceIDs.getInt() : deviceIDs.getLong());
             }
         }
     }
@@ -203,17 +198,17 @@ public class CLContext extends CLObjectResource {
     }
 
     protected static long createContextFromType(CLPlatform platform, CLErrorHandler handler, PointerBuffer properties, long deviceType) {
-        IntBuffer status = newDirectIntBuffer(1);
+        IntBuffer status = Buffers.newDirectIntBuffer(1);
         CLContextBinding cl = platform.getContextBinding();
         long context = cl.clCreateContextFromType(properties, deviceType, handler, status);
 
-        checkForError(status.get(), "can not create CL context");
+        CLException.checkForError(status.get(), "can not create CL context");
 
         return context;
     }
 
     protected static long createContext(CLPlatform platform, CLErrorHandler handler, PointerBuffer properties, CLDevice... devices) {
-        IntBuffer status = newDirectIntBuffer(1);
+        IntBuffer status = Buffers.newDirectIntBuffer(1);
         PointerBuffer pb = null;
         if(devices != null && devices.length != 0) {
             pb = PointerBuffer.allocateDirect(devices.length);
@@ -228,7 +223,7 @@ public class CLContext extends CLObjectResource {
         CLContextBinding cl = platform.getContextBinding();
         long context = cl.clCreateContext(properties, pb, handler, status);
 
-        checkForError(status.get(), "can not create CL context");
+        CLException.checkForError(status.get(), "can not create CL context");
 
         return context;
     }
@@ -238,7 +233,7 @@ public class CLContext extends CLObjectResource {
             throw new RuntimeException("no OpenCL installation found");
         }
 
-        return PointerBuffer.allocateDirect(3).put(CL_CONTEXT_PLATFORM)
+        return PointerBuffer.allocateDirect(3).put(CL.CL_CONTEXT_PLATFORM)
                                               .put(platform.ID).put(0) // 0 terminated array
                                               .rewind();
     }
@@ -296,35 +291,35 @@ public class CLContext extends CLObjectResource {
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
     public final CLBuffer<ShortBuffer> createShortBuffer(int size, Mem... flags) {
-        return createBuffer(newDirectShortBuffer(size), flags);
+        return createBuffer(Buffers.newDirectShortBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
     public final CLBuffer<IntBuffer> createIntBuffer(int size, Mem... flags) {
-        return createBuffer(newDirectIntBuffer(size), flags);
+        return createBuffer(Buffers.newDirectIntBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
     public final CLBuffer<LongBuffer> createLongBuffer(int size, Mem... flags) {
-        return createBuffer(newDirectLongBuffer(size), flags);
+        return createBuffer(Buffers.newDirectLongBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
     public final CLBuffer<FloatBuffer> createFloatBuffer(int size, Mem... flags) {
-        return createBuffer(newDirectFloatBuffer(size), flags);
+        return createBuffer(Buffers.newDirectFloatBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
     public final CLBuffer<DoubleBuffer> createDoubleBuffer(int size, Mem... flags) {
-        return createBuffer(newDirectDoubleBuffer(size), flags);
+        return createBuffer(Buffers.newDirectDoubleBuffer(size), flags);
     }
 
     /**
@@ -338,7 +333,7 @@ public class CLContext extends CLObjectResource {
      * Creates a CLBuffer with the specified flags and buffer size in bytes.
      */
     public final CLBuffer<ByteBuffer> createByteBuffer(int size, int flags) {
-        return createBuffer(newDirectByteBuffer(size), flags);
+        return createBuffer(Buffers.newDirectByteBuffer(size), flags);
     }
 
     /**
@@ -484,7 +479,7 @@ public class CLContext extends CLObjectResource {
     public void removeCLErrorHandler(CLErrorHandler handler) {
         errorHandler.removeHandler(handler);
     }
-    
+
     private void release(Collection<? extends CLResource> resources) {
         // resources remove themselves when released, see above
         while(!resources.isEmpty()) {
@@ -513,7 +508,7 @@ public class CLContext extends CLObjectResource {
 
         } finally {
             int ret = platform.getContextBinding().clReleaseContext(ID);
-            checkForError(ret, "error releasing context");
+            CLException.checkForError(ret, "error releasing context");
         }
 
     }
@@ -528,8 +523,8 @@ public class CLContext extends CLObjectResource {
 
         int[] entries = new int[1];
         int ret = binding.clGetSupportedImageFormats(ID, flags, type, 0, null, entries, 0);
-        if(ret != CL_SUCCESS) {
-            throw newException(ret, "error calling clGetSupportedImageFormats");
+        if(ret != CL.CL_SUCCESS) {
+            throw CLException.newException(ret, "error calling clGetSupportedImageFormats");
         }
 
         int count = entries[0];
@@ -538,10 +533,10 @@ public class CLContext extends CLObjectResource {
         }
 
         CLImageFormat[] formats = new CLImageFormat[count];
-        CLImageFormatImpl impl = CLImageFormatImpl.create(newDirectByteBuffer(count * CLImageFormatImpl.size()));
+        CLImageFormatImpl impl = CLImageFormatImpl.create(Buffers.newDirectByteBuffer(count * CLImageFormatImpl.size()));
         ret = binding.clGetSupportedImageFormats(ID, flags, type, count, impl, null);
-        if(ret != CL_SUCCESS) {
-            throw newException(ret, "error calling clGetSupportedImageFormats");
+        if(ret != CL.CL_SUCCESS) {
+            throw CLException.newException(ret, "error calling clGetSupportedImageFormats");
         }
 
         ByteBuffer buffer = impl.getBuffer();
@@ -558,14 +553,14 @@ public class CLContext extends CLObjectResource {
      * Returns all supported 2d image formats with the (optional) memory allocation flags.
      */
     public CLImageFormat[] getSupportedImage2dFormats(Mem... flags) {
-        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CL_MEM_OBJECT_IMAGE2D);
+        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CL.CL_MEM_OBJECT_IMAGE2D);
     }
 
     /**
      * Returns all supported 3d image formats with the (optional) memory allocation flags.
      */
     public CLImageFormat[] getSupportedImage3dFormats(Mem... flags) {
-        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CL_MEM_OBJECT_IMAGE3D);
+        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CL.CL_MEM_OBJECT_IMAGE3D);
     }
 
     /**
@@ -586,7 +581,7 @@ public class CLContext extends CLObjectResource {
      */
     public List<CLProgram> getPrograms() {
         synchronized(programs) {
-            return unmodifiableList(new ArrayList<CLProgram>(programs));
+            return Collections.unmodifiableList(new ArrayList<CLProgram>(programs));
         }
     }
 
@@ -595,7 +590,7 @@ public class CLContext extends CLObjectResource {
      */
     public List<CLMemory<? extends Buffer>> getMemoryObjects() {
         synchronized(memoryObjects) {
-            return unmodifiableList(new ArrayList<CLMemory<? extends Buffer>>(memoryObjects));
+            return Collections.unmodifiableList(new ArrayList<CLMemory<? extends Buffer>>(memoryObjects));
         }
     }
 
@@ -604,7 +599,7 @@ public class CLContext extends CLObjectResource {
      */
     public List<CLSampler> getSamplers() {
         synchronized(samplers) {
-            return unmodifiableList(new ArrayList<CLSampler>(samplers));
+            return Collections.unmodifiableList(new ArrayList<CLSampler>(samplers));
         }
     }
 
@@ -730,13 +725,13 @@ public class CLContext extends CLObjectResource {
             }
 
             CLErrorHandler[] handlers = new CLErrorHandler[clientHandlers.length+1];
-            arraycopy(clientHandlers, 0, handlers, 0, clientHandlers.length);
+            System.arraycopy(clientHandlers, 0, handlers, 0, clientHandlers.length);
             handlers[handlers.length-1] = handler;
             clientHandlers = handlers;
         }
 
         private synchronized void removeHandler(CLErrorHandler handler) {
-            
+
             if(handler == null) {
                 throw new IllegalArgumentException("handler was null.");
             }
@@ -744,8 +739,8 @@ public class CLContext extends CLObjectResource {
             for (int i = 0; i < clientHandlers.length; i++) {
                 if(handler.equals(clientHandlers[i])) {
                     CLErrorHandler[] handlers = new CLErrorHandler[clientHandlers.length-1];
-                    arraycopy(clientHandlers, 0, handlers, 0, i);
-                    arraycopy(clientHandlers, i, handlers, 0, handlers.length-i);
+                    System.arraycopy(clientHandlers, 0, handlers, 0, i);
+                    System.arraycopy(clientHandlers, i, handlers, 0, handlers.length-i);
                     clientHandlers = handlers;
                     return;
                 }
