@@ -32,6 +32,7 @@ import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLMemory.Map;
 import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.common.nio.Buffers;
+import com.jogamp.common.util.Bitstream;
 
 import java.io.IOException;
 import java.nio.Buffer;
@@ -247,7 +248,7 @@ public class CLBufferTest extends UITestCase {
     }
 
     @Test
-    public void subBufferTest() {
+    public void subBufferTest01ByteBuffer() {
 
         out.println(" - - - subBufferTest - - - ");
 
@@ -260,48 +261,77 @@ public class CLBufferTest extends UITestCase {
         CLContext context = CLContext.create(platform);
         try{
             final int subelements = 5;
+            final long lMaxAlignment = context.getMaxMemBaseAddrAlign();
+            final int iMaxAlignment = Bitstream.uint32LongToInt(lMaxAlignment);
+            System.err.println("XXX: maxAlignment "+lMaxAlignment+", 0x"+Long.toHexString(lMaxAlignment)+", (int)"+iMaxAlignment+", (int)0x"+Integer.toHexString(iMaxAlignment));
+            if( -1 == iMaxAlignment ) {
+                throw new RuntimeException("Cannot handle MaxMemBaseAddrAlign > MAX_INT, has 0x"+Long.toHexString(lMaxAlignment));
+            }
             // device only
-            {
-                CLBuffer<?> buffer = context.createBuffer(64);
+            CLBuffer<?> buffer = context.createBuffer(iMaxAlignment+subelements);
 
-                assertFalse(buffer.isSubBuffer());
-                assertNotNull(buffer.getSubBuffers());
-                assertTrue(buffer.getSubBuffers().isEmpty());
+            assertFalse(buffer.isSubBuffer());
+            assertNotNull(buffer.getSubBuffers());
+            assertTrue(buffer.getSubBuffers().isEmpty());
 
-                CLSubBuffer<?> subBuffer = buffer.createSubBuffer(10, subelements);
+            CLSubBuffer<?> subBuffer = buffer.createSubBuffer(iMaxAlignment, subelements);
 
-                assertTrue(subBuffer.isSubBuffer());
-                assertEquals(subelements, subBuffer.getCLSize());
-                assertEquals(10, subBuffer.getOffset());
-                assertEquals(10, subBuffer.getCLOffset());
-                assertEquals(buffer, subBuffer.getParent());
-                assertEquals(1, buffer.getSubBuffers().size());
+            assertTrue(subBuffer.isSubBuffer());
+            assertEquals(subelements, subBuffer.getCLSize());
+            assertEquals(iMaxAlignment, subBuffer.getOffset());
+            assertEquals(iMaxAlignment, subBuffer.getCLOffset());
+            assertEquals(buffer, subBuffer.getParent());
+            assertEquals(1, buffer.getSubBuffers().size());
 
-                subBuffer.release();
-                assertEquals(0, buffer.getSubBuffers().size());
+            subBuffer.release();
+            assertEquals(0, buffer.getSubBuffers().size());
+        }finally{
+            context.release();
+        }
+
+    }
+
+    @Test
+    public void subBufferTest02FloatBuffer() {
+
+        out.println(" - - - subBufferTest - - - ");
+
+        CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
+        if(platform == null) {
+            out.println("aborting subBufferTest");
+            return;
+        }
+
+        CLContext context = CLContext.create(platform);
+        try{
+            final int subelements = 5;
+            final long lMaxAlignment = context.getMaxMemBaseAddrAlign();
+            final int iMaxAlignment = Bitstream.uint32LongToInt(lMaxAlignment);
+            System.err.println("XXX: maxAlignment "+lMaxAlignment+", 0x"+Long.toHexString(lMaxAlignment)+", (int)"+iMaxAlignment+", (int)0x"+Integer.toHexString(iMaxAlignment));
+            if( -1 == iMaxAlignment ) {
+                throw new RuntimeException("Cannot handle MaxMemBaseAddrAlign > MAX_INT, has 0x"+Long.toHexString(lMaxAlignment));
             }
-
+            // FIXME: See Bug 979: Offset/Alignment via offset calculation per element-count is faulty!
+            final int floatsPerAlignment = iMaxAlignment / Buffers.SIZEOF_FLOAT;
             // device + direct buffer
-            {
-                CLBuffer<FloatBuffer> buffer = context.createFloatBuffer(64);
-                assertFalse(buffer.isSubBuffer());
-                assertNotNull(buffer.getSubBuffers());
-                assertTrue(buffer.getSubBuffers().isEmpty());
+            CLBuffer<FloatBuffer> buffer = context.createFloatBuffer(floatsPerAlignment+subelements);
+            assertFalse(buffer.isSubBuffer());
+            assertNotNull(buffer.getSubBuffers());
+            assertTrue(buffer.getSubBuffers().isEmpty());
 
-                CLSubBuffer<FloatBuffer> subBuffer = buffer.createSubBuffer(10, subelements);
+            CLSubBuffer<FloatBuffer> subBuffer = buffer.createSubBuffer(floatsPerAlignment, subelements);
 
-                assertTrue(subBuffer.isSubBuffer());
-                assertEquals(subelements, subBuffer.getBuffer().capacity());
-                assertEquals(10, subBuffer.getOffset());
-                assertEquals(40, subBuffer.getCLOffset());
-                assertEquals(buffer, subBuffer.getParent());
-                assertEquals(1, buffer.getSubBuffers().size());
+            assertTrue(subBuffer.isSubBuffer());
+            assertEquals(subelements, subBuffer.getBuffer().capacity());
+            assertEquals(floatsPerAlignment, subBuffer.getOffset());
+            assertEquals(iMaxAlignment, subBuffer.getCLOffset());
+            assertEquals(buffer, subBuffer.getParent());
+            assertEquals(1, buffer.getSubBuffers().size());
 
-                assertEquals(subBuffer.getCLCapacity(), subBuffer.getBuffer().capacity());
+            assertEquals(subBuffer.getCLCapacity(), subBuffer.getBuffer().capacity());
 
-                subBuffer.release();
-                assertEquals(0, buffer.getSubBuffers().size());
-            }
+            subBuffer.release();
+            assertEquals(0, buffer.getSubBuffers().size());
 
         }finally{
             context.release();

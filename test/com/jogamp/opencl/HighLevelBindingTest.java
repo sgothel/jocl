@@ -164,6 +164,7 @@ public class HighLevelBindingTest extends UITestCase {
 //                out.println("    C version: "+device.getCVersion()); //CL 1.1
                 out.println("    driver version: "+device.getDriverVersion());
                 out.println("    type: "+device.getType());
+                out.println("    mem base addr align: "+device.getMemBaseAddrAlign());
                 out.println("    global mem: "+device.getGlobalMemSize()/(1024*1024)+" MB");
                 out.println("    max alloc mem: "+device.getMaxMemAllocSize()/(1024*1024)+" MB");
                 out.println("    max param size: "+device.getMaxParameterSize()+" byte");

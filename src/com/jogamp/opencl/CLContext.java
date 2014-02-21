@@ -628,6 +628,17 @@ public class CLContext extends CLObjectResource {
     }
 
     /**
+     * Returns the maximum {@link CLDevice#getMemBaseAddrAlign()} of all devices.
+     */
+    public long getMaxMemBaseAddrAlign() {
+        long maxAlignment = 0;
+        for (CLDevice device : getDevices()) {
+            maxAlignment = Math.max(maxAlignment, device.getMemBaseAddrAlign());
+        }
+        return maxAlignment;
+    }
+
+    /**
      * Returns all devices associated with this CLContext.
      */
     public CLDevice[] getDevices() {

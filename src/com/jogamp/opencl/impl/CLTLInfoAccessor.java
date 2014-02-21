@@ -41,7 +41,7 @@ import static com.jogamp.opencl.CLException.*;
 /**
  * Internal utility for common OpenCL clGetFooInfo calls.
  * Threadsafe, threadlocal implementation.
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public abstract class CLTLInfoAccessor implements CLInfoAccessor {
 
@@ -63,6 +63,14 @@ public abstract class CLTLInfoAccessor implements CLInfoAccessor {
         }
 
     };
+
+    @Override
+    public final long getUInt32Long(int key) {
+        final ByteBuffer buffer = getBB(4).putInt(0, 0);
+        final int ret = getInfo(key, 4, buffer, null);
+        CLException.checkForError(ret, "error while asking for info value");
+        return Bitstream.toUInt32Long(buffer.getInt(0));
+    }
 
     @Override
     public final long getLong(int key) {

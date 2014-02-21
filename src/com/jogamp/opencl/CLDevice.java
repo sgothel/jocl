@@ -48,7 +48,7 @@ import static com.jogamp.opencl.llb.CL.*;
  * @see CLPlatform#getMaxFlopsDevice(com.jogamp.opencl.CLDevice.Type...)
  * @see CLContext#getDevices()
  * @see CLContext#getMaxFlopsDevice(com.jogamp.opencl.CLDevice.Type)
- * @author Michael Bien
+ * @author Michael Bien, et al.
  */
 public class CLDevice extends CLObject {
 
@@ -356,7 +356,16 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_MEM_ALLOC_SIZE")
     public long getMaxMemAllocSize() {
-        return deviceInfo.getLong(CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+        return deviceInfo.getLong(CL.CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+    }
+
+    /**
+     * Returns the <code>uint32_t</code> memory base address alignment
+     * value reinterpreted as a <code>long</code> value.
+     */
+    @CLProperty("CL_DEVICE_MEM_BASE_ADDR_ALIGN")
+    public long getMemBaseAddrAlign() {
+        return deviceInfo.getUInt32Long(CL.CL_DEVICE_MEM_BASE_ADDR_ALIGN);
     }
 
     /**
