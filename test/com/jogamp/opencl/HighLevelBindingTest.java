@@ -314,13 +314,29 @@ public class HighLevelBindingTest extends UITestCase {
 
         int elementCount = 11444777;	// Length of float arrays to process (odd # for illustration)
         int localWorkSize = device.getMaxWorkItemSizes()[0];      // set and log Global and Local work size dimensions
-        int globalWorkSize = roundUp(localWorkSize, elementCount);  // rounded up to the nearest multiple of the LocalWorkSize
+        int globalWorkSize = 0;
 
-        out.println("allocateing buffers of size: "+globalWorkSize);
-
-        ByteBuffer srcA = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
-        ByteBuffer srcB = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
-        ByteBuffer dest = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
+        ByteBuffer srcA = null;
+        ByteBuffer srcB = null;
+        ByteBuffer dest = null;
+        boolean allocated = false;
+        int divisor = 1;
+        while( !allocated ) {
+            try {
+                // round up to the nearest multiple of the LocalWorkSize
+                globalWorkSize = roundUp(localWorkSize, elementCount);
+                out.println("allocating three buffers of size: "+globalWorkSize);
+                srcA = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
+                srcB = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
+                dest = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
+                allocated = true;
+            }
+            catch( OutOfMemoryError oome ) {
+                ++divisor;
+                elementCount /= divisor;
+                out.println("not enough direct buffer memory; retrying with smaller buffers");
+            }
+        }
 
         fillBuffer(srcA, 23456);
         fillBuffer(srcB, 46987);

@@ -273,13 +273,30 @@ public class LowLevelBindingTest extends UITestCase {
         checkError("on clCreateCommandQueue", intBuffer.get(0));
 
         int localWorkSize = Math.min(128, maxWGS);      // set and log Global and Local work size dimensions
-        int globalWorkSize = roundUp(localWorkSize, ELEMENT_COUNT);  // rounded up to the nearest multiple of the LocalWorkSize
+        int elementCount = ELEMENT_COUNT;
+        int globalWorkSize = 0;
 
-        out.println("allocateing buffers of size: "+globalWorkSize);
-
-        ByteBuffer srcA = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
-        ByteBuffer srcB = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
-        ByteBuffer dest = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
+        ByteBuffer srcA = null;
+        ByteBuffer srcB = null;
+        ByteBuffer dest = null;
+        boolean allocated = false;
+        int divisor = 1;
+        while( !allocated ) {
+            try {
+                // round up to the nearest multiple of the LocalWorkSize
+                globalWorkSize = roundUp(localWorkSize, elementCount);
+                out.println("allocating three buffers of size: "+globalWorkSize);
+                srcA = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
+                srcB = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
+                dest = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
+                allocated = true;
+            }
+            catch( OutOfMemoryError oome ) {
+                ++divisor;
+                elementCount /= divisor;
+                out.println("not enough direct buffer memory; retrying with smaller buffers");
+            }
+        }
 
         // Allocate the OpenCL buffer memory objects for source and result on the device GMEM
         long devSrcA = cl.clCreateBuffer(context, CL.CL_MEM_READ_ONLY, srcA.capacity(), null, intBuffer);
@@ -367,7 +384,7 @@ public class LowLevelBindingTest extends UITestCase {
         ret = cl.clSetKernelArg(kernel, 0, is32Bit()?SIZEOF_INT:SIZEOF_LONG, wrap(devSrcA));        checkError("on clSetKernelArg0", ret);
         ret = cl.clSetKernelArg(kernel, 1, is32Bit()?SIZEOF_INT:SIZEOF_LONG, wrap(devSrcB));        checkError("on clSetKernelArg1", ret);
         ret = cl.clSetKernelArg(kernel, 2, is32Bit()?SIZEOF_INT:SIZEOF_LONG, wrap(devDst));         checkError("on clSetKernelArg2", ret);
-        ret = cl.clSetKernelArg(kernel, 3, SIZEOF_INT,                     wrap(ELEMENT_COUNT));  checkError("on clSetKernelArg3", ret);
+        ret = cl.clSetKernelArg(kernel, 3, SIZEOF_INT,                       wrap(elementCount));   checkError("on clSetKernelArg3", ret);
 
         out.println("used device memory: "+ (srcA.capacity()+srcB.capacity()+dest.capacity())/1000000 +"MB");
 
