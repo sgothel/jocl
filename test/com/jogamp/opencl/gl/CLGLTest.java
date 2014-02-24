@@ -45,6 +45,7 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLPlatform;
+import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.opencl.util.CLDeviceFilters;
 import com.jogamp.opencl.util.CLPlatformFilters;
@@ -106,9 +107,11 @@ public class CLGLTest extends UITestCase {
     @Test(timeout=15000)
     public void createContextTest() {
 
-        initGL();
-
         out.println(" - - - glcl; createContextTest - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
+
+        initGL();
 
         CLPlatform platform = CLPlatform.getDefault(CLPlatformFilters.glSharing());
         CLDevice device = platform.getMaxFlopsDevice(CLDeviceFilters.glSharing());
@@ -149,6 +152,8 @@ public class CLGLTest extends UITestCase {
     public void vboSharing() {
 
         out.println(" - - - glcl; vboSharing - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         initGL();
         makeGLCurrent();

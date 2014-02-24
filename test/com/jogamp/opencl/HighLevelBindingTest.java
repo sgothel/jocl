@@ -40,6 +40,7 @@ import com.jogamp.opencl.CLDevice.LocalMemType;
 import com.jogamp.opencl.CLDevice.Type;
 import com.jogamp.opencl.CLDevice.Capabilities;
 import com.jogamp.opencl.llb.CL;
+import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 
 import java.io.IOException;
@@ -137,6 +138,8 @@ public class HighLevelBindingTest extends UITestCase {
     public void contextlessTest() {
 
         out.println(" - - - highLevelTest; contextless - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         // platform/device info tests
         CLPlatform[] clPlatforms = CLPlatform.listCLPlatforms();
@@ -205,6 +208,9 @@ public class HighLevelBindingTest extends UITestCase {
     @Test
     public void platformTest() {
 
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
+
         CLPlatform platformGPU = CLPlatform.getDefault(version(CL_1_0), type(GPU));
         CLPlatform platformCPU = CLPlatform.getDefault(version(CL_1_0), type(CPU));
 
@@ -221,6 +227,8 @@ public class HighLevelBindingTest extends UITestCase {
     public void createContextTest() {
 
         out.println(" - - - highLevelTest; create context - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLPlatform platform = CLPlatform.getDefault();
         CLDevice[] devices = platform.listCLDevices();
@@ -280,6 +288,8 @@ public class HighLevelBindingTest extends UITestCase {
     public void vectorAddGMTest() throws IOException {
 
         out.println(" - - - highLevelTest; global memory kernel - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLPlatform[] clPlatforms = CLPlatform.listCLPlatforms();
         CLContext context = CLContext.create(clPlatforms[0]);
