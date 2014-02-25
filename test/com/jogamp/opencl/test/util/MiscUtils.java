@@ -31,6 +31,8 @@ package com.jogamp.opencl.test.util;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
+import com.jogamp.opencl.llb.impl.CLAbstractImpl;
+
 import static java.lang.System.*;
 import static org.junit.Assert.*;
 
@@ -76,5 +78,18 @@ public class MiscUtils {
         }
         a.rewind();
         b.rewind();
+    }
+
+    /**
+     * @return true if OpenCL is not available for this operating system, CPU architecture, et cetera.
+     * This is meant to be a check that there can't possibly be a driver installed because
+     * nobody makes one, not just a check that we didn't see one.
+     */
+    public static final boolean isOpenCLUnavailable() {
+        if(!CLAbstractImpl.isAvailable() && System.getProperty("os.name").startsWith("SunOS")) {
+            out.println("OpenCL not available on this operating system. Skipping test.");
+            return true;
+        }
+        return false;
     }
 }

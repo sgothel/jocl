@@ -10,6 +10,7 @@ import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLPlatform;
+import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.opencl.util.concurrent.CLQueueContext.CLSimpleQueueContext;
 import com.jogamp.opencl.util.concurrent.CLQueueContextFactory.CLSimpleContextFactory;
@@ -47,6 +48,9 @@ public class CLMultiContextTest extends UITestCase {
 
     @Test
     public void createMultiContextTest() {
+
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLMultiContext mc = CLMultiContext.create(CLPlatform.listCLPlatforms());
 
@@ -116,6 +120,9 @@ public class CLMultiContextTest extends UITestCase {
 
     @Test
     public void commandQueuePoolTest() throws InterruptedException, ExecutionException {
+
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLMultiContext mc = CLMultiContext.create(CLPlatform.listCLPlatforms());
 
