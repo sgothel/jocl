@@ -306,6 +306,8 @@ public class CLBufferTest extends UITestCase {
     public void subBufferTest02FloatBuffer() {
 
         out.println(" - - - subBufferTest - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
