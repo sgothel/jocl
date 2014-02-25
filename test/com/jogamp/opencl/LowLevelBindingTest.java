@@ -33,6 +33,7 @@ import java.util.Random;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.impl.BuildProgramCallback;
 import com.jogamp.opencl.llb.CL;
+import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 
 import java.io.IOException;
@@ -102,6 +103,8 @@ public class LowLevelBindingTest extends UITestCase {
     public void contextlessTest() {
 
         out.println(" - - - lowLevelTest; contextless binding - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CL cl = CLPlatform.getLowLevelCLInterface();
 
@@ -174,6 +177,8 @@ public class LowLevelBindingTest extends UITestCase {
     public void createContextTest() {
 
         out.println(" - - - createContextTest - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CL cl = CLPlatform.getLowLevelCLInterface();
 
@@ -219,6 +224,8 @@ public class LowLevelBindingTest extends UITestCase {
     public void lowLevelVectorAddTest() throws InterruptedException {
 
         out.println(" - - - lowLevelTest2; VectorAdd kernel - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CL cl = CLPlatform.getLowLevelCLInterface();
 

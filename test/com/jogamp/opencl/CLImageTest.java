@@ -40,6 +40,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 
 import static org.junit.Assert.*;
@@ -83,6 +84,9 @@ public class CLImageTest extends UITestCase {
 
     @Test
     public void supportedImageFormatsTest() {
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
+
         CLDevice device = getCompatibleDevice();
         if(device == null) {
             out.println("WARNING: can not test image api.");
@@ -105,6 +109,9 @@ public class CLImageTest extends UITestCase {
 
     @Test
     public void image2dCopyTest() throws IOException {
+
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLDevice device = getCompatibleDevice();
         if(device == null) {
@@ -141,6 +148,9 @@ public class CLImageTest extends UITestCase {
 
     @Test
     public void image2dKernelCopyTest() throws IOException {
+
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLDevice device = getCompatibleDevice();
         if(device == null) {

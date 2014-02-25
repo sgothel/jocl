@@ -30,6 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLMemory.Map;
+import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.util.Bitstream;
@@ -67,6 +68,8 @@ public class CLBufferTest extends UITestCase {
     public void createBufferTest() {
 
         out.println(" - - - highLevelTest; create buffer test - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLContext context = CLContext.create();
         try{
@@ -122,6 +125,8 @@ public class CLBufferTest extends UITestCase {
     public void writeCopyReadBufferTest() {
 
         out.println(" - - - highLevelTest; copy buffer test - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         final int elements = NUM_ELEMENTS;
 
@@ -154,6 +159,8 @@ public class CLBufferTest extends UITestCase {
     public void bufferWithHostPointerTest() {
 
         out.println(" - - - highLevelTest; host pointer test - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         final int elements = NUM_ELEMENTS;
 
@@ -198,6 +205,8 @@ public class CLBufferTest extends UITestCase {
     public void mapBufferTest() {
 
         out.println(" - - - highLevelTest; map buffer test - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         final int elements = NUM_ELEMENTS;
         final int sizeInBytes = elements*SIZEOF_INT;
@@ -251,6 +260,8 @@ public class CLBufferTest extends UITestCase {
     public void subBufferTest01ByteBuffer() {
 
         out.println(" - - - subBufferTest - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
@@ -343,6 +354,8 @@ public class CLBufferTest extends UITestCase {
     public void destructorCallbackTest() throws InterruptedException {
 
         out.println(" - - - destructorCallbackTest - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
 
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
