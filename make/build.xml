@@ -74,7 +74,7 @@
     <target name="load.user.properties">
         <property name="user.properties.file" value="${user.home}/jocl.properties" />
         <property file="${user.properties.file}" />
-        <echo message="Loaded ${user.properties.file}. (optionally)" />
+        <echo message="Loaded ${user.properties.file}." />
 
         <property file="${user.home}/gluegen.properties" />
         <echo message="Loaded ${user.home}/gluegen.properties." />
@@ -84,7 +84,7 @@
     <!--
        - Declare all paths and user defined variables.
       -->
-    <target name="init.base" depends="jogamp.env.init,gluegen.properties.load.user,gluegen.cpptasks.detect.os">
+    <target name="init.base" depends="load.user.properties,jogamp.env.init,gluegen.properties.load.user,gluegen.cpptasks.detect.os">
         <property name="jocl.build.number" value="manual"/>
         <property name="jocl.build.id"     value="${version.timestamp}"/>
         <property name="jocl.version"      value="${jogamp.version.base}-b${jocl.build.number}-${version.timestamp}" />
