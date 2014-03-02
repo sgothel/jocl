@@ -348,11 +348,11 @@ Java_com_jogamp_opencl_llb_impl_CLImpl_clEnqueueMapImage0__JJIJLjava_lang_Object
     cl_int status;
 
     typedef int32_t (*imageInfoFunctionType)(cl_mem, uint32_t, size_t, void *, size_t *);
-    imageInfoFunctionType clGetImageInfo;
+    imageInfoFunctionType clGetImageInfo = (imageInfoFunctionType)(intptr_t)imageInfoAddress;
 
     typedef void* (*mapInfoFunctionType)(cl_command_queue, cl_mem, uint32_t, uint64_t, const size_t *,
                 const size_t *, size_t *, size_t *, uint32_t, cl_event *, cl_event *, int32_t *);
-    mapInfoFunctionType clEnqueueMapImage;
+    mapInfoFunctionType clEnqueueMapImage = (mapInfoFunctionType)(intptr_t)mapImageAddress;
 
     void * _res;
 

@@ -32,7 +32,6 @@
 package com.jogamp.opencl.llb.impl;
 
 import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.common.os.Platform;
 import com.jogamp.common.util.LongLongHashMap;
 import com.jogamp.opencl.CLErrorHandler;
 import com.jogamp.opencl.CLException;
@@ -215,12 +214,12 @@ public class CLImpl extends CLAbstractImpl {
             throw new CLException("Argument \"errcode_ret\" was not a direct buffer");
         }
 
-        final long mapImageAddress = addressTable._addressof_clEnqueueMapImage;
-        if (mapImageAddress == 0) {
-            throw new UnsupportedOperationException("Method not available");
-        }
         final long getImageInfoAddress = addressTable._addressof_clGetImageInfo;
         if (getImageInfoAddress == 0) {
+            throw new UnsupportedOperationException("Method not available");
+        }
+        final long mapImageAddress = addressTable._addressof_clEnqueueMapImage;
+        if (mapImageAddress == 0) {
             throw new UnsupportedOperationException("Method not available");
         }
         ByteBuffer _res;
@@ -231,7 +230,7 @@ public class CLImpl extends CLAbstractImpl {
                 getDirectBufferByteOffset(image_slice_pitch), num_events_in_wait_list,
                 event_wait_list != null ? event_wait_list.getBuffer() : null, getDirectBufferByteOffset(event_wait_list),
                 event != null ? event.getBuffer() : null, getDirectBufferByteOffset(event), errcode_ret,
-                getDirectBufferByteOffset(errcode_ret));
+                getDirectBufferByteOffset(errcode_ret), getImageInfoAddress, mapImageAddress);
         if (_res == null) {
             return null;
         }
@@ -251,7 +250,8 @@ public class CLImpl extends CLAbstractImpl {
             Object origin, int origin_byte_offset, Object range, int range_byte_offset, Object image_row_pitch,
             int image_row_pitch_byte_offset, Object image_slice_pitch, int image_slice_pitch_byte_offset,
             int num_events_in_wait_list, Object event_wait_list, int event_wait_list_byte_offset, Object event,
-            int event_byte_offset, Object errcode_ret, int errcode_ret_byte_offset);
+            int event_byte_offset, Object errcode_ret, int errcode_ret_byte_offset,
+            long getImageInfoAddress, long mapImageAddress);
 
     public CLProcAddressTable getAddressTable() {
         return addressTable;
