@@ -407,7 +407,7 @@ JNIEXPORT jint JNICALL
 Java_com_jogamp_opencl_llb_impl_CLImpl_clSetEventCallback0(JNIEnv *env, jobject _unused,
         jlong event, jint trigger, jobject listener, jlong procAddress) {
 
-    cl_event _event = event;
+    cl_event _event = (cl_event)event;
     cl_int _trigger = trigger;
     cl_int _res;
     typedef int32_t (*function)(cl_event, cl_int, void (*pfn_event_notify) (cl_event, cl_int, void *), void *);
@@ -423,7 +423,7 @@ JNIEXPORT jint JNICALL
 Java_com_jogamp_opencl_llb_impl_CLImpl_clSetMemObjectDestructorCallback0(JNIEnv *env, jobject _unused,
         jlong mem, jobject listener, jlong procAddress) {
 
-    cl_mem _mem = mem;
+    cl_mem _mem = (cl_mem)mem;
     cl_int _res;
     typedef int32_t (*function)(cl_mem, void (*pfn_event_notify) (cl_mem, void *), void *);
     function clSetMemObjectDestructorCallback = (function)(intptr_t) procAddress;

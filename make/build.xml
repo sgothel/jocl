@@ -625,8 +625,7 @@
             optimize="${c.compiler.optimise}" 
             debug="${c.compiler.debug}"
             multithreaded="true" 
-            exceptions="false" 
-            rtti="false">
+            exceptions="false">
 
                 <fileset dir="${project.root}">
                     <patternset refid="c.src.files"/>
