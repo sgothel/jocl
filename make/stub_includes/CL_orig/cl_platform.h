@@ -404,9 +404,12 @@ typedef unsigned int cl_GLenum;
     /* #include <crtdefs.h>                                                                                             */
     /* #define CL_ALIGNED(_x)          _CRT_ALIGN(_x)                                                                   */
     #define CL_ALIGNED(_x)
+/* Don't warn if we're in GlueGen's preprocessor; it doesn't have compiler defines set */
+#elif defined( __GLUEGEN__ )
+    #define CL_ALIGNED(_x)
 #else
-   #warning "Need to implement some method to align data here"
-   #define  CL_ALIGNED(_x)
+    #warning "Need to implement some method to align data here"
+    #define CL_ALIGNED(_x)
 #endif
 
 /* Indicate whether .xyzw, .s0123 and .hi.lo are supported */
