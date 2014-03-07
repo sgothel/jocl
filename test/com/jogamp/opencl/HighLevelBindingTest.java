@@ -212,7 +212,9 @@ public class HighLevelBindingTest extends UITestCase {
         if(MiscUtils.isOpenCLUnavailable())
             return;
 
+        @SuppressWarnings("unchecked")
         CLPlatform platformGPU = CLPlatform.getDefault(version(CL_1_0), type(GPU));
+        @SuppressWarnings("unchecked")
         CLPlatform platformCPU = CLPlatform.getDefault(version(CL_1_0), type(CPU));
 
         if(platformGPU != null) {

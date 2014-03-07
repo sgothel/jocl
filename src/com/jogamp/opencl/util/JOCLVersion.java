@@ -48,6 +48,7 @@ import static com.jogamp.common.util.VersionUtil.*;
  * @author Michael Bien
  * @deprecated Use {@link com.jogamp.opencl.JoclVersion}
  */
+@Deprecated
 public class JOCLVersion extends JogampVersion {
 
     private static final String PACKAGE = "com.jogamp.opencl";

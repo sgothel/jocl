@@ -170,6 +170,7 @@ public class CLCommandQueueTest extends UITestCase {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void eventConditionsTest() throws IOException {
 

@@ -32,5 +32,5 @@ package com.jogamp.opencl;
  * import of JDK7's ARM interface allowing JDK6 backwards compatibility.
  */
 public interface AutoCloseable /*extends java.lang.AutoCloseable*/ {
-    void close() throws Exception;
+    void close();
 }

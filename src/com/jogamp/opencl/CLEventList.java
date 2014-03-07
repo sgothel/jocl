@@ -151,7 +151,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
      */
     @Deprecated
     @Override
-    public final void close() throws Exception {
+    public final void close() {
         release();
     }
  

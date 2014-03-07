@@ -113,7 +113,9 @@ public class CLGLTest extends UITestCase {
 
         initGL();
 
+        @SuppressWarnings("unchecked")
         CLPlatform platform = CLPlatform.getDefault(CLPlatformFilters.glSharing());
+        @SuppressWarnings("unchecked")
         CLDevice device = platform.getMaxFlopsDevice(CLDeviceFilters.glSharing());
 
         if(device == null) {
@@ -159,12 +161,14 @@ public class CLGLTest extends UITestCase {
         makeGLCurrent();
         assertTrue(glcontext.isCurrent());
 
+        @SuppressWarnings("unchecked")
         CLPlatform platform = CLPlatform.getDefault(glSharing(glcontext));
         if(platform == null) {
             out.println("test aborted");
             return;
         }
 
+        @SuppressWarnings("unchecked")
         CLDevice theChosenOne = platform.getMaxFlopsDevice(CLDeviceFilters.glSharing());
         out.println(theChosenOne);
 

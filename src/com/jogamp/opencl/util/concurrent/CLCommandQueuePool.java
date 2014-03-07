@@ -31,12 +31,12 @@ public class CLCommandQueuePool<C extends CLQueueContext> implements CLResource 
     private FinishAction finishAction = FinishAction.DO_NOTHING;
     private boolean released;
 
-    private CLCommandQueuePool(CLQueueContextFactory factory, Collection<CLCommandQueue> queues) {
+    private CLCommandQueuePool(CLQueueContextFactory<C> factory, Collection<CLCommandQueue> queues) {
         this.contexts = initContexts(queues, factory);
         initExecutor();
     }
 
-    private List<CLQueueContext> initContexts(Collection<CLCommandQueue> queues, CLQueueContextFactory factory) {
+    private List<CLQueueContext> initContexts(Collection<CLCommandQueue> queues, CLQueueContextFactory<C> factory) {
         List<CLQueueContext> newContexts = new ArrayList<CLQueueContext>(queues.size());
         
         int index = 0;
@@ -69,8 +69,8 @@ public class CLCommandQueuePool<C extends CLQueueContext> implements CLResource 
         return create(factory, queues);
     }
 
-    public static <C extends CLQueueContext> CLCommandQueuePool create(CLQueueContextFactory<C> factory, Collection<CLCommandQueue> queues) {
-        return new CLCommandQueuePool(factory, queues);
+    public static <C extends CLQueueContext> CLCommandQueuePool<C> create(CLQueueContextFactory<C> factory, Collection<CLCommandQueue> queues) {
+        return new CLCommandQueuePool<C>(factory, queues);
     }
 
     /**
@@ -78,7 +78,7 @@ public class CLCommandQueuePool<C extends CLQueueContext> implements CLResource 
      * @see ExecutorService#submit(java.util.concurrent.Callable)
      */
     public <R> Future<R> submit(CLTask<? super C, R> task) {
-        return excecutor.submit(new TaskWrapper(task, finishAction));
+        return excecutor.submit(new TaskWrapper<C,R>(task, finishAction));
     }
 
     /**
@@ -127,7 +127,7 @@ public class CLCommandQueuePool<C extends CLQueueContext> implements CLResource 
      * Blocks until all tasks finish and sets up a new context for all queues.
      * @return this
      */
-    public <C extends CLQueueContext> CLCommandQueuePool switchContext(CLQueueContextFactory<C> factory) {
+    public CLCommandQueuePool<C> switchContext(CLQueueContextFactory<C> factory) {
         
         excecutor.shutdown();
         finishQueues(); // just to be sure
@@ -255,6 +255,9 @@ public class CLCommandQueuePool<C extends CLQueueContext> implements CLResource 
 
         public R call() throws Exception {
             CLQueueContext context = ((QueueThread)Thread.currentThread()).context;
+            // we make sure to only wrap tasks on the correct kind of thread, so this
+            // shouldn't fail (trying to genericize QueueThread properly becomes tricky)
+            @SuppressWarnings("unchecked")
             R result = task.execute((C)context);
             if(mode.equals(FinishAction.FLUSH)) {
                 context.queue.flush();

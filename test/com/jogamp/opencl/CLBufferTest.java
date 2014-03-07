@@ -263,6 +263,7 @@ public class CLBufferTest extends UITestCase {
         if(MiscUtils.isOpenCLUnavailable())
             return;
 
+        @SuppressWarnings("unchecked")
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
             out.println("aborting subBufferTest");
@@ -309,6 +310,7 @@ public class CLBufferTest extends UITestCase {
         if(MiscUtils.isOpenCLUnavailable())
             return;
 
+        @SuppressWarnings("unchecked")
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
             out.println("aborting subBufferTest");
@@ -359,6 +361,7 @@ public class CLBufferTest extends UITestCase {
         if(MiscUtils.isOpenCLUnavailable())
             return;
 
+        @SuppressWarnings("unchecked")
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
             out.println("aborting destructorCallbackTest");

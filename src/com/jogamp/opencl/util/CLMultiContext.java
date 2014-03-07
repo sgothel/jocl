@@ -41,6 +41,7 @@ public class CLMultiContext implements CLResource {
     /**
      * Creates a multi context with all devices of the specified platforms and types.
      */
+    @SuppressWarnings("unchecked")
     public static CLMultiContext create(CLPlatform[] platforms, CLDevice.Type... types) {
         return create(platforms, CLDeviceFilters.type(types));
     }
@@ -48,6 +49,7 @@ public class CLMultiContext implements CLResource {
     /**
      * Creates a multi context with all matching devices of the specified platforms.
      */
+    @SuppressWarnings("unchecked")
     public static CLMultiContext create(CLPlatform[] platforms, Filter<CLDevice>... filters) {
 
         if(platforms == null) {

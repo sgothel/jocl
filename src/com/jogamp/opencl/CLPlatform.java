@@ -187,6 +187,7 @@ public class CLPlatform {
     /**
      * Returns the default OpenCL platform or null when no platform found.
      */
+    @SuppressWarnings("unchecked")
     public static CLPlatform getDefault(Filter<CLPlatform>... filter) {
         CLPlatform[] platforms = listCLPlatforms(filter);
         if(platforms.length > 0) {
@@ -219,6 +220,7 @@ public class CLPlatform {
      * @param filter Acceptance filter for the returned platforms.
      * @throws CLException if something went wrong initializing OpenCL
      */
+    @SuppressWarnings("unchecked")
     public static CLPlatform[] listCLPlatforms(Filter<CLPlatform>... filter) {
         initialize();
 
@@ -294,6 +296,7 @@ public class CLPlatform {
     /**
      * Lists all physical devices available on this platform matching the given {@link Filter}.
      */
+    @SuppressWarnings("unchecked")
     public CLDevice[] listCLDevices(Filter<CLDevice>... filters) {
         initialize();
 
@@ -389,6 +392,7 @@ public class CLPlatform {
      * The device speed is estimated by calculating the product of
      * MAX_COMPUTE_UNITS and MAX_CLOCK_FREQUENCY.
      */
+    @SuppressWarnings("unchecked")
     public CLDevice getMaxFlopsDevice(Filter<CLDevice>... filter) {
         return findMaxFlopsDevice(listCLDevices(filter));
     }
@@ -475,6 +479,7 @@ public class CLPlatform {
             while(scanner.hasNext())
                 extensions.add(scanner.next());
 
+            scanner.close();
             extensions = Collections.unmodifiableSet(extensions);
         }
 
