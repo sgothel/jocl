@@ -335,6 +335,7 @@
                bootclasspath="${target.rt.jar}"
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <src path="${basedir}/../etc/src"/>
+            <compilerarg value="-Xlint:all"/>
         </javac>
 
         <taskdef name="update-headers"            classname="com.jogamp.ant.HeaderFileDownloader"     classpath="${etc.build.dir}"/>
@@ -356,8 +357,9 @@
         <mkdir dir="${headers.dest}"/>
 
         <!--uncomment function names in c headers and copy modified files into include path-->
-        <uncomment-function-params src="${headers.orig}/cl.h" dest="${headers.dest}/cl.h"/>
-        <uncomment-function-params src="${headers.orig}/cl_gl.h" dest="${headers.dest}/cl_gl.h"/>
+        <!-- need to pass in basedir or it won't work inside Eclipse, where user.dir is Eclipse's bin dir-->
+        <uncomment-function-params src="${basedir}/${headers.orig}/cl.h" dest="${basedir}/${headers.dest}/cl.h"/>
+        <uncomment-function-params src="${basedir}/${headers.orig}/cl_gl.h" dest="${basedir}/${headers.dest}/cl_gl.h"/>
 
         <!--nothing to uncomment in this headers-->
         <copy file="${headers.orig}/cl_platform.h" toDir="${headers.dest}" overwrite="true"/>
@@ -552,7 +554,6 @@
         <javac destdir="${classes}" 
                includeantruntime="false"
                excludes="${java.part.android}"
-               memoryMaximumSize="${javac.memorymax}"
                encoding="UTF-8"
                source="${target.sourcelevel}" 
                target="${target.targetlevel}" 
@@ -561,6 +562,9 @@
         	<classpath refid="javac.classpath"/>
         	<src path="${src.java}" />
             <src path="${src.generated.java}" />
+            <compilerarg value="-Xlint:all"/>
+            <!-- suppress warning due to @CLProperty annotation, which is used at runtime but not during compilation -->
+            <compilerarg value="-Xlint:-processing"/>
         </javac>
     </target>
 
@@ -568,7 +572,6 @@
         <!--compile gluegen-rt-android last-->
         <javac destdir="${classes}" 
                includeantruntime="false"
-               memoryMaximumSize="${javac.memorymax}"
                encoding="UTF-8"
                source="${target.sourcelevel}" 
                target="${target.targetlevel}" 
@@ -577,6 +580,7 @@
         	<classpath refid="javac.android.classpath"/>
         	<src path="${src.java}" />
             <src path="${src.generated.java}" />
+            <compilerarg value="-Xlint:all"/>
         </javac>
     </target>
 
