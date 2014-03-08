@@ -85,12 +85,16 @@ public class CLProgramTest extends UITestCase {
         CLContext context = CLContext.create();
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"));
 
-        try{
-            program.createCLKernels();
-            fail("expected exception but got none :(");
-        }catch(CLException ex) {
-            out.println("got expected exception:  "+ex.getCLErrorString());
-            assertEquals(ex.errorcode, CL.CL_INVALID_PROGRAM_EXECUTABLE);
+        // only test kernel creation error on unbuilt program if we're not on AMD -- as of
+        // 3/8/2014, AMD drivers segfault on this instead of returning CL_INVALID_PROGRAM_EXECUTABLE
+        if(!context.getPlatform().isVendorAMD()) {
+            try{
+                program.createCLKernels();
+                fail("expected exception but got none :(");
+            }catch(CLException ex) {
+                out.println("got expected exception:  "+ex.getCLErrorString());
+                assertEquals(ex.errorcode, CL.CL_INVALID_PROGRAM_EXECUTABLE);
+            }
         }
 
         out.println(program.getBuildStatus());
@@ -127,7 +131,7 @@ public class CLProgramTest extends UITestCase {
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"))
                                    .build(ENABLE_MAD, WARNINGS_ARE_ERRORS);
 
-        // optain binaries
+        // obtain binaries
         Map<CLDevice, byte[]> binaries = program.getBinaries();
         assertFalse(binaries.isEmpty());
 
@@ -177,11 +181,15 @@ public class CLProgramTest extends UITestCase {
         assertNotNull(program.getSource());
         assertEquals(program.getSource().length(), 0);
 
-        try{
-            Map<String, CLKernel> kernels = program.createCLKernels();
-            fail("expected an exception from createCLKernels but got: "+kernels);
-        }catch(CLException ex) {
-            // expected, not build yet
+        // only test kernel creation error on unbuilt program if we're not on AMD -- as of
+        // 3/8/2014, AMD drivers segfault on this instead of returning CL_INVALID_PROGRAM_EXECUTABLE
+        if(!context.getPlatform().isVendorAMD()) {
+            try{
+                Map<String, CLKernel> kernels = program.createCLKernels();
+                fail("expected an exception from createCLKernels but got: "+kernels);
+            }catch(CLException ex) {
+                // expected, not built yet
+            }
         }
 
         out.println(program.getBuildStatus());

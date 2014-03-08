@@ -256,7 +256,10 @@ public class LowLevelBindingTest extends UITestCase {
         int deviceCount = (int) (longBuffer.get(0) / (is32Bit() ? 4 : 8));
         out.println("context created with " + deviceCount + " devices");
 
-        ByteBuffer bb = newDirectByteBuffer(4096);
+        // Was originally 4096, but had to make this bigger or it would crash in UITestCase.oneTimeTearDown(){ System.gc() }
+        // without even dumping a stack when using AMD drivers. Presumably the drivers would write past the end
+        // of the block and mess up GC info somehow.
+        ByteBuffer bb = newDirectByteBuffer(8192);
         ret = cl.clGetContextInfo(context, CL.CL_CONTEXT_DEVICES, bb.capacity(), bb, null);
         checkError("on clGetContextInfo", ret);
 

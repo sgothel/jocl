@@ -451,6 +451,12 @@ public class CLPlatform {
     }
 
     /**
+     * @return true if the vendor is AMD.
+     */
+    public boolean isVendorAMD() {
+        return getVendor().contains("Advanced Micro Devices");
+    }
+    /**
      * Returns the ICD suffix.
      */
     @CLProperty("CL_PLATFORM_ICD_SUFFIX_KHR")
