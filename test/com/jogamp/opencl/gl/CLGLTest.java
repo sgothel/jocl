@@ -33,6 +33,7 @@
 package com.jogamp.opencl.gl;
 
 import com.jogamp.common.nio.Buffers;
+import com.jogamp.opencl.CLBuffer;
 import com.jogamp.opencl.CLCommandQueue;
 
 import javax.media.opengl.GL2;
@@ -51,6 +52,7 @@ import com.jogamp.opencl.util.CLDeviceFilters;
 import com.jogamp.opencl.util.CLPlatformFilters;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
 import javax.media.opengl.GLCapabilities;
@@ -224,6 +226,87 @@ public class CLGLTest extends UITestCase {
             deinitGL();
         }
 
+    }
+
+//    @Test(timeout=15000)
+    @Test
+    public void textureSharing() {
+
+        out.println(" - - - glcl; textureSharing - - - ");
+        if(MiscUtils.isOpenCLUnavailable())
+            return;
+
+        initGL();
+        makeGLCurrent();
+        assertTrue(glcontext.isCurrent());
+
+        @SuppressWarnings("unchecked")
+        CLPlatform platform = CLPlatform.getDefault(glSharing(glcontext));
+        if(platform == null) {
+            out.println("test aborted");
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        CLDevice device = platform.getMaxFlopsDevice(CLDeviceFilters.glSharing());
+        out.println(device);
+
+        CLGLContext context = CLGLContext.create(glcontext, device);
+
+        try {
+            out.println(context);
+
+            GL2 gl = glcontext.getGL().getGL2();
+
+            // create and write GL texture
+            int[] id = new int[1];
+            gl.glGenTextures(id.length, id, 0);
+            gl.glActiveTexture(GL2.GL_TEXTURE0);
+            gl.glBindTexture  (GL2.GL_TEXTURE_2D, id[0]);
+//            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+//            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
+//            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
+//            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 0);
+
+            ByteBuffer bufferGL = Buffers.newDirectByteBuffer(new byte [] {
+                (byte)0,  (byte)5,  (byte)10, (byte)0xff,
+                (byte)15, (byte)20, (byte)25, (byte)0xff,
+                (byte)30, (byte)35, (byte)40, (byte)0xff,
+                (byte)45, (byte)50, (byte)55, (byte)0xff});
+            bufferGL.rewind();
+            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, 2, 2, 0, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, bufferGL);
+            gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
+            gl.glFinish();
+
+            // create CLGL buffer
+            ByteBuffer bufferCL = Buffers.newDirectByteBuffer(2*2*4);
+            CLGLTexture2d<ByteBuffer> clTexture = context.createFromGLTexture2d(bufferCL, GL2.GL_TEXTURE_2D, id[0], 0, CLBuffer.Mem.READ_ONLY);
+
+//            assertEquals(bufferGL.capacity(), clTexture.getCLCapacity());
+//            assertEquals(bufferGL.capacity(), clTexture.getCLSize());
+
+            CLCommandQueue queue = device.createCommandQueue();
+
+            // read gl buffer into cl nio buffer
+            queue.putAcquireGLObject(clTexture)
+                 .putReadImage(clTexture, true)
+                 .putReleaseGLObject(clTexture);
+
+            while(bufferCL.hasRemaining()) {
+                byte bGL = bufferGL.get();
+                byte bCL = bufferCL.get();
+                assertEquals(bGL, bCL);
+            }
+
+            out.println(clTexture);
+
+            clTexture.release();
+            gl.glDeleteBuffers(1, id, 0);
+        }
+        finally {
+            context.release();
+            deinitGL();
+        }
     }
 
     private void makeGLCurrent() {
