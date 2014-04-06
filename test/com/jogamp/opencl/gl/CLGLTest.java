@@ -35,6 +35,8 @@ package com.jogamp.opencl.gl;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opencl.CLBuffer;
 import com.jogamp.opencl.CLCommandQueue;
+import com.jogamp.opencl.CLKernel;
+import com.jogamp.opencl.CLProgram;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
@@ -228,8 +230,7 @@ public class CLGLTest extends UITestCase {
 
     }
 
-//    @Test(timeout=15000)
-    @Test
+    @Test(timeout=15000)
     public void textureSharing() {
 
         out.println(" - - - glcl; textureSharing - - - ");
@@ -241,20 +242,32 @@ public class CLGLTest extends UITestCase {
         assertTrue(glcontext.isCurrent());
 
         @SuppressWarnings("unchecked")
-        CLPlatform platform = CLPlatform.getDefault(glSharing(glcontext));
-        if(platform == null) {
-            out.println("test aborted");
+        CLPlatform [] clplatforms = CLPlatform.listCLPlatforms(glSharing(glcontext));
+        if(clplatforms.length == 0) {
+            out.println("no platform that supports OpenGL-OpenCL interoperability");
             return;
         }
 
-        @SuppressWarnings("unchecked")
-        CLDevice device = platform.getMaxFlopsDevice(CLDeviceFilters.glSharing());
-        out.println(device);
+        for(CLPlatform clplatform : clplatforms) {
+    
+            @SuppressWarnings("unchecked")
+            CLDevice [] cldevices = clplatform.listCLDevices(CLDeviceFilters.glSharing());
+    
+            for(CLDevice cldevice : cldevices) {
+                out.println(cldevice);
+                textureSharingInner(cldevice);
+            }
+        }
+        
+        deinitGL();
+    }
 
-        CLGLContext context = CLGLContext.create(glcontext, device);
+    public void textureSharingInner(CLDevice cldevice) {
+
+        CLGLContext clglcontext = CLGLContext.create(glcontext, cldevice);
 
         try {
-            out.println(context);
+            out.println(clglcontext);
 
             GL2 gl = glcontext.getGL().getGL2();
 
@@ -263,39 +276,59 @@ public class CLGLTest extends UITestCase {
             gl.glGenTextures(id.length, id, 0);
             gl.glActiveTexture(GL2.GL_TEXTURE0);
             gl.glBindTexture  (GL2.GL_TEXTURE_2D, id[0]);
-//            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
-//            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
-//            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_BASE_LEVEL, 0);
-//            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAX_LEVEL, 0);
-
-            ByteBuffer bufferGL = Buffers.newDirectByteBuffer(new byte [] {
-                (byte)0,  (byte)5,  (byte)10, (byte)0xff,
-                (byte)15, (byte)20, (byte)25, (byte)0xff,
-                (byte)30, (byte)35, (byte)40, (byte)0xff,
-                (byte)45, (byte)50, (byte)55, (byte)0xff});
-            bufferGL.rewind();
-            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, 2, 2, 0, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, bufferGL);
+            int texWidth = 2;
+            int texHeight = 2;
+            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, texWidth, texHeight, 0, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, null );
             gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
             gl.glFinish();
 
             // create CLGL buffer
-            ByteBuffer bufferCL = Buffers.newDirectByteBuffer(2*2*4);
-            CLGLTexture2d<ByteBuffer> clTexture = context.createFromGLTexture2d(bufferCL, GL2.GL_TEXTURE_2D, id[0], 0, CLBuffer.Mem.READ_ONLY);
+            ByteBuffer bufferCL = Buffers.newDirectByteBuffer(texWidth*texHeight*4);
+            CLGLTexture2d<ByteBuffer> clTexture = clglcontext.createFromGLTexture2d(bufferCL, GL2.GL_TEXTURE_2D, id[0], 0, CLBuffer.Mem.READ_ONLY);
 
-//            assertEquals(bufferGL.capacity(), clTexture.getCLCapacity());
-//            assertEquals(bufferGL.capacity(), clTexture.getCLSize());
+            // set texel values to a formula that can be read back and verified
+            String sourceCL = "__kernel void writeTexture (__write_only image2d_t imageTex, unsigned w, unsigned h ) \n" +
+                    "{                                                                        \n" +
+                    "    for(int y=1; y<=h; ++y) {                                            \n" +
+                    "        for(int x=1; x<=w; ++x) {                                        \n" +
+                    "            write_imagef(imageTex, (int2)(x-1,y-1), (float4)(((float)x)/((float)(4*w)), ((float)y)/((float)(4*h)), 0.0f, 1.0f)); \n" +
+                    "        }                                                                \n" +
+                    "    }                                                                    \n" +
+                    "}";
+            CLProgram program = clglcontext.createProgram(sourceCL);
+            program.build();
+            System.out.println(program.getBuildStatus());
+            System.out.println(program.getBuildLog());
+            assertTrue(program.isExecutable());
 
-            CLCommandQueue queue = device.createCommandQueue();
+            CLKernel clkernel = program.createCLKernel("writeTexture")
+                    .putArg(clTexture)
+                    .putArg(texWidth)
+                    .putArg(texHeight)
+                    .rewind();
 
-            // read gl buffer into cl nio buffer
+            CLCommandQueue queue = cldevice.createCommandQueue();
+
+            // write gl texture with cl kernel, then read it to host buffer
             queue.putAcquireGLObject(clTexture)
-                 .putReadImage(clTexture, true)
-                 .putReleaseGLObject(clTexture);
+                .put1DRangeKernel(clkernel, 0, 1, 1)
+                .putReadImage(clTexture, true)
+                .putReleaseGLObject(clTexture)
+                .finish();
 
-            while(bufferCL.hasRemaining()) {
-                byte bGL = bufferGL.get();
-                byte bCL = bufferCL.get();
-                assertEquals(bGL, bCL);
+            for(int y = 1; y <= texHeight; y++) {
+                for(int x = 1; x <= texWidth; x++) {
+                    byte bX = bufferCL.get();
+                    byte bY = bufferCL.get();
+                    byte bZero = bufferCL.get();
+                    byte bMinusOne = bufferCL.get();
+                    byte bXCheck = (byte)(((float)x)/((float)(4*texWidth))*256);
+                    byte bYCheck = (byte)(((float)y)/((float)(4*texHeight))*256);
+                    assertEquals(bXCheck, bX);
+                    assertEquals(bYCheck, bY);
+                    assertEquals(0, bZero);
+                    assertEquals(-1, bMinusOne);
+                }
             }
 
             out.println(clTexture);
@@ -304,8 +337,7 @@ public class CLGLTest extends UITestCase {
             gl.glDeleteBuffers(1, id, 0);
         }
         finally {
-            context.release();
-            deinitGL();
+            clglcontext.release();
         }
     }
 

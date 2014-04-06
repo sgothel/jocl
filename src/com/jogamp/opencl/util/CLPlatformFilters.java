@@ -67,7 +67,7 @@ public class CLPlatformFilters {
     }
     
     /**
-     * Accepts all platforms containing at least one devices of which supports OpenGL-OpenCL interoparability.
+     * Accepts all platforms containing at least one devices of which supports OpenGL-OpenCL interoperability.
      */
     public static Filter<CLPlatform> glSharing() {
         return new Filter<CLPlatform>() {
@@ -86,7 +86,7 @@ public class CLPlatformFilters {
 
     /**
      * Accepts all with the given OpenGL context compatible platforms containing at least one
-     * devices of which supports OpenGL-OpenCL interoparability.
+     * devices of which supports OpenGL-OpenCL interoperability.
      */
     public static Filter<CLPlatform> glSharing(final GLContext context) {
         return new Filter<CLPlatform>() {
@@ -94,9 +94,21 @@ public class CLPlatformFilters {
             public boolean accept(CLPlatform item) {
                 String glVendor = context.getGL().glGetString(GL.GL_VENDOR);
                 String clVendor = item.getVendor();
-                return clVendor.equals(glVendor) && glFilter.accept(item);
+                return areVendorsCompatible(glVendor,clVendor) && glFilter.accept(item);
             }
         };
+    }
+    
+    /**
+     * We need this test because on at least some AMD cards, the GL vendor is ATI,
+     * but the CL vendor is AMD.
+     * @param glVendor OpenGL vendor string.
+     * @param clVendor OpenCL vendor string.
+     * @return true if the strings are either the same, or indicate that they're part of the same card.
+     */
+    private static boolean areVendorsCompatible(final String glVendor, final String clVendor) {
+        return(   clVendor.equals(glVendor)
+               || (glVendor.contains("ATI Technologies") && clVendor.contains("Advanced Micro Devices")));
     }
 
     /**
