@@ -100,15 +100,17 @@ public class CLPlatformFilters {
     }
     
     /**
-     * We need this test because on at least some AMD cards, the GL vendor is ATI,
-     * but the CL vendor is AMD.
+     * We need this test because:
+     *  - On at least some AMD cards, the GL vendor is ATI, but the CL vendor is AMD.
+     *  - On at least some Macs, the GL vendor is Nvidia, but the CL vendor is Apple.
      * @param glVendor OpenGL vendor string.
      * @param clVendor OpenCL vendor string.
      * @return true if the strings are either the same, or indicate that they're part of the same card.
      */
     private static boolean areVendorsCompatible(final String glVendor, final String clVendor) {
         return(   clVendor.equals(glVendor)
-               || (glVendor.contains("ATI Technologies") && clVendor.contains("Advanced Micro Devices")));
+               || (glVendor.contains("ATI Technologies") && clVendor.contains("Advanced Micro Devices"))
+               || (glVendor.contains("NVIDIA Corporation") && clVendor.contains("Apple")));
     }
 
     /**

@@ -284,13 +284,13 @@ public class CLGLTest extends UITestCase {
 
             // create CLGL buffer
             ByteBuffer bufferCL = Buffers.newDirectByteBuffer(texWidth*texHeight*4);
-            CLGLTexture2d<ByteBuffer> clTexture = clglcontext.createFromGLTexture2d(bufferCL, GL2.GL_TEXTURE_2D, id[0], 0, CLBuffer.Mem.READ_ONLY);
+            CLGLTexture2d<ByteBuffer> clTexture = clglcontext.createFromGLTexture2d(bufferCL, GL2.GL_TEXTURE_2D, id[0], 0, CLBuffer.Mem.WRITE_ONLY);
 
             // set texel values to a formula that can be read back and verified
             String sourceCL = "__kernel void writeTexture (__write_only image2d_t imageTex, unsigned w, unsigned h ) \n" +
                     "{                                                                        \n" +
-                    "    for(int y=1; y<=h; ++y) {                                            \n" +
-                    "        for(int x=1; x<=w; ++x) {                                        \n" +
+                    "    for(unsigned y=1; y<=h; ++y) {                                       \n" +
+                    "        for(unsigned x=1; x<=w; ++x) {                                   \n" +
                     "            write_imagef(imageTex, (int2)(x-1,y-1), (float4)(((float)x)/((float)(4*w)), ((float)y)/((float)(4*h)), 0.0f, 1.0f)); \n" +
                     "        }                                                                \n" +
                     "    }                                                                    \n" +
