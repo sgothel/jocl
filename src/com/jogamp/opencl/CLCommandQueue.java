@@ -421,7 +421,7 @@ public class CLCommandQueue extends CLObjectResource {
         putCopyBufferRect(  src, dest, srcOriginX, srcOriginY, 0,
                             destOriginX, destOriginY, 0,
                             rangeX, rangeY, 1,
-                            srcRowPitch, srcSlicePitch, destSlicePitch, destRowPitch, condition, events);
+                            srcRowPitch, srcSlicePitch, destRowPitch, destSlicePitch, condition, events);
         return this;
     }
 
