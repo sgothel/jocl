@@ -70,7 +70,7 @@ public class CLDeviceFilters {
     }
     
     /**
-     * Accepts all devices which support OpenGL-OpenCL interoparability.
+     * Accepts all devices which support OpenGL-OpenCL interoperability.
      */
     public static Filter<CLDevice> glSharing() {
         return new Filter<CLDevice>() {
