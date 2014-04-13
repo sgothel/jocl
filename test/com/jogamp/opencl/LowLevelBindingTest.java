@@ -259,7 +259,7 @@ public class LowLevelBindingTest extends UITestCase {
         // Was originally 4096, but had to make this bigger or it would crash in UITestCase.oneTimeTearDown(){ System.gc() }
         // without even dumping a stack when using AMD drivers. Presumably the drivers would write past the end
         // of the block and mess up GC info somehow.
-        ByteBuffer bb = newDirectByteBuffer(8192);
+        ByteBuffer bb = newDirectByteBuffer(32768);
         ret = cl.clGetContextInfo(context, CL.CL_CONTEXT_DEVICES, bb.capacity(), bb, null);
         checkError("on clGetContextInfo", ret);
 
@@ -273,6 +273,7 @@ public class LowLevelBindingTest extends UITestCase {
         offset *= (is32Bit() ? 4 : 8);
         long device = is32Bit()?bb.getInt(offset):bb.getLong(offset);
 
+        bb.rewind();
         ret = cl.clGetDeviceInfo(device, CL.CL_DEVICE_MAX_WORK_GROUP_SIZE, bb.capacity(), bb, null);
         checkError("on clGetDeviceInfo", ret);
         int maxWGS = bb.getInt();
@@ -358,11 +359,13 @@ public class LowLevelBindingTest extends UITestCase {
         out.println("program source length (cl): "+longBuffer.get(0));
         out.println("program source length (java): "+programSource.length());
 
+        bb.rewind();
         ret = cl.clGetProgramInfo(program, CL.CL_PROGRAM_SOURCE, bb.capacity(), bb, null);
         checkError("on clGetProgramInfo CL_PROGRAM_SOURCE", ret);
         out.println("program source:\n" + clString2JavaString(bb, (int)longBuffer.get(0)));
 
         // Check program status
+        bb.rewind();
         ret = cl.clGetProgramBuildInfo(program, device, CL.CL_PROGRAM_BUILD_STATUS, bb.capacity(), bb, null);
         checkError("on clGetProgramBuildInfo1", ret);
 
