@@ -39,14 +39,15 @@
                     </ul>
                     <h3>External References</h3>
                     <ul>
-                        <li><a href="http://www.khronos.org/registry/cl/sdk/1.1/docs/man/xhtml/">OpenCL Reference Pages</a></li>
-                        <li><a href="http://www.khronos.org/registry/cl/specs/opencl-1.1.pdf">OpenCL 1.1 Specification</a></li>
-                        <li><a href="http://www.khronos.org/files/opencl-quick-reference-card.pdf">OpenCL Quick Reference</a></li>
+                        <li><a href="http://www.khronos.org/opencl/">OpenCL Home</a></li>
+                        <li><a href="http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/">OpenCL 1.2 Reference Pages</a></li>
+                        <li><a href="http://www.khronos.org/registry/cl/specs/opencl-1.2.pdf">OpenCL 1.2 Specification</a></li>
+                        <li><a href="https://www.khronos.org/files/opencl-1-2-quick-reference-card.pdf">OpenCL 1.2 Quick Reference Card</a></li>
                     </ul>
                     <h3>External Tutorials</h3>
                     <ul>
-                        <li><a href="http://developer.amd.com/zones/OpenCLZone/universities/pages/default.aspx">AMD OpenCL University Kit</a></li>
-                        <li><a href="http://developer.amd.com/documentation/videos/OpenCLTechnicalOverviewVideoSeries/Pages/default.aspx">AMD Stream OpenCL Technical Overview Video Series</a></li>
+                        <li><a href="http://developer.amd.com/partners/university-programs/">AMD OpenCL University Kit</a></li>
+                        <li><a href="http://developer.amd.com/resources/documentation-articles/videos/ati-stream-opencl-technical-overview-video-series/">OpenCL Technical Overview Video Series</a></li>
                         <li><a href="http://www.macresearch.org/opencl">Mac Research OpenCL Tutorials</a></li>
                     </ul>
                     <a href="http://www.khronos.org/opencl/"><img src="http://www.khronos.org/opencl/images/opencl_100px.png" alt="OpenCL"/></a>
@@ -56,31 +57,30 @@
                     <h2>Prerequisites</h2>
                     <hr/>
                     <p>
-                        <b>Follow all steps</b> described in <a href="../../jogl/doc/HowToBuild.html">How to build JOGL</a>,
-                        since GlueGen and JOGL are required as compiletime dependencies.
+                        Follow all steps described in <a href="../../jogl/doc/HowToBuild.html">How to build JOGL</a>,
+                        since GlueGen and JOGL are required as compile-time dependencies.
                     </p>
 
                     <h2>Platform and Component Requirements</h2>
                     <hr/>
-                    To verify the build you will have to install a OpenCL implementation on your platform.
+                    To run the tests included with JOCL, you will have to install an OpenCL implementation on your platform.
                     <p>
-                        Some vendors ship OpenCL already with the graphics driver or operating system.
-                        So please make sure your system is up2date.
+                        Some vendors include OpenCL with the graphics driver or operating system.
+                        So please make sure your system is up to date.
                     </p>
                     OpenCL SDKs for the desktop:
                     <ul>
-                        <li> <b>GPU NVidia</b> Geforce >= 8<br/>
+                        <li> <b>NVidia GPU</b> Geforce >= 8</b>
                             <ul>
                                 <li> NVidia <a href="http://developer.nvidia.com/cuda-downloads">GPU Computing SDK</a></li>
                             </ul>
                         </li>
-                        <li> <b>GPU AMD or</b></li>
-                        <li> <b>CPU x86 x86_64 SSE3</b>
+                        <li> <b>AMD GPU or CPU</b>
                             <ul>
-                                <li> AMD <a href="http://developer.amd.com/gpu/AMDAPPSDK/Pages/default.aspx">Accelerated Parallel Processing SDK</a></li>
+                                <li> AMD <a href="http://developer.amd.com/tools-and-sdks/heterogeneous-computing/amd-accelerated-parallel-processing-app-sdk/">Accelerated Parallel Processing SDK</a></li>
                             </ul>
                         </li>
-                        <li> <b>CPU Intel</b>
+                        <li> <b>Intel CPU</b>
                             <ul>
                                 <li>Intel <a href="http://software.intel.com/en-us/articles/opencl-sdk/">OpenCL SDK</a></li>
                             </ul>
@@ -90,16 +90,13 @@
                     <h2>Build Steps</h2>
                     <hr/>
                     <p>
-                        Here are the steps that are required in order to build JOCL.
+                        Here are the steps required to build JOCL.
                     </p>
 
                     <ol>
-                        <li><b>Optain the source code</b> using git:
-                            <ul>
-                                <li><a href="http://jogamp.org/git/?p=jocl.git">JOCL Dev GIT Repo</a></li>
-                            </ul>
-
-                            It is important that you checkout the source project side by side to its dependencies:
+                        <li><b>Check out and build Gluegen and JOGL</b> as described <a href="../../jogl/doc/HowToBuild.html">here.</a></li>
+                        <li><b>Get the JOCL source code</b> from the <a href="http://jogamp.org/git/?p=jocl.git">JOCL Git repository</a>.
+                            It is important that you check out the source code side by side with its dependencies:
                             <pre>
     /home/dude/projects/jogamp> git clone git://jogamp.org/srv/scm/jocl.git jocl
                             </pre>
@@ -110,23 +107,17 @@
     /home/dude/projects/jogamp/jogl
     /home/dude/projects/jogamp/jocl
                             </pre>
-                            you can now open the projects with NetBeans or proceed with:
                         </li>
 
                         <li> <b>Build the source tree:</b> <br/>
-                            Open a command shell in the "jocl" directory of the source tree and type <code>"ant jar"</code>.
+                            Open a command shell in the "jocl/make" directory of the source tree and type
+                            <code>"ant clean"</code>, then <code>"ant"</code>.
                         </li>
-                        <li> <b>Test your build:</b> <br/> Stay in your command shell in the "jocl" directory of the source tree and type <code>"ant test"</code>.</li>
-                        <li> <b>Build Javadoc:</b> <br/> Stay in your command shell in the "jocl" directory of the source tree and type "<code>ant javadoc"</code>.
+                        <li> <b>Test your build:</b> <br/> Stay in your command shell in the "jocl/make" directory of the source tree and type <code>"ant junit.run"</code>.</li>
+                        <li> <b>Build Javadoc:</b> <br/> Stay in your command shell in the "jocl/make" directory of the source tree and type "<code>ant javadoc"</code>.
                             This will produce the end-user documentation for JOCL.
                         </li>
                     </ol>
-
-                    <h2> Common build problems </h2>
-
-                    <ul>
-                        <li>TODO</li>
-                    </ul>
                 </div>
             </div>
             <div id="footer">
