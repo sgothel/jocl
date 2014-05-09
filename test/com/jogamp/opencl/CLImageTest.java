@@ -84,9 +84,6 @@ public class CLImageTest extends UITestCase {
 
     @Test
     public void supportedImageFormatsTest() {
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
-
         CLDevice device = getCompatibleDevice();
         if(device == null) {
             out.println("WARNING: can not test image api.");
@@ -109,10 +106,6 @@ public class CLImageTest extends UITestCase {
 
     @Test
     public void image2dCopyTest() throws IOException {
-
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
-
         CLDevice device = getCompatibleDevice();
         if(device == null) {
             out.println("WARNING: can not test image api.");
@@ -148,10 +141,6 @@ public class CLImageTest extends UITestCase {
 
     @Test
     public void image2dKernelCopyTest() throws IOException {
-
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
-
         CLDevice device = getCompatibleDevice();
         if(device == null) {
             out.println("WARNING: can not test image api.");

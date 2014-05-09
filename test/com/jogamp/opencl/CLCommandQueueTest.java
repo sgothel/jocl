@@ -102,8 +102,6 @@ public class CLCommandQueueTest extends UITestCase {
     public void eventsTest() throws IOException {
 
         out.println(" - - - event synchronization test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLContext context = CLContext.create();
 
@@ -175,8 +173,6 @@ public class CLCommandQueueTest extends UITestCase {
     public void eventConditionsTest() throws IOException {
 
         out.println(" - - - event conditions test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLPlatform platform = CLPlatform.getDefault(CLPlatformFilters.queueMode(OUT_OF_ORDER_MODE));
 
@@ -237,8 +233,6 @@ public class CLCommandQueueTest extends UITestCase {
     public void profilingEventsTest() throws IOException {
 
         out.println(" - - - event synchronization test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLContext context = CLContext.create();
 
@@ -294,8 +288,6 @@ public class CLCommandQueueTest extends UITestCase {
     @Test
     public void customEventsTest() throws IOException, InterruptedException {
         out.println(" - - - user events test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLPlatform[] platforms = CLPlatform.listCLPlatforms();
         CLPlatform theChosenOne = platforms[0];
@@ -372,8 +364,6 @@ public class CLCommandQueueTest extends UITestCase {
     public void eventCallbackTest() throws InterruptedException {
 
         out.println(" - - - event callback test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLPlatform platform = CLPlatform.getDefault();
 
@@ -414,8 +404,6 @@ public class CLCommandQueueTest extends UITestCase {
     public void concurrencyTest() throws IOException, InterruptedException {
 
         out.println(" - - - QueueBarrier test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         final int elements = ONE_MB / SIZEOF_INT * 10; // 20MB per buffer
 

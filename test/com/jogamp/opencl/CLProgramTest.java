@@ -79,8 +79,6 @@ public class CLProgramTest extends UITestCase {
     public void rebuildProgramTest() throws IOException {
 
         out.println(" - - - CLProgramTest; rebuild program test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLContext context = CLContext.create();
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"));
@@ -124,8 +122,6 @@ public class CLProgramTest extends UITestCase {
     public void programBinariesTest() throws IOException {
 
         out.println(" - - - CLProgramTest; down-/upload binaries test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLContext context = CLContext.create();
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"))
@@ -207,8 +203,6 @@ public class CLProgramTest extends UITestCase {
     @Test
     public void builderTest() throws IOException, ClassNotFoundException, InterruptedException {
         out.println(" - - - CLProgramTest; program builder test - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLContext context = CLContext.create();
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"));
@@ -290,10 +284,6 @@ public class CLProgramTest extends UITestCase {
 
     @Test
     public void kernelTest() {
-
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
-
         String source = "__attribute__((reqd_work_group_size(1, 1, 1))) kernel void foo(float a, int b, short c) { }\n";
 
         CLContext context = CLContext.create();
@@ -341,9 +331,6 @@ public class CLProgramTest extends UITestCase {
 
     @Test
     public void createAllKernelsTest() {
-
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         String source = "kernel void foo(int a) { }\n"+
                         "kernel void bar(float b) { }\n";

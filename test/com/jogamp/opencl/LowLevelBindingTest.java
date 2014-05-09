@@ -103,8 +103,6 @@ public class LowLevelBindingTest extends UITestCase {
     public void contextlessTest() {
 
         out.println(" - - - lowLevelTest; contextless binding - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CL cl = CLPlatform.getLowLevelCLInterface();
 
@@ -177,8 +175,6 @@ public class LowLevelBindingTest extends UITestCase {
     public void createContextTest() {
 
         out.println(" - - - createContextTest - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CL cl = CLPlatform.getLowLevelCLInterface();
 
@@ -224,8 +220,6 @@ public class LowLevelBindingTest extends UITestCase {
     public void lowLevelVectorAddTest() throws InterruptedException {
 
         out.println(" - - - lowLevelTest2; VectorAdd kernel - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CL cl = CLPlatform.getLowLevelCLInterface();
 

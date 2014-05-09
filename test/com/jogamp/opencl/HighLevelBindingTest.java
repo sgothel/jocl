@@ -138,8 +138,6 @@ public class HighLevelBindingTest extends UITestCase {
     public void contextlessTest() {
 
         out.println(" - - - highLevelTest; contextless - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         // platform/device info tests
         CLPlatform[] clPlatforms = CLPlatform.listCLPlatforms();
@@ -208,10 +206,6 @@ public class HighLevelBindingTest extends UITestCase {
 
     @Test
     public void platformTest() {
-
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
-
         @SuppressWarnings("unchecked")
         CLPlatform platformGPU = CLPlatform.getDefault(version(CL_1_0), type(GPU));
         @SuppressWarnings("unchecked")
@@ -230,8 +224,6 @@ public class HighLevelBindingTest extends UITestCase {
     public void createContextTest() {
 
         out.println(" - - - highLevelTest; create context - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLPlatform platform = CLPlatform.getDefault();
         CLDevice[] devices = platform.listCLDevices();
@@ -291,8 +283,6 @@ public class HighLevelBindingTest extends UITestCase {
     public void vectorAddGMTest() throws IOException {
 
         out.println(" - - - highLevelTest; global memory kernel - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLPlatform[] clPlatforms = CLPlatform.listCLPlatforms();
         CLContext context = CLContext.create(clPlatforms[0]);

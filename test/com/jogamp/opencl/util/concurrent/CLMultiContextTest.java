@@ -49,9 +49,6 @@ public class CLMultiContextTest extends UITestCase {
     @Test
     public void createMultiContextTest() {
 
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
-
         CLMultiContext mc = CLMultiContext.create(CLPlatform.listCLPlatforms());
 
         try{
@@ -120,9 +117,6 @@ public class CLMultiContextTest extends UITestCase {
 
     @Test
     public void commandQueuePoolTest() throws InterruptedException, ExecutionException {
-
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         CLMultiContext mc = CLMultiContext.create(CLPlatform.listCLPlatforms());
 

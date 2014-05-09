@@ -108,8 +108,6 @@ public class CLGLTest extends UITestCase {
     public void createContextTest() {
 
         out.println(" - - - glcl; createContextTest - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         initGL();
 
@@ -154,8 +152,6 @@ public class CLGLTest extends UITestCase {
     public void vboSharing() {
 
         out.println(" - - - glcl; vboSharing - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         initGL();
         makeGLCurrent();

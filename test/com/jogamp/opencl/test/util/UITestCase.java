@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 
+import com.jogamp.common.os.Platform;
 import com.jogamp.common.util.locks.SingletonInstance;
 
 import org.junit.Assume;
@@ -125,9 +126,17 @@ public abstract class UITestCase {
     @Before
     public void setUp() {
         System.err.print("++++ UITestCase.setUp: "+getFullTestName(" - "));
-        if(!testSupported) {
-            System.err.println(" - "+unsupportedTestMsg);
-            Assume.assumeTrue(testSupported); // abort
+        final boolean isOpenCLUnavailable = MiscUtils.isOpenCLUnavailable();
+        final boolean abortTest = isOpenCLUnavailable || !testSupported;
+        if( abortTest ) {
+            if( isOpenCLUnavailable ) {
+                System.err.print(" - CL not supported on "+Platform.getOSType());
+            }
+            if( !testSupported ) {
+                System.err.print(" - "+unsupportedTestMsg);
+            }
+            System.err.println("");
+            Assume.assumeTrue(false); // abort
         }
         System.err.println();
     }
