@@ -63,7 +63,7 @@ function jrun() {
     #D_ARGS="-Djocl.debug=all"
     #D_ARGS="-Djogamp.debug=all -Djocl.debug=all"
     #D_ARGS="-Djogamp.debug.ProcAddressHelper -Djogamp.debug.NativeLibrary -Djogamp.debug.NativeLibrary.Lookup -Djogamp.debug.JNILibLoader -Djogamp.debug.TempJarCache -Djogamp.debug.JarUtil -Djocl.debug=all"
-    D_ARGS="-Djogamp.debug.ProcAddressHelper -Djogamp.debug.NativeLibrary -Djogamp.debug.NativeLibrary.Lookup -Djogamp.debug.JNILibLoader"
+    #D_ARGS="-Djogamp.debug.ProcAddressHelper -Djogamp.debug.NativeLibrary -Djogamp.debug.NativeLibrary.Lookup -Djogamp.debug.JNILibLoader"
 
     #X_ARGS="-Dsun.java2d.noddraw=true -Dsun.awt.noerasebackground=true"
     #X_ARGS="-verbose:jni"
@@ -115,7 +115,7 @@ function testawt() {
 
 #
 #
-testnoawt com.jogamp.opencl.CLBufferTest $*
+#testnoawt com.jogamp.opencl.CLBufferTest $*
 #testnoawt com.jogamp.opencl.CLCommandQueueTest $*
 #testnoawt com.jogamp.opencl.CLExceptionTest $*
 #testnoawt com.jogamp.opencl.CLImageTest $*
@@ -124,7 +124,7 @@ testnoawt com.jogamp.opencl.CLBufferTest $*
 #testnoawt com.jogamp.opencl.LowLevelBindingTest $*
 #testnoawt com.jogamp.opencl.TestJoclVersion $*
 #testnoawt com.jogamp.opencl.TestUtils $*
-#testnoawt com.jogamp.opencl.gl.CLGLTest $*
+testnoawt com.jogamp.opencl.gl.CLGLTest $*
 #testnoawt com.jogamp.opencl.util.concurrent.CLMultiContextTest $*
 
 

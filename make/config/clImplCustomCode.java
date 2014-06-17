@@ -19,6 +19,9 @@
                                           return null;
                                       }
                                       addressTable.reset(bundle);
+                                      if( !initializeImpl() ) {
+                                          throw new RuntimeException("Initialization failure");
+                                      }                                      
                                       return bundle;
                                   } } );
     }
