@@ -14,14 +14,14 @@
                                           return null;
                                       }
                                       if(!bundle.isLibComplete()) {
-                                          // couldn't load native CL/JNI glue library
-                                          // TODO: log this?
+                                          System.err.println("Couln't load native CL/JNI glue library");
                                           return null;
                                       }
                                       addressTable.reset(bundle);
                                       /** Not required nor forced
                                       if( !initializeImpl() ) {
-                                          throw new RuntimeException("Initialization failure");
+                                          System.err.println("Native initialization failure of CL/JNI glue library");
+                                          return null;
                                       } */
                                       return bundle;
                                   } } );
