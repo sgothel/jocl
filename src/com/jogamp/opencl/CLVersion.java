@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -67,9 +67,9 @@ public class CLVersion implements Comparable<CLVersion> {
      */
     public final short major;
 
-    protected CLVersion(String version) {
+    protected CLVersion(final String version) {
         this.fullversion = version;
-        Matcher matcher = pattern.matcher(version);
+        final Matcher matcher = pattern.matcher(version);
         matcher.matches();
         major = Short.parseShort(matcher.group(1));
         minor = Short.parseShort(matcher.group(2));
@@ -81,11 +81,11 @@ public class CLVersion implements Comparable<CLVersion> {
         }
     }
 
-    public int compareTo(CLVersion other) {
+    public int compareTo(final CLVersion other) {
         return compareTo(other.major, other.minor);
     }
-    
-    private int compareTo(int otherMajor, int otherMinor)  {
+
+    private int compareTo(final int otherMajor, final int otherMinor)  {
         if(otherMajor == major && otherMinor == minor) {
             return 0;
         }else if(this.major > otherMajor || (this.major == otherMajor && this.minor > otherMinor)) {
@@ -95,19 +95,19 @@ public class CLVersion implements Comparable<CLVersion> {
         }
     }
 
-    public boolean isAtLeast(CLVersion other) {
+    public boolean isAtLeast(final CLVersion other) {
         return this.compareTo(other) >= 0;
     }
 
-    public boolean isAtLeast(int major, int minor) {
+    public boolean isAtLeast(final int major, final int minor) {
         return this.compareTo(major, minor) >= 0;
     }
 
-    public boolean isEqual(CLVersion other) {
+    public boolean isEqual(final CLVersion other) {
         return this.isEqual(other.major, other.minor);
     }
-    
-    public boolean isEqual(int major, int minor) {
+
+    public boolean isEqual(final int major, final int minor) {
         return this.major == major && this.minor == minor;
     }
 
@@ -161,7 +161,7 @@ public class CLVersion implements Comparable<CLVersion> {
      * Returns true if both {@link #fullversion} Strings match.
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         return obj != null && obj.getClass() == getClass() && fullversion.equals(((CLVersion)obj).fullversion);
     }
 

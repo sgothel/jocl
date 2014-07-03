@@ -44,7 +44,7 @@ public class JoclBaseActivity extends Activity {
        rootActivity = this;
    }
 
-   public void setRootActivity(Activity rootActivity) {
+   public void setRootActivity(final Activity rootActivity) {
        this.rootActivity = rootActivity;
        this.isDelegatedActivity = this != rootActivity;
    }
@@ -65,7 +65,7 @@ public class JoclBaseActivity extends Activity {
     * @param androidWindow
     * @param newtWindow
     */
-   public void setFullscreenFeature(android.view.Window androidWindow, boolean fullscreen) {
+   public void setFullscreenFeature(final android.view.Window androidWindow, final boolean fullscreen) {
         if(null == androidWindow) {
             throw new IllegalArgumentException("Android or Window null");
         }
@@ -118,7 +118,7 @@ public class JoclBaseActivity extends Activity {
    }
 
    @Override
-   public void onCreate(Bundle savedInstanceState) {
+   public void onCreate(final Bundle savedInstanceState) {
        Log.d(MD.TAG, "onCreate.0");
        if(!isDelegatedActivity()) {
            super.onCreate(savedInstanceState);

@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -48,29 +48,29 @@ public class CLSampler extends CLObjectResource {
     private final CLSamplerInfoAccessor samplerInfo;
     private final CLSamplerBinding binding;
 
-    private CLSampler(CLContext context, long id,  AddressingMode addrMode, FilteringMode filtMode, boolean normalizedCoords) {
+    private CLSampler(final CLContext context, final long id,  final AddressingMode addrMode, final FilteringMode filtMode, final boolean normalizedCoords) {
         super(context, id);
         this.binding = context.getPlatform().getSamplerBinding();
         this.samplerInfo = new CLSamplerInfoAccessor();
     }
 
-    static CLSampler create(CLContext context, AddressingMode addrMode, FilteringMode filtMode, boolean normalizedCoords) {
-        int[] error = new int[1];
+    static CLSampler create(final CLContext context, final AddressingMode addrMode, final FilteringMode filtMode, final boolean normalizedCoords) {
+        final int[] error = new int[1];
 
-        CLSamplerBinding binding = context.getPlatform().getSamplerBinding();
-        long id = binding.clCreateSampler(context.ID, clBoolean(normalizedCoords), addrMode.MODE, filtMode.MODE, error, 0);
+        final CLSamplerBinding binding = context.getPlatform().getSamplerBinding();
+        final long id = binding.clCreateSampler(context.ID, clBoolean(normalizedCoords), addrMode.MODE, filtMode.MODE, error, 0);
 
         checkForError(error[0], "can not create sampler");
         return new CLSampler(context, id, addrMode, filtMode, normalizedCoords);
     }
 
     public FilteringMode getFilteringMode() {
-        int info = (int)samplerInfo.getLong(CL_SAMPLER_FILTER_MODE);
+        final int info = (int)samplerInfo.getLong(CL_SAMPLER_FILTER_MODE);
         return FilteringMode.valueOf(info);
     }
 
     public AddressingMode getAddressingMode() {
-        int info = (int)samplerInfo.getLong(CL_SAMPLER_ADDRESSING_MODE);
+        final int info = (int)samplerInfo.getLong(CL_SAMPLER_ADDRESSING_MODE);
         return AddressingMode.valueOf(info);
     }
 
@@ -81,7 +81,7 @@ public class CLSampler extends CLObjectResource {
     @Override
     public void release() {
         super.release();
-        int ret = binding.clReleaseSampler(ID);
+        final int ret = binding.clReleaseSampler(ID);
         context.onSamplerReleased(this);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not release "+this);
@@ -91,7 +91,7 @@ public class CLSampler extends CLObjectResource {
     private class CLSamplerInfoAccessor extends CLTLInfoAccessor {
 
         @Override
-        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
+        protected int getInfo(final int name, final long valueSize, final Buffer value, final PointerBuffer valueSizeRet) {
             return binding.clGetSamplerInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
@@ -107,11 +107,11 @@ public class CLSampler extends CLObjectResource {
          */
         public final int MODE;
 
-        private FilteringMode(int mode) {
+        private FilteringMode(final int mode) {
             this.MODE = mode;
         }
 
-        public static FilteringMode valueOf(int mode) {
+        public static FilteringMode valueOf(final int mode) {
             switch(mode) {
                 case(CL_FILTER_NEAREST):
                     return NEAREST;
@@ -134,11 +134,11 @@ public class CLSampler extends CLObjectResource {
          */
         public final int MODE;
 
-        private AddressingMode(int mode) {
+        private AddressingMode(final int mode) {
             this.MODE = mode;
         }
 
-        public static AddressingMode valueOf(int mode) {
+        public static AddressingMode valueOf(final int mode) {
             switch(mode) {
                 case(CL_ADDRESS_REPEAT):
                     return REPEAT;

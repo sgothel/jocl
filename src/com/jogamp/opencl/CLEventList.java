@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -44,34 +44,34 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
      * stores event ids for fast access.
      */
     final PointerBuffer IDs;
-    
+
     /**
      * Points always to the first element of the id buffer.
      */
     final PointerBuffer IDsView;
-    
+
     int size;
-    
-    public CLEventList(int capacity) {
+
+    public CLEventList(final int capacity) {
         this(null, capacity);
     }
 
-    public CLEventList(CLEvent... events) {
+    public CLEventList(final CLEvent... events) {
         this(null, events);
     }
 
-    public CLEventList(CachedBufferFactory factory, int capacity) {
+    public CLEventList(final CachedBufferFactory factory, final int capacity) {
         this.events = new CLEvent[capacity];
         this.IDs = initIDBuffer(factory, capacity);
         this.IDsView = IDs.duplicate();
     }
 
-    public CLEventList(CachedBufferFactory factory, CLEvent... events) {
+    public CLEventList(final CachedBufferFactory factory, final CLEvent... events) {
         this.events = events;
         this.IDs = initIDBuffer(factory, events.length);
         this.IDsView = IDs.duplicate();
-        
-        for (CLEvent event : events) {
+
+        for (final CLEvent event : events) {
             if(event == null) {
                 throw new IllegalArgumentException("event list containes null element.");
             }
@@ -80,8 +80,8 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         IDs.rewind();
         size = events.length;
     }
-    
-    private PointerBuffer initIDBuffer(CachedBufferFactory factory, int size) {
+
+    private PointerBuffer initIDBuffer(final CachedBufferFactory factory, final int size) {
         if(factory == null) {
             return PointerBuffer.allocateDirect(size);
         }else{
@@ -89,7 +89,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         }
     }
 
-    void createEvent(CLContext context) {
+    void createEvent(final CLContext context) {
 
         if(events[size] != null)
             events[size].release();
@@ -97,8 +97,8 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         events[size] = new CLEvent(context, IDs.get());
         size++;
     }
-    
-    PointerBuffer getEventBuffer(int index) {
+
+    PointerBuffer getEventBuffer(final int index) {
         return IDs.duplicate().position(index);
     }
 
@@ -116,7 +116,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
      * Waits for all events of the specified region in this list to occur.
      * Will throw IndexOutOfBoundsException if indices are out of bounds.
      */
-    public void waitForEvents(int start, int range) {
+    public void waitForEvents(final int start, final int range) {
         if(start+range < size || range <= 0) {
             throw new IndexOutOfBoundsException("args: [start: "+start+" range: "+range+"], eventcount: "+size);
         }
@@ -128,7 +128,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
     /**
      * Waits for the event with the given index in this list to occur.
      */
-    public void waitForEvent(int index) {
+    public void waitForEvent(final int index) {
         final PointerBuffer view = getEventBuffer(index);
         getEvent(index).getPlatform().getEventBinding().clWaitForEvents(1, view);
     }
@@ -154,8 +154,8 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
     public final void close() {
         release();
     }
- 
-    public CLEvent getEvent(int index) {
+
+    public CLEvent getEvent(final int index) {
         if(index >= size)
             throw new IndexOutOfBoundsException("list contains "+size+" events, can not return event with index "+index);
         return events[index];
@@ -186,7 +186,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(getClass().getName()).append('[');
         for (int i = 0; i < size; i++) {
             sb.append(events[i].toString());
@@ -203,7 +203,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         private final int size;
         private int index;
 
-        private EventIterator(CLEvent[] events, int size) {
+        private EventIterator(final CLEvent[] events, final int size) {
             this.events = events;
             this.size = size;
         }

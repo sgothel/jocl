@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -46,22 +46,22 @@ public final class CLImageFormat {
         format = CLImageFormatImpl.create();
     }
 
-    CLImageFormat(CLImageFormatImpl format) {
+    CLImageFormat(final CLImageFormatImpl format) {
         this.format = format;
     }
 
-    public CLImageFormat(ChannelOrder order, ChannelType type) {
+    public CLImageFormat(final ChannelOrder order, final ChannelType type) {
         format = CLImageFormatImpl.create();
         setImageChannelOrder(order);
         setImageChannelDataType(type);
     }
 
-    public CLImageFormat setImageChannelOrder(ChannelOrder order) {
+    public CLImageFormat setImageChannelOrder(final ChannelOrder order) {
         format.setImageChannelOrder(order.ORDER);
         return this;
     }
 
-    public CLImageFormat setImageChannelDataType(ChannelType type) {
+    public CLImageFormat setImageChannelDataType(final ChannelType type) {
         format.setImageChannelDataType(type.TYPE);
         return this;
     }
@@ -87,7 +87,7 @@ public final class CLImageFormat {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -117,7 +117,7 @@ public final class CLImageFormat {
      * layout in which channels are stored in the image.
      */
     public enum ChannelOrder {
-                
+
         /**
          *
          */
@@ -190,18 +190,18 @@ public final class CLImageFormat {
          * {@link ChannelType#SNORM_INT16}, {@link ChannelType#HALF_FLOAT}, or {@link ChannelType#FLOAT}.
          */
         LUMINANCE(CL_LUMINANCE);
-        
-        
+
+
         /**
          * Value of wrapped OpenCL flag.
          */
         public final int ORDER;
 
-        private ChannelOrder(int order) {
+        private ChannelOrder(final int order) {
             this.ORDER = order;
         }
 
-        public static ChannelOrder valueOf(int orderFlag) {
+        public static ChannelOrder valueOf(final int orderFlag) {
             switch (orderFlag) {
                 case CL_R:
                     return R;
@@ -245,7 +245,7 @@ public final class CLImageFormat {
          * Each channel component is a normalized signed 8-bit integer value.
          */
         SNORM_INT8(CL_SNORM_INT8),
-        
+
         /**
          * Each channel component is a normalized signed 16-bit integer value.
          */
@@ -324,11 +324,11 @@ public final class CLImageFormat {
          */
         public final int TYPE;
 
-        private ChannelType(int channel) {
+        private ChannelType(final int channel) {
             this.TYPE = channel;
         }
 
-        public static ChannelType valueOf(int channelFlag) {
+        public static ChannelType valueOf(final int channelFlag) {
             switch (channelFlag) {
                 case CL_SNORM_INT8:
                     return SNORM_INT8;

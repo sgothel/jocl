@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -52,7 +52,7 @@ public class MultiQueueBarrier {
      * It is recommented to use {@link #MultiQueueBarrier(CLCommandQueue... allowedQueues)} if possible
      * which restricts the set of allowed queues for the barrier.
      */
-    public MultiQueueBarrier(int queueCount) {
+    public MultiQueueBarrier(final int queueCount) {
         if(queueCount == 0) {
             throw new IllegalArgumentException("queueCount was 0");
         }
@@ -64,15 +64,15 @@ public class MultiQueueBarrier {
     /**
      * Creates a new MultiQueueBarrier for the given queues.
      */
-    public MultiQueueBarrier(CLCommandQueue... allowedQueues) {
+    public MultiQueueBarrier(final CLCommandQueue... allowedQueues) {
         if(allowedQueues.length == 0) {
             throw new IllegalArgumentException("allowedQueues was empty");
         }
         this.latch = new CountDownLatch(allowedQueues.length);
         this.count = allowedQueues.length;
 
-        HashSet<CLCommandQueue> set = new HashSet<CLCommandQueue>(allowedQueues.length);
-        for (CLCommandQueue queue : allowedQueues) {
+        final HashSet<CLCommandQueue> set = new HashSet<CLCommandQueue>(allowedQueues.length);
+        for (final CLCommandQueue queue : allowedQueues) {
             set.add(queue);
         }
         this.queues = Collections.unmodifiableSet(set);
@@ -83,7 +83,7 @@ public class MultiQueueBarrier {
      * This method may be invoked concurrently without synchronization on the MultiQueueBarrier object
      * as long each Thread passes a distinct CLCommandQueue as parameter to this method.
      */
-    public MultiQueueBarrier waitFor(CLCommandQueue queue) {
+    public MultiQueueBarrier waitFor(final CLCommandQueue queue) {
         checkQueue(queue);
 
         queue.putBarrier();
@@ -98,7 +98,7 @@ public class MultiQueueBarrier {
      * This method may be invoked concurrently without synchronization on the MultiQueueBarrier object
      * as long each Thread passes a distinct CLCommandQueue as parameter to this method.
      */
-    public MultiQueueBarrier waitFor(CLCommandQueue queue, CLEventList events) {
+    public MultiQueueBarrier waitFor(final CLCommandQueue queue, final CLEventList events) {
         checkQueue(queue);
 
         queue.putWaitForEvents(events, true);
@@ -118,18 +118,18 @@ public class MultiQueueBarrier {
         rebuildBarrierIfBroken();
         return this;
     }
-    
+
     /**
      * @see #await()
      * @param timeout the maximum time to wait
      * @param unit the time unit of the {@code timeout} argument
      */
-    public boolean await(long timeout, TimeUnit unit) throws InterruptedException {
-        boolean ret = latch.await(timeout, unit);
+    public boolean await(final long timeout, final TimeUnit unit) throws InterruptedException {
+        final boolean ret = latch.await(timeout, unit);
         rebuildBarrierIfBroken();
         return ret;
     }
-    
+
     /**
      * Resets this barrier and unblocks all waiting threads.
      */
@@ -160,7 +160,7 @@ public class MultiQueueBarrier {
         return latch.getCount();
     }
 
-    private void checkQueue(CLCommandQueue queue) throws IllegalArgumentException {
+    private void checkQueue(final CLCommandQueue queue) throws IllegalArgumentException {
         if (queues != null && !queues.contains(queue)) {
             throw new IllegalArgumentException(queue + " is not in the allowedQueues Set: " + queues);
         }

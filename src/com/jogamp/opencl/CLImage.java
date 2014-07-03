@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -48,11 +48,11 @@ public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
     public final int width;
     public final int height;
 
-    protected CLImage(CLContext context, B directBuffer, CLImageFormat format, int width, int height, long id, int flags) {
+    protected CLImage(final CLContext context, final B directBuffer, final CLImageFormat format, final int width, final int height, final long id, final int flags) {
         this(context, directBuffer, format, createAccessor(context, id), width, height, id, flags);
     }
 
-    protected CLImage(CLContext context, B directBuffer, CLImageFormat format, CLImageInfoAccessor accessor, int width, int height, long id, int flags) {
+    protected CLImage(final CLContext context, final B directBuffer, final CLImageFormat format, final CLImageInfoAccessor accessor, final int width, final int height, final long id, final int flags) {
         super(context, directBuffer, getSizeImpl(context, id), id, flags);
         this.imageInfo = accessor;
         this.format = format;
@@ -60,7 +60,7 @@ public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
         this.height = height;
     }
 
-    private static CLImageInfoAccessor createAccessor(CLContext context, long id) {
+    private static CLImageInfoAccessor createAccessor(final CLContext context, final long id) {
         return new CLImageInfoAccessor(context.getPlatform().getImageBinding(), id);
     }
 
@@ -111,12 +111,12 @@ public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
         private final long id;
         private final CLImageBinding cl;
 
-        public CLImageInfoAccessor(CLImageBinding cl, long id) {
+        public CLImageInfoAccessor(final CLImageBinding cl, final long id) {
             this.cl = cl;
             this.id = id;
         }
         @Override
-        public int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
+        public int getInfo(final int name, final long valueSize, final Buffer value, final PointerBuffer valueSizeRet) {
             return cl.clGetImageInfo(id, name, valueSize, value, valueSizeRet);
         }
     }

@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -76,11 +76,11 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
         this(null);
     }
 
-    private CLProgramBuilder(CLProgram program) {
+    private CLProgramBuilder(final CLProgram program) {
         this(program, null, null);
     }
 
-    private CLProgramBuilder(CLProgram program, String source, Map<CLDevice, byte[]> map) {
+    private CLProgramBuilder(final CLProgram program, final String source, final Map<CLDevice, byte[]> map) {
         this.program = program;
         this.source = source;
         if(map != null) {
@@ -98,7 +98,7 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     /**
      * Creates a new CLProgramConfiguration for this program.
      */
-    public static CLProgramConfiguration createConfiguration(CLProgram program) {
+    public static CLProgramConfiguration createConfiguration(final CLProgram program) {
         return new CLProgramBuilder(program);
     }
 
@@ -106,7 +106,7 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
      * Loads a CLBuildConfiguration.
      * @param ois The ObjectInputStream for reading the object.
      */
-    public static CLBuildConfiguration loadConfiguration(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+    public static CLBuildConfiguration loadConfiguration(final ObjectInputStream ois) throws IOException, ClassNotFoundException {
         return (CLBuildConfiguration) ois.readObject();
     }
 
@@ -119,12 +119,12 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
      * @param ois The ObjectInputStream for reading the object.
      * @param context The context used for program initialization.
      */
-    public static CLProgramConfiguration loadConfiguration(ObjectInputStream ois, CLContext context) throws IOException, ClassNotFoundException {
-        CLProgramBuilder config = (CLProgramBuilder) ois.readObject();
+    public static CLProgramConfiguration loadConfiguration(final ObjectInputStream ois, final CLContext context) throws IOException, ClassNotFoundException {
+        final CLProgramBuilder config = (CLProgramBuilder) ois.readObject();
         if(allBinariesAvailable(config)) {
             try{
                 config.program = context.createProgram(config.binariesMap);
-            }catch(CLException.CLInvalidBinaryException ex) {
+            }catch(final CLException.CLInvalidBinaryException ex) {
                 if(config.source != null) {
                     config.program = context.createProgram(config.source);
                 }else{
@@ -138,9 +138,9 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
         }
         return config;
     }
-    
-    private static boolean allBinariesAvailable(CLProgramBuilder config) {
-        for (Map.Entry<CLDevice, byte[]> entry : config.binariesMap.entrySet()) {
+
+    private static boolean allBinariesAvailable(final CLProgramBuilder config) {
+        for (final Map.Entry<CLDevice, byte[]> entry : config.binariesMap.entrySet()) {
             if(Arrays.equals(NO_BINARIES, entry.getValue())) {
                 return false;
             }
@@ -149,7 +149,7 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     }
 
     @Override
-    public void save(ObjectOutputStream oos) throws IOException {
+    public void save(final ObjectOutputStream oos) throws IOException {
         if(program != null) {
             this.source = program.getSource();
             if(program.isExecutable()) {
@@ -161,49 +161,49 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
 
 
     @Override
-    public CLProgramBuilder withOption(String option) {
+    public CLProgramBuilder withOption(final String option) {
         optionSet.add(option);
         return this;
     }
 
     @Override
-    public CLProgramBuilder withOptions(String... options) {
+    public CLProgramBuilder withOptions(final String... options) {
         optionSet.addAll(Arrays.asList(options));
         return this;
     }
 
     @Override
-    public CLProgramBuilder withDefine(String name) {
+    public CLProgramBuilder withDefine(final String name) {
         defineSet.add(CLProgram.define(name));
         return this;
     }
 
     @Override
-    public CLProgramBuilder withDefines(String... names) {
-        for (String name : names) {
+    public CLProgramBuilder withDefines(final String... names) {
+        for (final String name : names) {
             defineSet.add(CLProgram.define(name));
         }
         return this;
     }
 
     @Override
-    public CLProgramBuilder withDefine(String name, Object value) {
+    public CLProgramBuilder withDefine(final String name, final Object value) {
         defineSet.add(CLProgram.define(name, value.toString()));
         return this;
     }
 
     @Override
-    public CLProgramBuilder withDefines(Map<String, ? extends Object> defines) {
-        for (Map.Entry<String, ? extends Object> define : defines.entrySet()) {
-            String name = define.getKey();
-            Object value = define.getValue();
+    public CLProgramBuilder withDefines(final Map<String, ? extends Object> defines) {
+        for (final Map.Entry<String, ? extends Object> define : defines.entrySet()) {
+            final String name = define.getKey();
+            final Object value = define.getValue();
             defineSet.add(CLProgram.define(name, value));
         }
         return this;
     }
 
     @Override
-    public CLProgramBuilder forDevice(CLDevice device) {
+    public CLProgramBuilder forDevice(final CLDevice device) {
         if(!binariesMap.containsKey(device)) {
             binariesMap.put(device, NO_BINARIES);
         }
@@ -211,8 +211,8 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     }
 
     @Override
-    public CLProgramBuilder forDevices(CLDevice... devices) {
-        for (CLDevice device : devices) {
+    public CLProgramBuilder forDevices(final CLDevice... devices) {
+        for (final CLDevice device : devices) {
             forDevice(device);
         }
         return this;
@@ -224,25 +224,25 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     }
 
     @Override
-    public CLProgram build(CLBuildListener listener) {
+    public CLProgram build(final CLBuildListener listener) {
         return build(program, listener);
     }
 
     @Override
-    public CLProgram build(CLProgram program) {
+    public CLProgram build(final CLProgram program) {
         return build(program, null);
     }
-    
+
     @Override
-    public CLProgram build(CLProgram program, CLBuildListener listener) {
+    public CLProgram build(final CLProgram program, final CLBuildListener listener) {
         if(program == null) {
             throw new NullPointerException("no program has been set");
         }
-        List<String> setup = new ArrayList<String>();
+        final List<String> setup = new ArrayList<String>();
         setup.addAll(optionSet);
         setup.addAll(defineSet);
-        String options = CLProgram.optionsOf(setup.toArray(new String[setup.size()]));
-        CLDevice[] devices = binariesMap.keySet().toArray(new CLDevice[binariesMap.size()]);
+        final String options = CLProgram.optionsOf(setup.toArray(new String[setup.size()]));
+        final CLDevice[] devices = binariesMap.keySet().toArray(new CLDevice[binariesMap.size()]);
         return program.build(listener, options, devices);
     }
 
@@ -273,37 +273,37 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     }
 
     // format: { platform_suffix, num_binaries, (device_name, length, binaries)+ }
-    private void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(final ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
 
         String suffix = "";
 
         if(!binariesMap.isEmpty()) {
-            CLDevice device = binariesMap.keySet().iterator().next();
+            final CLDevice device = binariesMap.keySet().iterator().next();
             if(device.isICDAvailable())
                 suffix = device.getPlatform().getICDSuffix();
         }
-        
+
         // empty string if we have no binaries or no devices specified, or if cl_khr_icd isn't supported
         out.writeUTF(suffix);
         out.writeInt(binariesMap.size());   // may be 0
 
-        for (Map.Entry<CLDevice, byte[]> entry : binariesMap.entrySet()) {
-            CLDevice device = entry.getKey();
-            byte[] binaries = entry.getValue();
-            
+        for (final Map.Entry<CLDevice, byte[]> entry : binariesMap.entrySet()) {
+            final CLDevice device = entry.getKey();
+            final byte[] binaries = entry.getValue();
+
             out.writeUTF(device.getName());
             out.writeInt(binaries.length);
             out.write(binaries);
         }
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
-        String suffix = in.readUTF();  // empty string means no suffix was written; just picks first platform
+        final String suffix = in.readUTF();  // empty string means no suffix was written; just picks first platform
         CLPlatform platform = null;
-        for (CLPlatform p : CLPlatform.listCLPlatforms()) {
+        for (final CLPlatform p : CLPlatform.listCLPlatforms()) {
             if(suffix.isEmpty() || p.getICDSuffix().equals(suffix)) {
                 platform = p;
                 break;
@@ -311,24 +311,24 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
         }
 
         this.binariesMap = new LinkedHashMap<CLDevice, byte[]>();
-        
+
         List<CLDevice> devices;
         if(platform != null) {
             devices = new ArrayList<CLDevice>(Arrays.asList(platform.listCLDevices()));
         }else{
             devices = Collections.emptyList();
         }
-        
-        int mapSize = in.readInt();
+
+        final int mapSize = in.readInt();
 
         for (int i = 0; i < mapSize; i++) {
-            String name = in.readUTF();
-            int length = in.readInt();
-            byte[] binaries = new byte[length];
+            final String name = in.readUTF();
+            final int length = in.readInt();
+            final byte[] binaries = new byte[length];
             in.readFully(binaries);
-            
+
             for (int d = 0; d < devices.size(); d++) {
-                CLDevice device = devices.get(d);
+                final CLDevice device = devices.get(d);
                 if(device.getName().equals(name)) {
                     binariesMap.put(device, binaries);
                     devices.remove(d);
@@ -340,15 +340,15 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
 
     @Override
     public CLProgramBuilder asBuildConfiguration() {
-        CLProgramBuilder builder = new CLProgramBuilder();
+        final CLProgramBuilder builder = new CLProgramBuilder();
         builder.defineSet.addAll(defineSet);
         builder.optionSet.addAll(optionSet);
         return builder;
     }
-    
+
     @Override
     public CLProgramBuilder clone() {
-        CLProgramBuilder builder = new CLProgramBuilder(program, source, binariesMap);
+        final CLProgramBuilder builder = new CLProgramBuilder(program, source, binariesMap);
         builder.defineSet.addAll(defineSet);
         builder.optionSet.addAll(optionSet);
         return builder;
@@ -360,7 +360,7 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     }
 
     @Override
-    public CLProgramBuilder setProgram(CLProgram program) {
+    public CLProgramBuilder setProgram(final CLProgram program) {
         this.program = program;
         return this;
     }
@@ -377,11 +377,11 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CLProgramBuilder that = (CLProgramBuilder) o;
+        final CLProgramBuilder that = (CLProgramBuilder) o;
 
         if (source    != null ? !source.equals(that.source)       : that.source    != null) return false;
         if (defineSet != null ? !defineSet.equals(that.defineSet) : that.defineSet != null) return false;
@@ -391,11 +391,11 @@ public final class CLProgramBuilder implements CLProgramConfiguration, Serializa
             if(binariesMap.size() != that.binariesMap.size()) {
                 return false;
             }
-            Iterator<CLDevice> iterator0 = binariesMap.keySet().iterator();
-            Iterator<CLDevice> iterator1 = that.binariesMap.keySet().iterator();
+            final Iterator<CLDevice> iterator0 = binariesMap.keySet().iterator();
+            final Iterator<CLDevice> iterator1 = that.binariesMap.keySet().iterator();
             for (int i = 0; i < binariesMap.size(); i++) {
-                CLDevice device0 = iterator0.next();
-                CLDevice device1 = iterator1.next();
+                final CLDevice device0 = iterator0.next();
+                final CLDevice device1 = iterator1.next();
                 if(!device0.equals(device1) || !Arrays.equals(binariesMap.get(device0), that.binariesMap.get(device1)))
                     return false;
             }

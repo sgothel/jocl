@@ -39,6 +39,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.*;
 
+import jogamp.common.os.PlatformPropsImpl;
+
 public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInfo  {
     private static final boolean isAndroid;
     private static final List<String> glueLibNames;
@@ -55,7 +57,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
                 return null;
             }
         });
-        isAndroid = Platform.OSType.ANDROID == Platform.OS_TYPE;
+        isAndroid = Platform.OSType.ANDROID == PlatformPropsImpl.OS_TYPE;
 
         glueLibNames = new ArrayList<String>();
         glueLibNames.add("jocl");
@@ -95,7 +97,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
 
     @Override
     public final List<List<String>> getToolLibNames() {
-        List<List<String>> libNamesList = new ArrayList<List<String>>();
+        final List<List<String>> libNamesList = new ArrayList<List<String>>();
 
         final List<String> libCL = new ArrayList<String>();
         {
@@ -126,7 +128,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
 
     @Override
     public final List<String> getToolGetProcAddressFuncNameList() {
-        List<String> res = new ArrayList<String>();
+        final List<String> res = new ArrayList<String>();
         res.add("clGetExtensionFunctionAddress");
         return res;
     }
@@ -141,13 +143,13 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
             funcName = funcName.substring(0, funcName.length() - Impl_len);
         }
         if( funcName.endsWith("KHR") || funcName.endsWith("EXT") ) {
-            return CLImpl.clGetExtensionFunctionAddress(toolGetProcAddressHandle, funcName);
+            return CLAbstractImpl.clGetExtensionFunctionAddress(toolGetProcAddressHandle, funcName);
         }
         return 0; // on libs ..
     }
 
     @Override
-    public final boolean useToolGetProcAdressFirst(String funcName) {
+    public final boolean useToolGetProcAdressFirst(final String funcName) {
         return true;
     }
 

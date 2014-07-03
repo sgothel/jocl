@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class JoclVersionActivityLauncher extends Activity {
        @Override
-       public void onCreate(Bundle savedInstanceState) {
+       public void onCreate(final Bundle savedInstanceState) {
            super.onCreate(savedInstanceState);
 
            final Uri uri = Uri.parse("launch://jogamp.org/jogamp.opencl.os.android.JoclVersionActivity?sys=com.jogamp.common&sys=javax.media.opengl&sys=com.jogamp.opencl&pkg=com.jogamp.opencl.test&jogamp.debug=all&jocl.debug=all");

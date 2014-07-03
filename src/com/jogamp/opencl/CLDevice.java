@@ -39,6 +39,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import com.jogamp.opencl.llb.CL;
+import com.jogamp.opencl.llb.CLDeviceBinding;
 import com.jogamp.opencl.spi.CLInfoAccessor;
 import com.jogamp.opencl.util.CLUtil;
 
@@ -57,13 +58,13 @@ public class CLDevice extends CLObject {
     private final CLInfoAccessor deviceInfo;
     private final CLPlatform platform;
 
-    protected CLDevice(CLPlatform platform, long id) {
+    protected CLDevice(final CLPlatform platform, final long id) {
         super(id);
         this.platform = platform;
         this.deviceInfo = platform.getAccessorFactory().createDeviceInfoAccessor(platform.getDeviceBinding(), id);
     }
 
-    protected CLDevice(CLContext context, long id) {
+    protected CLDevice(final CLContext context, final long id) {
         super(context, id);
         this.platform = context.getPlatform();
         this.deviceInfo = platform.getAccessorFactory().createDeviceInfoAccessor(platform.getDeviceBinding(), id);
@@ -73,11 +74,11 @@ public class CLDevice extends CLObject {
         return createCommandQueue(0);
     }
 
-    public CLCommandQueue createCommandQueue(CLCommandQueue.Mode property) {
+    public CLCommandQueue createCommandQueue(final CLCommandQueue.Mode property) {
         return createCommandQueue(property.QUEUE_MODE);
     }
 
-    public CLCommandQueue createCommandQueue(CLCommandQueue.Mode... properties) {
+    public CLCommandQueue createCommandQueue(final CLCommandQueue.Mode... properties) {
         int flags = 0;
         if(properties != null) {
             for (int i = 0; i < properties.length; i++) {
@@ -87,14 +88,14 @@ public class CLDevice extends CLObject {
         return createCommandQueue(flags);
     }
 
-    public CLCommandQueue createCommandQueue(long properties) {
+    public CLCommandQueue createCommandQueue(final long properties) {
         if(context == null)
             throw new IllegalStateException("this device is not associated with a context");
         return context.createCommandQueue(this, properties);
     }
 
     /*keep this package private*/
-    void setContext(CLContext context) {
+    void setContext(final CLContext context) {
         this.context = context;
     }
 
@@ -108,7 +109,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_NAME")
     public String getName() {
-        return deviceInfo.getString(CL.CL_DEVICE_NAME);
+        return deviceInfo.getString(CLDeviceBinding.CL_DEVICE_NAME);
     }
 
     /**
@@ -116,7 +117,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_PROFILE")
     public String getProfile() {
-        return deviceInfo.getString(CL.CL_DEVICE_PROFILE);
+        return deviceInfo.getString(CLDeviceBinding.CL_DEVICE_PROFILE);
     }
 
     /**
@@ -124,7 +125,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_VENDOR")
     public String getVendor() {
-        return deviceInfo.getString(CL.CL_DEVICE_VENDOR);
+        return deviceInfo.getString(CLDeviceBinding.CL_DEVICE_VENDOR);
     }
 
     /**
@@ -132,7 +133,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_VENDOR_ID")
     public long getVendorID() {
-        return deviceInfo.getLong(CL.CL_DEVICE_VENDOR_ID);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_VENDOR_ID);
     }
 
     /**
@@ -140,7 +141,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_VERSION")
     public CLVersion getVersion() {
-        return new CLVersion(deviceInfo.getString(CL.CL_DEVICE_VERSION));
+        return new CLVersion(deviceInfo.getString(CLDeviceBinding.CL_DEVICE_VERSION));
     }
 
     /**
@@ -148,7 +149,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_OPENCL_C_VERSION")
     public CLVersion getCVersion() {
-        return new CLVersion(deviceInfo.getString(CL.CL_DEVICE_OPENCL_C_VERSION));
+        return new CLVersion(deviceInfo.getString(CLDeviceBinding.CL_DEVICE_OPENCL_C_VERSION));
     }
 
     /**
@@ -164,7 +165,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_TYPE")
     public Type getType() {
-        return Type.valueOf((int)deviceInfo.getLong(CL.CL_DEVICE_TYPE));
+        return Type.valueOf((int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_TYPE));
     }
 
     /**
@@ -173,7 +174,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_ADDRESS_BITS")
     public int getAddressBits() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_ADDRESS_BITS);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_ADDRESS_BITS);
     }
 
     /**
@@ -182,7 +183,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT")
     public int getPreferredShortVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT);
     }
 
     /**
@@ -191,7 +192,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR")
     public int getPreferredCharVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR);
     }
 
     /**
@@ -200,7 +201,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT")
     public int getPreferredIntVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT);
     }
 
     /**
@@ -209,7 +210,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG")
     public int getPreferredLongVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG);
     }
 
     /**
@@ -218,7 +219,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT")
     public int getPreferredFloatVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT);
     }
 
     /**
@@ -227,7 +228,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE")
     public int getPreferredDoubleVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE);
     }
 
     /**
@@ -236,7 +237,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR")
     public int getNativeCharVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR);
     }
 
     /**
@@ -245,7 +246,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT")
     public int getNativeShortVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT);
     }
 
     /**
@@ -254,7 +255,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_NATIVE_VECTOR_WIDTH_INT")
     public int getNativeIntVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_INT);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_NATIVE_VECTOR_WIDTH_INT);
     }
 
     /**
@@ -263,7 +264,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG")
     public int getNativeLongVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG);
     }
 
     /**
@@ -272,7 +273,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF")
     public int getNativeHalfVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF);
     }
 
     /**
@@ -281,7 +282,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT")
     public int getNativeFloatVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT);
     }
 
     /**
@@ -290,7 +291,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE")
     public int getNativeDoubleVectorWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE);
     }
 
     /**
@@ -299,7 +300,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_COMPUTE_UNITS")
     public int getMaxComputeUnits() {
-        return (int) deviceInfo.getLong(CL.CL_DEVICE_MAX_COMPUTE_UNITS);
+        return (int) deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_COMPUTE_UNITS);
     }
 
     /**
@@ -309,7 +310,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_WORK_GROUP_SIZE")
     public int getMaxWorkGroupSize() {
-        return (int) deviceInfo.getLong(CL.CL_DEVICE_MAX_WORK_GROUP_SIZE);
+        return (int) deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_WORK_GROUP_SIZE);
     }
 
     /**
@@ -317,7 +318,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_CLOCK_FREQUENCY")
     public int getMaxClockFrequency() {
-        return (int) (deviceInfo.getLong(CL.CL_DEVICE_MAX_CLOCK_FREQUENCY));
+        return (int) (deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_CLOCK_FREQUENCY));
     }
 
     /**
@@ -327,7 +328,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS")
     public int getMaxWorkItemDimensions() {
-        return (int) deviceInfo.getLong(CL.CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS);
+        return (int) deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS);
     }
 
     /**
@@ -337,8 +338,8 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_WORK_ITEM_SIZES")
     public int[] getMaxWorkItemSizes() {
-        int n = getMaxWorkItemDimensions();
-        return deviceInfo.getInts(CL.CL_DEVICE_MAX_WORK_ITEM_SIZES, n);
+        final int n = getMaxWorkItemDimensions();
+        return deviceInfo.getInts(CLDeviceBinding.CL_DEVICE_MAX_WORK_ITEM_SIZES, n);
     }
 
     /**
@@ -348,7 +349,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_PARAMETER_SIZE")
     public long getMaxParameterSize() {
-        return deviceInfo.getLong(CL.CL_DEVICE_MAX_PARAMETER_SIZE);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_PARAMETER_SIZE);
     }
 
     /**
@@ -356,7 +357,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_MEM_ALLOC_SIZE")
     public long getMaxMemAllocSize() {
-        return deviceInfo.getLong(CL.CL_DEVICE_MAX_MEM_ALLOC_SIZE);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_MEM_ALLOC_SIZE);
     }
 
     /**
@@ -365,7 +366,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MEM_BASE_ADDR_ALIGN")
     public long getMemBaseAddrAlign() {
-        return deviceInfo.getUInt32Long(CL.CL_DEVICE_MEM_BASE_ADDR_ALIGN);
+        return deviceInfo.getUInt32Long(CLDeviceBinding.CL_DEVICE_MEM_BASE_ADDR_ALIGN);
     }
 
     /**
@@ -373,7 +374,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_GLOBAL_MEM_SIZE")
     public long getGlobalMemSize() {
-        return deviceInfo.getLong(CL.CL_DEVICE_GLOBAL_MEM_SIZE);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_GLOBAL_MEM_SIZE);
     }
 
     /**
@@ -383,7 +384,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_LOCAL_MEM_SIZE")
     public long getLocalMemSize() {
-        return deviceInfo.getLong(CL.CL_DEVICE_LOCAL_MEM_SIZE);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_LOCAL_MEM_SIZE);
     }
 
     /**
@@ -391,7 +392,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_HOST_UNIFIED_MEMORY")
     public boolean isMemoryUnified() {
-        return deviceInfo.getLong(CL.CL_DEVICE_HOST_UNIFIED_MEMORY) == CL.CL_TRUE;
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_HOST_UNIFIED_MEMORY) == CL.CL_TRUE;
     }
 
     /**
@@ -400,7 +401,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE")
     public long getMaxConstantBufferSize() {
-        return deviceInfo.getLong(CL.CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE);
     }
 
     /**
@@ -408,7 +409,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE")
     public long getGlobalMemCachelineSize() {
-        return deviceInfo.getLong(CL.CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE);
     }
 
     /**
@@ -416,7 +417,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_GLOBAL_MEM_CACHE_SIZE")
     public long getGlobalMemCacheSize() {
-        return deviceInfo.getLong(CL.CL_DEVICE_GLOBAL_MEM_CACHE_SIZE);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_GLOBAL_MEM_CACHE_SIZE);
     }
 
     /**
@@ -425,7 +426,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_CONSTANT_ARGS")
     public long getMaxConstantArgs() {
-        return deviceInfo.getLong(CL.CL_DEVICE_MAX_CONSTANT_ARGS);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_CONSTANT_ARGS);
     }
 
     /**
@@ -433,7 +434,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_IMAGE_SUPPORT")
     public boolean isImageSupportAvailable() {
-        return deviceInfo.getLong(CL.CL_DEVICE_IMAGE_SUPPORT) == CL.CL_TRUE;
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_IMAGE_SUPPORT) == CL.CL_TRUE;
     }
 
     /**
@@ -442,7 +443,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_READ_IMAGE_ARGS")
     public int getMaxReadImageArgs() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_MAX_READ_IMAGE_ARGS);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_READ_IMAGE_ARGS);
     }
 
     /**
@@ -451,7 +452,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_WRITE_IMAGE_ARGS")
     public int getMaxWriteImageArgs() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_MAX_WRITE_IMAGE_ARGS);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_WRITE_IMAGE_ARGS);
     }
 
     /**
@@ -460,7 +461,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_IMAGE2D_MAX_WIDTH")
     public int getMaxImage2dWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_IMAGE2D_MAX_WIDTH);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_IMAGE2D_MAX_WIDTH);
     }
 
     /**
@@ -469,7 +470,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_IMAGE2D_MAX_HEIGHT")
     public int getMaxImage2dHeight() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_IMAGE2D_MAX_HEIGHT);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_IMAGE2D_MAX_HEIGHT);
     }
 
     /**
@@ -478,7 +479,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_IMAGE3D_MAX_WIDTH")
     public int getMaxImage3dWidth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_IMAGE3D_MAX_WIDTH);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_IMAGE3D_MAX_WIDTH);
     }
 
     /**
@@ -487,7 +488,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_IMAGE3D_MAX_HEIGHT")
     public int getMaxImage3dHeight() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_IMAGE3D_MAX_HEIGHT);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_IMAGE3D_MAX_HEIGHT);
     }
 
     /**
@@ -496,7 +497,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_IMAGE3D_MAX_DEPTH")
     public int getMaxImage3dDepth() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_IMAGE3D_MAX_DEPTH);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_IMAGE3D_MAX_DEPTH);
     }
 
     /**
@@ -505,7 +506,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_MAX_SAMPLERS")
     public int getMaxSamplers() {
-        return (int)deviceInfo.getLong(CL.CL_DEVICE_MAX_SAMPLERS);
+        return (int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_MAX_SAMPLERS);
     }
 
     /**
@@ -513,7 +514,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_PROFILING_TIMER_RESOLUTION")
     public long getProfilingTimerResolution() {
-        return deviceInfo.getLong(CL.CL_DEVICE_PROFILING_TIMER_RESOLUTION);
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_PROFILING_TIMER_RESOLUTION);
     }
 
     /**
@@ -521,7 +522,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_EXECUTION_CAPABILITIES")
     public EnumSet<Capabilities> getExecutionCapabilities() {
-        return Capabilities.valuesOf((int)deviceInfo.getLong(CL.CL_DEVICE_EXECUTION_CAPABILITIES));
+        return Capabilities.valuesOf((int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_EXECUTION_CAPABILITIES));
     }
 
     /**
@@ -534,7 +535,7 @@ public class CLDevice extends CLObject {
     @CLProperty("CL_DEVICE_HALF_FP_CONFIG")
     public EnumSet<FPConfig> getHalfFPConfig() {
         if(isHalfFPAvailable())
-            return FPConfig.valuesOf((int)deviceInfo.getLong(CL.CL_DEVICE_HALF_FP_CONFIG));
+            return FPConfig.valuesOf((int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_HALF_FP_CONFIG));
         else
             return EnumSet.noneOf(FPConfig.class);
     }
@@ -547,7 +548,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_SINGLE_FP_CONFIG")
     public EnumSet<FPConfig> getSingleFPConfig() {
-        return FPConfig.valuesOf((int)deviceInfo.getLong(CL.CL_DEVICE_SINGLE_FP_CONFIG));
+        return FPConfig.valuesOf((int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_SINGLE_FP_CONFIG));
     }
 
     /**
@@ -560,7 +561,7 @@ public class CLDevice extends CLObject {
     @CLProperty("CL_DEVICE_DOUBLE_FP_CONFIG")
     public EnumSet<FPConfig> getDoubleFPConfig() {
         if(isDoubleFPAvailable())
-            return FPConfig.valuesOf((int)deviceInfo.getLong(CL.CL_DEVICE_DOUBLE_FP_CONFIG));
+            return FPConfig.valuesOf((int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_DOUBLE_FP_CONFIG));
         else
             return EnumSet.noneOf(FPConfig.class);
     }
@@ -570,7 +571,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_LOCAL_MEM_TYPE")
     public LocalMemType getLocalMemType() {
-        return LocalMemType.valueOf((int)deviceInfo.getLong(CL.CL_DEVICE_LOCAL_MEM_TYPE));
+        return LocalMemType.valueOf((int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_LOCAL_MEM_TYPE));
     }
 
     /**
@@ -578,7 +579,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_GLOBAL_MEM_CACHE_TYPE")
     public GlobalMemCacheType getGlobalMemCacheType() {
-        return GlobalMemCacheType.valueOf((int)deviceInfo.getLong(CL.CL_DEVICE_GLOBAL_MEM_CACHE_TYPE));
+        return GlobalMemCacheType.valueOf((int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_GLOBAL_MEM_CACHE_TYPE));
     }
 
 
@@ -587,7 +588,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_QUEUE_PROPERTIES")
     public EnumSet<CLCommandQueue.Mode> getQueueProperties() {
-        return CLCommandQueue.Mode.valuesOf((int)deviceInfo.getLong(CL.CL_DEVICE_QUEUE_PROPERTIES));
+        return CLCommandQueue.Mode.valuesOf((int)deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_QUEUE_PROPERTIES));
     }
 
     /**
@@ -595,7 +596,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_AVAILABLE")
     public boolean isAvailable() {
-        return deviceInfo.getLong(CL.CL_DEVICE_AVAILABLE) == CL.CL_TRUE;
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_AVAILABLE) == CL.CL_TRUE;
     }
 
     /**
@@ -605,7 +606,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_COMPILER_AVAILABLE")
     public boolean isCompilerAvailable() {
-        return deviceInfo.getLong(CL.CL_DEVICE_COMPILER_AVAILABLE) == CL.CL_TRUE;
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_COMPILER_AVAILABLE) == CL.CL_TRUE;
     }
 
     /**
@@ -613,7 +614,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_ENDIAN_LITTLE")
     public boolean isLittleEndian() {
-        return deviceInfo.getLong(CL.CL_DEVICE_ENDIAN_LITTLE) == CL.CL_TRUE;
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_ENDIAN_LITTLE) == CL.CL_TRUE;
     }
 
     /**
@@ -623,7 +624,7 @@ public class CLDevice extends CLObject {
      */
     @CLProperty("CL_DEVICE_ERROR_CORRECTION_SUPPORT")
     public boolean isErrorCorrectionSupported() {
-        return deviceInfo.getLong(CL.CL_DEVICE_ERROR_CORRECTION_SUPPORT) == CL.CL_TRUE;
+        return deviceInfo.getLong(CLDeviceBinding.CL_DEVICE_ERROR_CORRECTION_SUPPORT) == CL.CL_TRUE;
     }
 
     /**
@@ -666,7 +667,7 @@ public class CLDevice extends CLObject {
      * Returns true if the extension is supported on this device.
      * @see #getExtensions()
      */
-    public boolean isExtensionAvailable(String extension) {
+    public boolean isExtensionAvailable(final String extension) {
         return getExtensions().contains(extension);
     }
 
@@ -689,8 +690,8 @@ public class CLDevice extends CLObject {
 
         if(extensions == null) {
             extensions = new HashSet<String>();
-            String ext = deviceInfo.getString(CL.CL_DEVICE_EXTENSIONS);
-            Scanner scanner = new Scanner(ext);
+            final String ext = deviceInfo.getString(CLDeviceBinding.CL_DEVICE_EXTENSIONS);
+            final Scanner scanner = new Scanner(ext);
 
             while(scanner.hasNext())
                 extensions.add(scanner.next());
@@ -722,7 +723,7 @@ public class CLDevice extends CLObject {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -763,11 +764,11 @@ public class CLDevice extends CLObject {
          */
         public final int CAPS;
 
-        private Capabilities(int type) {
+        private Capabilities(final int type) {
             this.CAPS = type;
         }
 
-        public static Capabilities valueOf(int caps) {
+        public static Capabilities valueOf(final int caps) {
             switch(caps) {
                 case(CL.CL_EXEC_KERNEL):
                     return EXEC_KERNEL;
@@ -777,7 +778,7 @@ public class CLDevice extends CLObject {
             return null;
         }
 
-        public static EnumSet<Capabilities> valuesOf(int bitfield) {
+        public static EnumSet<Capabilities> valuesOf(final int bitfield) {
             if((EXEC_KERNEL.CAPS & bitfield) != 0) {
                 if((EXEC_NATIVE_KERNEL.CAPS & bitfield) != 0) {
                     return EnumSet.of(EXEC_KERNEL, EXEC_NATIVE_KERNEL);
@@ -824,23 +825,23 @@ public class CLDevice extends CLObject {
          */
         public final long TYPE;
 
-        private Type(long type) {
+        private Type(final long type) {
             this.TYPE = type;
         }
 
-        public static Type valueOf(long clDeviceType) {
+        public static Type valueOf(final long clDeviceType) {
 
-            if(clDeviceType == CL.CL_DEVICE_TYPE_ALL)
+            if(clDeviceType == CLDeviceBinding.CL_DEVICE_TYPE_ALL)
                 return ALL;
 
             switch((int)clDeviceType) {
-                case(CL.CL_DEVICE_TYPE_DEFAULT):
+                case(CLDeviceBinding.CL_DEVICE_TYPE_DEFAULT):
                     return DEFAULT;
-                case(CL.CL_DEVICE_TYPE_CPU):
+                case(CLDeviceBinding.CL_DEVICE_TYPE_CPU):
                     return CPU;
-                case(CL.CL_DEVICE_TYPE_GPU):
+                case(CLDeviceBinding.CL_DEVICE_TYPE_GPU):
                     return GPU;
-                case(CL.CL_DEVICE_TYPE_ACCELERATOR):
+                case(CLDeviceBinding.CL_DEVICE_TYPE_ACCELERATOR):
                     return ACCELERATOR;
             }
             return null;
@@ -889,17 +890,17 @@ public class CLDevice extends CLObject {
          */
         public final int CONFIG;
 
-        private FPConfig(int config) {
+        private FPConfig(final int config) {
             this.CONFIG = config;
         }
 
         /**
          * Returns a EnumSet for the given bitfield.
          */
-        public static EnumSet<FPConfig> valuesOf(int bitfield) {
-            List<FPConfig> matching = new ArrayList<FPConfig>();
-            FPConfig[] values = FPConfig.values();
-            for (FPConfig value : values) {
+        public static EnumSet<FPConfig> valuesOf(final int bitfield) {
+            final List<FPConfig> matching = new ArrayList<FPConfig>();
+            final FPConfig[] values = FPConfig.values();
+            for (final FPConfig value : values) {
                 if((value.CONFIG & bitfield) != 0)
                     matching.add(value);
             }
@@ -937,16 +938,16 @@ public class CLDevice extends CLObject {
          */
         public final int TYPE;
 
-        private GlobalMemCacheType(int type) {
+        private GlobalMemCacheType(final int type) {
             this.TYPE = type;
         }
 
         /**
          * Returns the matching GlobalMemCacheType for the given cl type.
          */
-        public static GlobalMemCacheType valueOf(int bitfield) {
-            GlobalMemCacheType[] values = GlobalMemCacheType.values();
-            for (GlobalMemCacheType value : values) {
+        public static GlobalMemCacheType valueOf(final int bitfield) {
+            final GlobalMemCacheType[] values = GlobalMemCacheType.values();
+            for (final GlobalMemCacheType value : values) {
                 if(value.TYPE == bitfield)
                     return value;
             }
@@ -974,17 +975,17 @@ public class CLDevice extends CLObject {
          */
         public final int TYPE;
 
-        private LocalMemType(int type) {
+        private LocalMemType(final int type) {
             this.TYPE = type;
         }
 
         /**
          * Returns the matching LocalMemCacheType for the given cl type.
          */
-        public static LocalMemType valueOf(int clLocalCacheType) {
-            if(clLocalCacheType == CL.CL_GLOBAL)
+        public static LocalMemType valueOf(final int clLocalCacheType) {
+            if(clLocalCacheType == CLDeviceBinding.CL_GLOBAL)
                 return GLOBAL;
-            else if(clLocalCacheType == CL.CL_LOCAL)
+            else if(clLocalCacheType == CLDeviceBinding.CL_LOCAL)
                 return LOCAL;
             return null;
         }

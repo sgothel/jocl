@@ -24,7 +24,7 @@ public abstract class CLQueueContextFactory<C extends CLQueueContext> {
      * Creates a simple context factory producing single program contexts.
      * @param source sourcecode of a OpenCL program.
      */
-    public static CLSimpleContextFactory createSimple(String source) {
+    public static CLSimpleContextFactory createSimple(final String source) {
         return new CLSimpleContextFactory(source);
     }
 
@@ -36,13 +36,13 @@ public abstract class CLQueueContextFactory<C extends CLQueueContext> {
 
         private final String source;
 
-        public CLSimpleContextFactory(String source) {
+        public CLSimpleContextFactory(final String source) {
             this.source = source;
         }
 
         @Override
-        public CLSimpleQueueContext setup(CLCommandQueue queue, CLQueueContext old) {
-            CLProgram program = queue.getContext().createProgram(source).build(queue.getDevice());
+        public CLSimpleQueueContext setup(final CLCommandQueue queue, final CLQueueContext old) {
+            final CLProgram program = queue.getContext().createProgram(source).build(queue.getDevice());
             return new CLSimpleQueueContext(queue, program);
         }
 

@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -40,7 +40,7 @@ import javax.media.opengl.GLContext;
  * Pre-defined filters.
  * @author Michael Bien
  * @see CLPlatform#getDefault(com.jogamp.opencl.util.Filter[])
- * @see CLPlatform#listCLPlatforms(com.jogamp.opencl.util.Filter[]) 
+ * @see CLPlatform#listCLPlatforms(com.jogamp.opencl.util.Filter[])
  */
 public class CLPlatformFilters {
 
@@ -49,7 +49,7 @@ public class CLPlatformFilters {
      */
     public static Filter<CLPlatform> version(final CLVersion version) {
         return new Filter<CLPlatform>() {
-            public boolean accept(CLPlatform item) {
+            public boolean accept(final CLPlatform item) {
                 return item.isAtLeast(version);
             }
         };
@@ -60,21 +60,21 @@ public class CLPlatformFilters {
      */
     public static Filter<CLPlatform> type(final CLDevice.Type type) {
         return new Filter<CLPlatform>() {
-            public boolean accept(CLPlatform item) {
+            public boolean accept(final CLPlatform item) {
                 return item.listCLDevices(type).length > 0;
             }
         };
     }
-    
+
     /**
      * Accepts all platforms containing at least one devices of which supports OpenGL-OpenCL interoperability.
      */
     public static Filter<CLPlatform> glSharing() {
         return new Filter<CLPlatform>() {
             private final Filter<CLDevice> glFilter = CLDeviceFilters.glSharing();
-            public boolean accept(CLPlatform item) {
-                CLDevice[] devices = item.listCLDevices();
-                for (CLDevice device : devices) {
+            public boolean accept(final CLPlatform item) {
+                final CLDevice[] devices = item.listCLDevices();
+                for (final CLDevice device : devices) {
                     if(glFilter.accept(device)) {
                         return true;
                     }
@@ -91,14 +91,14 @@ public class CLPlatformFilters {
     public static Filter<CLPlatform> glSharing(final GLContext context) {
         return new Filter<CLPlatform>() {
             private final Filter<CLPlatform> glFilter = glSharing();
-            public boolean accept(CLPlatform item) {
-                String glVendor = context.getGL().glGetString(GL.GL_VENDOR);
-                String clVendor = item.getVendor();
+            public boolean accept(final CLPlatform item) {
+                final String glVendor = context.getGL().glGetString(GL.GL_VENDOR);
+                final String clVendor = item.getVendor();
                 return areVendorsCompatible(glVendor,clVendor) && glFilter.accept(item);
             }
         };
     }
-    
+
     /**
      * We need this test because:
      *  - On at least some AMD cards, the GL vendor is ATI, but the CL vendor is AMD.
@@ -118,7 +118,7 @@ public class CLPlatformFilters {
      */
     public static Filter<CLPlatform> extension(final String... extensions) {
         return new Filter<CLPlatform>() {
-            public boolean accept(CLPlatform item) {
+            public boolean accept(final CLPlatform item) {
                 return item.getExtensions().containsAll(Arrays.asList(extensions));
             }
         };
@@ -130,8 +130,8 @@ public class CLPlatformFilters {
     public static Filter<CLPlatform> queueMode(final Mode... modes) {
         return new Filter<CLPlatform>() {
             private final Filter<CLDevice> queueModeFilter = CLDeviceFilters.queueMode(modes);
-            public boolean accept(CLPlatform item) {
-                for (CLDevice device : item.listCLDevices()) {
+            public boolean accept(final CLPlatform item) {
+                for (final CLDevice device : item.listCLDevices()) {
                     if(queueModeFilter.accept(device)) {
                         return true;
                     }

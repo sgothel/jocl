@@ -41,7 +41,7 @@ public class TestJoclVersion extends UITestCase {
 
     @Test
     public void testMain() throws InterruptedException {
-        JoclVersion j = JoclVersion.getInstance();
+        final JoclVersion j = JoclVersion.getInstance();
         System.out.println("Implementation-Version: "+j.getImplementationVersion());
         System.out.println("Implementation-Build: "+j.getImplementationBuild());
         System.out.println("Implementation-Branch: "+j.getImplementationBranch());
@@ -51,8 +51,8 @@ public class TestJoclVersion extends UITestCase {
     }
 
 
-    public static void main(String[] args) throws IOException {
-        String tstname = TestJoclVersion.class.getName();
+    public static void main(final String[] args) throws IOException {
+        final String tstname = TestJoclVersion.class.getName();
         org.junit.runner.JUnitCore.main(tstname);
     }
 

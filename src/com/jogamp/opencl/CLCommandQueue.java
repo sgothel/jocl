@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -66,7 +66,7 @@ public class CLCommandQueue extends CLObjectResource {
 
     private final CLCommandQueueBinding cl;
     private final CLDevice device;
-    private long properties;
+    private final long properties;
 
     /*
      * Those direct memory buffers are used to move data between the JVM and OpenCL.
@@ -76,28 +76,28 @@ public class CLCommandQueue extends CLObjectResource {
     private final PointerBuffer ibB;
     private final PointerBuffer ibC;
 
-    private CLCommandQueue(CLContext context, long id, CLDevice device, long properties) {
+    private CLCommandQueue(final CLContext context, final long id, final CLDevice device, final long properties) {
         super(context, id);
 
         this.device = device;
         this.properties = properties;
         this.cl = context.getPlatform().getCommandQueueBinding();
 
-        int pbsize = PointerBuffer.ELEMENT_SIZE;
-        CachedBufferFactory factory = CachedBufferFactory.create(9*pbsize + 4, true);
-        
+        final int pbsize = PointerBuffer.ELEMENT_SIZE;
+        final CachedBufferFactory factory = CachedBufferFactory.create(9*pbsize + 4, true);
+
         this.ibA = PointerBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
         this.ibB = PointerBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
         this.ibC = PointerBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));
-        
+
         this.pbA = factory.newDirectIntBuffer(1);
 
     }
 
-    static CLCommandQueue create(CLContext context, CLDevice device, long properties) {
-        int[] status = new int[1];
-        CLCommandQueueBinding binding = context.getPlatform().getCommandQueueBinding();
-        long id = binding.clCreateCommandQueue(context.ID, device.ID, properties, status, 0);
+    static CLCommandQueue create(final CLContext context, final CLDevice device, final long properties) {
+        final int[] status = new int[1];
+        final CLCommandQueueBinding binding = context.getPlatform().getCommandQueueBinding();
+        final long id = binding.clCreateCommandQueue(context.ID, device.ID, properties, status, 0);
 
         if(status[0] != CL_SUCCESS) {
             throw newException(status[0], "can not create command queue on " + device +" with properties: " + Mode.valuesOf(properties));
@@ -109,21 +109,21 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueWriteBuffer}.
      */
-    public CLCommandQueue putWriteBuffer(CLBuffer<?> writeBuffer, boolean blockingRead) {
+    public CLCommandQueue putWriteBuffer(final CLBuffer<?> writeBuffer, final boolean blockingRead) {
         return putWriteBuffer(writeBuffer, blockingRead, null, null);
     }
 
     /**
      * Calls {@native clEnqueueWriteBuffer}.
      */
-    public CLCommandQueue putWriteBuffer(CLBuffer<?> writeBuffer, boolean blockingRead, CLEventList events) {
+    public CLCommandQueue putWriteBuffer(final CLBuffer<?> writeBuffer, final boolean blockingRead, final CLEventList events) {
         return putWriteBuffer(writeBuffer, blockingRead, null, events);
     }
-    
+
     /**
      * Calls {@native clEnqueueWriteBuffer}.
      */
-    public CLCommandQueue putWriteBuffer(CLBuffer<?> writeBuffer, boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteBuffer(final CLBuffer<?> writeBuffer, final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -131,8 +131,8 @@ public class CLCommandQueue extends CLObjectResource {
             conditionIDs = condition.IDsView;
             conditions   = condition.size;
         }
-        
-        int ret = cl.clEnqueueWriteBuffer(
+
+        final int ret = cl.clEnqueueWriteBuffer(
                 ID, writeBuffer.ID, clBoolean(blockingWrite),
                 0, writeBuffer.getNIOSize(), writeBuffer.buffer,
                 conditions, conditionIDs, events==null ? null : events.IDs);
@@ -151,7 +151,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadBuffer}.
      */
-    public CLCommandQueue putReadBuffer(CLBuffer<?> readBuffer, boolean blockingRead) {
+    public CLCommandQueue putReadBuffer(final CLBuffer<?> readBuffer, final boolean blockingRead) {
         putReadBuffer(readBuffer, blockingRead, null, null);
         return this;
     }
@@ -159,7 +159,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadBuffer}.
      */
-    public CLCommandQueue putReadBuffer(CLBuffer<?> readBuffer, boolean blockingRead, CLEventList events) {
+    public CLCommandQueue putReadBuffer(final CLBuffer<?> readBuffer, final boolean blockingRead, final CLEventList events) {
         putReadBuffer(readBuffer, blockingRead, null, events);
         return this;
     }
@@ -167,7 +167,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadBuffer}.
      */
-    public CLCommandQueue putReadBuffer(CLBuffer<?> readBuffer, boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadBuffer(final CLBuffer<?> readBuffer, final boolean blockingRead, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -175,8 +175,8 @@ public class CLCommandQueue extends CLObjectResource {
             conditionIDs = condition.IDsView;
             conditions   = condition.size;
         }
-        
-        int ret = cl.clEnqueueReadBuffer(
+
+        final int ret = cl.clEnqueueReadBuffer(
                 ID, readBuffer.ID, clBoolean(blockingRead),
                 0, readBuffer.getNIOSize(), readBuffer.buffer,
                 conditions, conditionIDs, events==null ? null : events.IDs);
@@ -195,28 +195,28 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyBuffer}.
      */
-    public CLCommandQueue putCopyBuffer(CLBuffer<?> src, CLBuffer<?> dest) {
+    public CLCommandQueue putCopyBuffer(final CLBuffer<?> src, final CLBuffer<?> dest) {
         return putCopyBuffer(src, dest, 0, 0, src.getCLSize(), null, null);
     }
 
     /**
      * Calls {@native clEnqueueCopyBuffer}.
      */
-    public CLCommandQueue putCopyBuffer(CLBuffer<?> src, CLBuffer<?> dest, long bytesToCopy) {
+    public CLCommandQueue putCopyBuffer(final CLBuffer<?> src, final CLBuffer<?> dest, final long bytesToCopy) {
         return putCopyBuffer(src, dest, 0, 0, bytesToCopy, null, null);
     }
 
     /**
      * Calls {@native clEnqueueCopyBuffer}.
      */
-    public CLCommandQueue putCopyBuffer(CLBuffer<?> src, CLBuffer<?> dest, int srcOffset, int destOffset, long bytesToCopy, CLEventList events) {
+    public CLCommandQueue putCopyBuffer(final CLBuffer<?> src, final CLBuffer<?> dest, final int srcOffset, final int destOffset, final long bytesToCopy, final CLEventList events) {
         return putCopyBuffer(src, dest, srcOffset, destOffset, bytesToCopy, null, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyBuffer}.
      */
-    public CLCommandQueue putCopyBuffer(CLBuffer<?> src, CLBuffer<?> dest, int srcOffset, int destOffset, long bytesToCopy, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBuffer(final CLBuffer<?> src, final CLBuffer<?> dest, final int srcOffset, final int destOffset, final long bytesToCopy, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -225,7 +225,7 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        int ret = cl.clEnqueueCopyBuffer(
+        final int ret = cl.clEnqueueCopyBuffer(
                         ID, src.ID, dest.ID, srcOffset, destOffset, bytesToCopy,
                         conditions, conditionIDs, events==null ? null : events.IDs);
 
@@ -245,9 +245,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueWriteBufferRect}.
      */
-    public CLCommandQueue putWriteBufferRect(CLBuffer<?> writeBuffer,
-            int originX, int originY, int hostX, int hostY, int rangeX, int rangeY,
-            boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteBufferRect(final CLBuffer<?> writeBuffer,
+            final int originX, final int originY, final int hostX, final int hostY, final int rangeX, final int rangeY,
+            final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
         putWriteBufferRect(writeBuffer, originX, originY, hostX, hostY, rangeX, rangeY, 0, 0, 0, 0, blockingWrite, condition, events);
         return this;
     }
@@ -255,10 +255,10 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueWriteBufferRect}.
      */
-    public CLCommandQueue putWriteBufferRect(CLBuffer<?>  writeBuffer,
-            int originX, int originY, int hostX, int hostY, int rangeX, int rangeY,
-            long rowPitch, long slicePitch, long hostRowPitch, long hostSlicePitch,
-            boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteBufferRect(final CLBuffer<?>  writeBuffer,
+            final int originX, final int originY, final int hostX, final int hostY, final int rangeX, final int rangeY,
+            final long rowPitch, final long slicePitch, final long hostRowPitch, final long hostSlicePitch,
+            final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
         // spec: if 2d: origin/hostpos=0, range=1
         putWriteBufferRect( writeBuffer, originX, originY, 0,
                                          hostX, hostY, 0,
@@ -271,9 +271,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueWriteBufferRect}.
      */
-    public CLCommandQueue putWriteBufferRect(CLBuffer<?> writeBuffer,
-            int originX, int originY, int originZ, int hostX, int hostY, int hostZ, int rangeX, int rangeY, int rangeZ,
-            boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteBufferRect(final CLBuffer<?> writeBuffer,
+            final int originX, final int originY, final int originZ, final int hostX, final int hostY, final int hostZ, final int rangeX, final int rangeY, final int rangeZ,
+            final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
         putWriteBufferRect(writeBuffer, originX, originY, originZ,
                                         hostX, hostY, hostZ,
                                         rangeX, rangeY, rangeZ, 0, 0, 0, 0, blockingWrite, condition, events);
@@ -283,10 +283,10 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueWriteBufferRect}.
      */
-    public CLCommandQueue putWriteBufferRect(CLBuffer<?> writeBuffer,
-            int originX, int originY, int originZ, int hostX, int hostY, int hostZ, int rangeX, int rangeY, int rangeZ,
-            long rowPitch, long slicePitch, long hostRowPitch, long hostSlicePitch,
-            boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteBufferRect(final CLBuffer<?> writeBuffer,
+            final int originX, final int originY, final int originZ, final int hostX, final int hostY, final int hostZ, final int rangeX, final int rangeY, final int rangeZ,
+            final long rowPitch, final long slicePitch, final long hostRowPitch, final long hostSlicePitch,
+            final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -299,7 +299,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibB, hostX, hostY, hostZ);
         copy2NIO(ibC, rangeX, rangeY, rangeZ);
 
-        int ret = cl.clEnqueueWriteBufferRect(
+        final int ret = cl.clEnqueueWriteBufferRect(
                 ID, writeBuffer.ID, clBoolean(blockingWrite), ibA, ibB, ibC,
                 rowPitch, slicePitch, hostRowPitch, hostSlicePitch, writeBuffer.getBuffer(),
                 conditions, conditionIDs, events==null ? null : events.IDs);
@@ -322,9 +322,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadBufferRect}.
      */
-    public CLCommandQueue putReadBufferRect(CLBuffer<?> readBuffer,
-            int originX, int originY, int hostX, int hostY, int rangeX, int rangeY,
-            boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadBufferRect(final CLBuffer<?> readBuffer,
+            final int originX, final int originY, final int hostX, final int hostY, final int rangeX, final int rangeY,
+            final boolean blockingRead, final CLEventList condition, final CLEventList events) {
         putReadBufferRect(readBuffer, originX, originY, hostX, hostY, rangeX, rangeY, 0, 0, 0, 0, blockingRead, condition, events);
         return this;
     }
@@ -332,10 +332,10 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadBufferRect}.
      */
-    public CLCommandQueue putReadBufferRect(CLBuffer<?> readBuffer,
-            int originX, int originY, int hostX, int hostY, int rangeX, int rangeY,
-            long rowPitch, long slicePitch, long hostRowPitch, long hostSlicePitch,
-            boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadBufferRect(final CLBuffer<?> readBuffer,
+            final int originX, final int originY, final int hostX, final int hostY, final int rangeX, final int rangeY,
+            final long rowPitch, final long slicePitch, final long hostRowPitch, final long hostSlicePitch,
+            final boolean blockingRead, final CLEventList condition, final CLEventList events) {
         // spec: if 2d: origin/hostpos=0, range=1
         putReadBufferRect(  readBuffer, originX, originY, 0,
                             hostX, hostY, 0,
@@ -348,9 +348,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadBufferRect}.
      */
-    public CLCommandQueue putReadBufferRect(CLBuffer<?> readBuffer,
-            int originX, int originY, int originZ, int hostX, int hostY, int hostZ, int rangeX, int rangeY, int rangeZ,
-            boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadBufferRect(final CLBuffer<?> readBuffer,
+            final int originX, final int originY, final int originZ, final int hostX, final int hostY, final int hostZ, final int rangeX, final int rangeY, final int rangeZ,
+            final boolean blockingRead, final CLEventList condition, final CLEventList events) {
         putReadBufferRect(  readBuffer, originX, originY, originZ,
                             hostX, hostY, hostZ,
                             rangeX, rangeY, rangeZ,
@@ -361,10 +361,10 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadBufferRect}.
      */
-    public CLCommandQueue putReadBufferRect(CLBuffer<?> readBuffer,
-            int originX, int originY, int originZ, int hostX, int hostY, int hostZ, int rangeX, int rangeY, int rangeZ,
-            long rowPitch, long slicePitch, long hostRowPitch, long hostSlicePitch,
-            boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadBufferRect(final CLBuffer<?> readBuffer,
+            final int originX, final int originY, final int originZ, final int hostX, final int hostY, final int hostZ, final int rangeX, final int rangeY, final int rangeZ,
+            final long rowPitch, final long slicePitch, final long hostRowPitch, final long hostSlicePitch,
+            final boolean blockingRead, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -377,7 +377,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibB, hostX, hostY, hostZ);
         copy2NIO(ibC, rangeX, rangeY, rangeZ);
 
-        int ret = cl.clEnqueueReadBufferRect(
+        final int ret = cl.clEnqueueReadBufferRect(
                 ID, readBuffer.ID, clBoolean(blockingRead), ibA, ibB, ibC,
                 rowPitch, slicePitch, hostRowPitch, hostSlicePitch, readBuffer.getBuffer(),
                 conditions, conditionIDs, events==null ? null : events.IDs);
@@ -400,9 +400,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyBufferRect}.
      */
-    public CLCommandQueue putCopyBufferRect(CLBuffer<?> src, CLBuffer<?> dest,
-            int srcOriginX, int srcOriginY, int destOriginX, int destOriginY, int rangeX, int rangeY,
-            CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBufferRect(final CLBuffer<?> src, final CLBuffer<?> dest,
+            final int srcOriginX, final int srcOriginY, final int destOriginX, final int destOriginY, final int rangeX, final int rangeY,
+            final CLEventList condition, final CLEventList events) {
         // spec: if 2d: origin/destpos=0, range=1
         putCopyBufferRect(  src, dest, srcOriginX, srcOriginY, 0,
                             destOriginX, destOriginY, 0,
@@ -414,10 +414,10 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyBufferRect}.
      */
-    public CLCommandQueue putCopyBufferRect(CLBuffer<?> src, CLBuffer<?> dest,
-            int srcOriginX, int srcOriginY, int destOriginX, int destOriginY, int rangeX, int rangeY,
-            long srcRowPitch, long srcSlicePitch, long destRowPitch, long destSlicePitch,
-            CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBufferRect(final CLBuffer<?> src, final CLBuffer<?> dest,
+            final int srcOriginX, final int srcOriginY, final int destOriginX, final int destOriginY, final int rangeX, final int rangeY,
+            final long srcRowPitch, final long srcSlicePitch, final long destRowPitch, final long destSlicePitch,
+            final CLEventList condition, final CLEventList events) {
         putCopyBufferRect(  src, dest, srcOriginX, srcOriginY, 0,
                             destOriginX, destOriginY, 0,
                             rangeX, rangeY, 1,
@@ -430,9 +430,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyBufferRect}.
      */
-    public CLCommandQueue putCopyBufferRect(CLBuffer<?> src, CLBuffer<?> dest,
-            int srcOriginX, int srcOriginY, int srcOriginZ, int destOriginX, int destOriginY, int destOriginZ, int rangeX, int rangeY, int rangeZ,
-            CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBufferRect(final CLBuffer<?> src, final CLBuffer<?> dest,
+            final int srcOriginX, final int srcOriginY, final int srcOriginZ, final int destOriginX, final int destOriginY, final int destOriginZ, final int rangeX, final int rangeY, final int rangeZ,
+            final CLEventList condition, final CLEventList events) {
         putCopyBufferRect(  src, dest, srcOriginX, srcOriginY, srcOriginZ,
                             destOriginX, destOriginY, destOriginZ,
                             rangeX, rangeY, rangeZ,
@@ -442,10 +442,10 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyBufferRect}.
      */
-    public CLCommandQueue putCopyBufferRect(CLBuffer<?> src, CLBuffer<?> dest,
-            int srcOriginX, int srcOriginY, int srcOriginZ, int destOriginX, int destOriginY, int destOriginZ, int rangeX, int rangeY, int rangeZ,
-            long srcRowPitch, long srcSlicePitch, long destRowPitch, long destSlicePitch,
-            CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBufferRect(final CLBuffer<?> src, final CLBuffer<?> dest,
+            final int srcOriginX, final int srcOriginY, final int srcOriginZ, final int destOriginX, final int destOriginY, final int destOriginZ, final int rangeX, final int rangeY, final int rangeZ,
+            final long srcRowPitch, final long srcSlicePitch, final long destRowPitch, final long destSlicePitch,
+            final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -458,7 +458,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibB, destOriginX, destOriginY, destOriginZ);
         copy2NIO(ibC, rangeX, rangeY, rangeZ);
 
-        int ret = cl.clEnqueueCopyBufferRect(
+        final int ret = cl.clEnqueueCopyBufferRect(
                         ID, src.ID, dest.ID, ibA, ibB, ibC,
                         srcRowPitch, srcSlicePitch, destRowPitch, destSlicePitch,
                         conditions, conditionIDs, events==null ? null : events.IDs);
@@ -483,37 +483,37 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage2d<?> writeImage, boolean blockingWrite) {
+    public CLCommandQueue putWriteImage(final CLImage2d<?> writeImage, final boolean blockingWrite) {
         return putWriteImage(writeImage, 0, 0, 0, writeImage.width, writeImage.height, blockingWrite, null, null);
     }
 
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage2d<?> writeImage, boolean blockingWrite, CLEventList events) {
+    public CLCommandQueue putWriteImage(final CLImage2d<?> writeImage, final boolean blockingWrite, final CLEventList events) {
         return putWriteImage(writeImage, 0, 0, 0, writeImage.width, writeImage.height, blockingWrite, null, events);
     }
 
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage2d<?> writeImage, boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteImage(final CLImage2d<?> writeImage, final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
         return putWriteImage(writeImage, 0, 0, 0, writeImage.width, writeImage.height, blockingWrite, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage2d<?> writeImage, int inputRowPitch,
-            int originX, int originY, int rangeX, int rangeY, boolean blockingWrite) {
+    public CLCommandQueue putWriteImage(final CLImage2d<?> writeImage, final int inputRowPitch,
+            final int originX, final int originY, final int rangeX, final int rangeY, final boolean blockingWrite) {
         return putWriteImage(writeImage, inputRowPitch, originX, originY, rangeX, rangeY, blockingWrite, null, null);
     }
 
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage2d<?> writeImage, int inputRowPitch,
-            int originX, int originY, int rangeX, int rangeY, boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteImage(final CLImage2d<?> writeImage, final int inputRowPitch,
+            final int originX, final int originY, final int rangeX, final int rangeY, final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -527,7 +527,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibA, originX, originY, 0);
         copy2NIO(ibB, rangeX, rangeY, 1);
 
-        int ret = cl.clEnqueueWriteImage(ID, writeImage.ID, clBoolean(blockingWrite),
+        final int ret = cl.clEnqueueWriteImage(ID, writeImage.ID, clBoolean(blockingWrite),
                                          ibA, ibB, inputRowPitch, 0, writeImage.buffer,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
@@ -545,37 +545,37 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage3d<?> writeImage, boolean blockingWrite) {
+    public CLCommandQueue putWriteImage(final CLImage3d<?> writeImage, final boolean blockingWrite) {
         return putWriteImage(writeImage, 0, 0, 0, 0, 0, writeImage.width, writeImage.height, writeImage.depth, blockingWrite, null, null);
     }
 
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage3d<?> writeImage, boolean blockingWrite, CLEventList events) {
+    public CLCommandQueue putWriteImage(final CLImage3d<?> writeImage, final boolean blockingWrite, final CLEventList events) {
         return putWriteImage(writeImage, 0, 0, 0, 0, 0, writeImage.width, writeImage.height, writeImage.depth, blockingWrite, null, events);
     }
 
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage3d<?> writeImage, boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteImage(final CLImage3d<?> writeImage, final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
         return putWriteImage(writeImage, 0, 0, 0, 0, 0, writeImage.width, writeImage.height, writeImage.depth, blockingWrite, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage3d<?> writeImage, int inputRowPitch, int inputSlicePitch,
-            int originX, int originY, int originZ, int rangeX, int rangeY, int rangeZ, boolean blockingWrite) {
+    public CLCommandQueue putWriteImage(final CLImage3d<?> writeImage, final int inputRowPitch, final int inputSlicePitch,
+            final int originX, final int originY, final int originZ, final int rangeX, final int rangeY, final int rangeZ, final boolean blockingWrite) {
         return putWriteImage(writeImage, inputRowPitch, inputSlicePitch, originX, originY, originZ, rangeX, rangeY, rangeZ, blockingWrite, null, null);
     }
 
     /**
      * Calls {@native clEnqueueWriteImage}.
      */
-    public CLCommandQueue putWriteImage(CLImage3d<?> writeImage, int inputRowPitch, int inputSlicePitch,
-            int originX, int originY, int originZ, int rangeX, int rangeY, int rangeZ, boolean blockingWrite, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putWriteImage(final CLImage3d<?> writeImage, final int inputRowPitch, final int inputSlicePitch,
+            final int originX, final int originY, final int originZ, final int rangeX, final int rangeY, final int rangeZ, final boolean blockingWrite, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -587,7 +587,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibA, originX, originY, originZ);
         copy2NIO(ibB, rangeX, rangeY, rangeZ);
 
-        int ret = cl.clEnqueueWriteImage(ID, writeImage.ID, clBoolean(blockingWrite),
+        final int ret = cl.clEnqueueWriteImage(ID, writeImage.ID, clBoolean(blockingWrite),
                                          ibA, ibB, inputRowPitch, inputSlicePitch, writeImage.buffer,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
 
@@ -606,37 +606,37 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage2d<?> readImage, boolean blockingRead) {
+    public CLCommandQueue putReadImage(final CLImage2d<?> readImage, final boolean blockingRead) {
         return putReadImage(readImage, 0, 0, 0, readImage.width, readImage.height, blockingRead, null, null);
     }
 
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage2d<?> readImage, boolean blockingRead, CLEventList events) {
+    public CLCommandQueue putReadImage(final CLImage2d<?> readImage, final boolean blockingRead, final CLEventList events) {
         return putReadImage(readImage, 0, 0, 0, readImage.width, readImage.height, blockingRead, null, events);
     }
 
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage2d<?> readImage, boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadImage(final CLImage2d<?> readImage, final boolean blockingRead, final CLEventList condition, final CLEventList events) {
         return putReadImage(readImage, 0, 0, 0, readImage.width, readImage.height, blockingRead, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage2d<?> readImage, int inputRowPitch,
-            int originX, int originY, int rangeX, int rangeY, boolean blockingRead) {
+    public CLCommandQueue putReadImage(final CLImage2d<?> readImage, final int inputRowPitch,
+            final int originX, final int originY, final int rangeX, final int rangeY, final boolean blockingRead) {
         return putReadImage(readImage, inputRowPitch, originX, originY, rangeX, rangeY, blockingRead, null, null);
     }
 
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage2d<?> readImage, int inputRowPitch,
-            int originX, int originY, int rangeX, int rangeY, boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadImage(final CLImage2d<?> readImage, final int inputRowPitch,
+            final int originX, final int originY, final int rangeX, final int rangeY, final boolean blockingRead, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -650,7 +650,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibA, originX, originY, 0);
         copy2NIO(ibB, rangeX, rangeY, 1);
 
-        int ret = cl.clEnqueueReadImage(ID, readImage.ID, clBoolean(blockingRead),
+        final int ret = cl.clEnqueueReadImage(ID, readImage.ID, clBoolean(blockingRead),
                                          ibA, ibB, inputRowPitch, 0, readImage.buffer,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
@@ -668,37 +668,37 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage3d<?> readImage, boolean blockingRead) {
+    public CLCommandQueue putReadImage(final CLImage3d<?> readImage, final boolean blockingRead) {
         return putReadImage(readImage, 0, 0, 0, 0, 0, readImage.width, readImage.height, readImage.depth, blockingRead, null, null);
     }
 
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage3d<?> readImage, boolean blockingRead, CLEventList events) {
+    public CLCommandQueue putReadImage(final CLImage3d<?> readImage, final boolean blockingRead, final CLEventList events) {
         return putReadImage(readImage, 0, 0, 0, 0, 0, readImage.width, readImage.height, readImage.depth, blockingRead, null, events);
     }
 
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage3d<?> readImage, boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadImage(final CLImage3d<?> readImage, final boolean blockingRead, final CLEventList condition, final CLEventList events) {
         return putReadImage(readImage, 0, 0, 0, 0, 0, readImage.width, readImage.height, readImage.depth, blockingRead, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage3d<?> readImage, int inputRowPitch, int inputSlicePitch,
-            int originX, int originY, int originZ, int rangeX, int rangeY, int rangeZ, boolean blockingRead) {
+    public CLCommandQueue putReadImage(final CLImage3d<?> readImage, final int inputRowPitch, final int inputSlicePitch,
+            final int originX, final int originY, final int originZ, final int rangeX, final int rangeY, final int rangeZ, final boolean blockingRead) {
         return putReadImage(readImage, inputRowPitch, inputSlicePitch, originX, originY, originZ, rangeX, rangeY, rangeZ, blockingRead, null, null);
     }
 
     /**
      * Calls {@native clEnqueueReadImage}.
      */
-    public CLCommandQueue putReadImage(CLImage3d<?> readImage, int inputRowPitch, int inputSlicePitch,
-            int originX, int originY, int originZ, int rangeX, int rangeY, int rangeZ, boolean blockingRead, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReadImage(final CLImage3d<?> readImage, final int inputRowPitch, final int inputSlicePitch,
+            final int originX, final int originY, final int originZ, final int rangeX, final int rangeY, final int rangeZ, final boolean blockingRead, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -710,7 +710,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibA, originX, originY, originZ);
         copy2NIO(ibB, rangeX, rangeY, rangeZ);
 
-        int ret = cl.clEnqueueReadImage(ID, readImage.ID, clBoolean(blockingRead),
+        final int ret = cl.clEnqueueReadImage(ID, readImage.ID, clBoolean(blockingRead),
                                         ibA, ibB, inputRowPitch, inputSlicePitch, readImage.buffer,
                                         conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
@@ -728,41 +728,41 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage2d<?> srcImage, CLImage2d<?> dstImage) {
+    public CLCommandQueue putCopyImage(final CLImage2d<?> srcImage, final CLImage2d<?> dstImage) {
         return putCopyImage(srcImage, dstImage, null);
     }
 
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage2d<?> srcImage, CLImage2d<?> dstImage, CLEventList events) {
+    public CLCommandQueue putCopyImage(final CLImage2d<?> srcImage, final CLImage2d<?> dstImage, final CLEventList events) {
         return putCopyImage(srcImage, dstImage, 0, 0, 0, 0, srcImage.width, srcImage.height, null, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage2d<?> srcImage, CLImage2d<?> dstImage, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyImage(final CLImage2d<?> srcImage, final CLImage2d<?> dstImage, final CLEventList condition, final CLEventList events) {
         return putCopyImage(srcImage, dstImage, 0, 0, 0, 0, srcImage.width, srcImage.height, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage2d<?> srcImage, CLImage2d<?> dstImage,
-                                        int srcOriginX, int srcOriginY,
-                                        int dstOriginX, int dstOriginY,
-                                        int rangeX, int rangeY) {
+    public CLCommandQueue putCopyImage(final CLImage2d<?> srcImage, final CLImage2d<?> dstImage,
+                                        final int srcOriginX, final int srcOriginY,
+                                        final int dstOriginX, final int dstOriginY,
+                                        final int rangeX, final int rangeY) {
         return putCopyImage(srcImage, dstImage, srcOriginX, srcOriginY, dstOriginX, dstOriginY, rangeX, rangeY, null, null);
     }
 
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage2d<?> srcImage, CLImage2d<?> dstImage,
-                                        int srcOriginX, int srcOriginY,
-                                        int dstOriginX, int dstOriginY,
-                                        int rangeX, int rangeY, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyImage(final CLImage2d<?> srcImage, final CLImage2d<?> dstImage,
+                                        final int srcOriginX, final int srcOriginY,
+                                        final int dstOriginX, final int dstOriginY,
+                                        final int rangeX, final int rangeY, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -777,7 +777,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibB, dstOriginX, dstOriginY, 0);
         copy2NIO(ibC, rangeX, rangeY, 1);
 
-        int ret = cl.clEnqueueCopyImage(ID, srcImage.ID, dstImage.ID, ibA, ibB, ibC,
+        final int ret = cl.clEnqueueCopyImage(ID, srcImage.ID, dstImage.ID, ibA, ibB, ibC,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not enqueue copy-image " + srcImage +" to "+ dstImage
@@ -795,31 +795,31 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage3d<?> srcImage, CLImage3d<?> dstImage) {
+    public CLCommandQueue putCopyImage(final CLImage3d<?> srcImage, final CLImage3d<?> dstImage) {
         return putCopyImage(srcImage, dstImage, null);
     }
 
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage3d<?> srcImage, CLImage3d<?> dstImage, CLEventList events) {
+    public CLCommandQueue putCopyImage(final CLImage3d<?> srcImage, final CLImage3d<?> dstImage, final CLEventList events) {
         return putCopyImage(srcImage, dstImage, 0, 0, 0, 0, 0, 0, srcImage.width, srcImage.height, srcImage.depth, null, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage3d<?> srcImage, CLImage3d<?> dstImage, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyImage(final CLImage3d<?> srcImage, final CLImage3d<?> dstImage, final CLEventList condition, final CLEventList events) {
         return putCopyImage(srcImage, dstImage, 0, 0, 0, 0, 0, 0, srcImage.width, srcImage.height, srcImage.depth, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage3d<?> srcImage, CLImage3d<?> dstImage,
-                                        int srcOriginX, int srcOriginY, int srcOriginZ,
-                                        int dstOriginX, int dstOriginY, int dstOriginZ,
-                                        int rangeX, int rangeY, int rangeZ) {
+    public CLCommandQueue putCopyImage(final CLImage3d<?> srcImage, final CLImage3d<?> dstImage,
+                                        final int srcOriginX, final int srcOriginY, final int srcOriginZ,
+                                        final int dstOriginX, final int dstOriginY, final int dstOriginZ,
+                                        final int rangeX, final int rangeY, final int rangeZ) {
         return putCopyImage(srcImage, dstImage, srcOriginX, srcOriginY, srcOriginZ,
                                                 dstOriginX, dstOriginY, dstOriginZ,
                                                 rangeX, rangeY, rangeZ, null, null);
@@ -828,10 +828,10 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyImage}.
      */
-    public CLCommandQueue putCopyImage(CLImage<?> srcImage, CLImage<?> dstImage,
-                                        int srcOriginX, int srcOriginY, int srcOriginZ,
-                                        int dstOriginX, int dstOriginY, int dstOriginZ,
-                                        int rangeX, int rangeY, int rangeZ, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyImage(final CLImage<?> srcImage, final CLImage<?> dstImage,
+                                        final int srcOriginX, final int srcOriginY, final int srcOriginZ,
+                                        final int dstOriginX, final int dstOriginY, final int dstOriginZ,
+                                        final int rangeX, final int rangeY, final int rangeZ, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -844,7 +844,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibB, dstOriginX, dstOriginY, dstOriginZ);
         copy2NIO(ibC, rangeX, rangeY, rangeZ);
 
-        int ret = cl.clEnqueueCopyImage(ID, srcImage.ID, dstImage.ID, ibA, ibB, ibC,
+        final int ret = cl.clEnqueueCopyImage(ID, srcImage.ID, dstImage.ID, ibA, ibB, ibC,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not enqueue copy-image " + srcImage +" to "+ dstImage
@@ -857,45 +857,45 @@ public class CLCommandQueue extends CLObjectResource {
         }
         return this;
     }
-    
+
     //2D
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage2d<?> dstImage) {
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage2d<?> dstImage) {
         return putCopyBufferToImage(srcBuffer, dstImage, null);
     }
-    
+
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage2d<?> dstImage, CLEventList events) {
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage2d<?> dstImage, final CLEventList events) {
         return putCopyBufferToImage(srcBuffer, dstImage, 0, 0, 0, dstImage.width, dstImage.height, null, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage2d<?> dstImage, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage2d<?> dstImage, final CLEventList condition, final CLEventList events) {
         return putCopyBufferToImage(srcBuffer, dstImage, 0, 0, 0, dstImage.width, dstImage.height, condition, events);
     }
-        
+
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage2d<?> dstImage,
-                                        long srcOffset, int dstOriginX, int dstOriginY,
-                                        int rangeX, int rangeY) {
-        return putCopyBufferToImage(srcBuffer, dstImage, 
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage2d<?> dstImage,
+                                        final long srcOffset, final int dstOriginX, final int dstOriginY,
+                                        final int rangeX, final int rangeY) {
+        return putCopyBufferToImage(srcBuffer, dstImage,
                 srcOffset, dstOriginX, dstOriginY, rangeX, rangeY, null, null);
     }
-    
+
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage2d<?> dstImage,
-                                        long srcOffset, int dstOriginX, int dstOriginY,
-                                        int rangeX, int rangeY, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage2d<?> dstImage,
+                                        final long srcOffset, final int dstOriginX, final int dstOriginY,
+                                        final int rangeX, final int rangeY, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -909,7 +909,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibA, dstOriginX, dstOriginY, 0);
         copy2NIO(ibB, rangeX, rangeY, 1);
 
-        int ret = cl.clEnqueueCopyBufferToImage(ID, srcBuffer.ID, dstImage.ID,
+        final int ret = cl.clEnqueueCopyBufferToImage(ID, srcBuffer.ID, dstImage.ID,
                                          srcOffset, ibA, ibB,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
@@ -923,46 +923,46 @@ public class CLCommandQueue extends CLObjectResource {
         }
         return this;
     }
-    
+
     //3D
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage3d<?> dstImage) {
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage3d<?> dstImage) {
         return putCopyBufferToImage(srcBuffer, dstImage, null);
     }
-    
+
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage3d<?> dstImage, CLEventList events) {
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage3d<?> dstImage, final CLEventList events) {
         return putCopyBufferToImage(srcBuffer, dstImage, 0, 0, 0, 0, dstImage.width, dstImage.height, dstImage.depth, null, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage3d<?> dstImage, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage3d<?> dstImage, final CLEventList condition, final CLEventList events) {
         return putCopyBufferToImage(srcBuffer, dstImage, 0, 0, 0, 0, dstImage.width, dstImage.height, dstImage.depth, condition, events);
     }
-        
+
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage3d<?> dstImage,
-                                        long srcOffset, int dstOriginX, int dstOriginY, int dstOriginZ,
-                                        int rangeX, int rangeY, int rangeZ) {
-        return putCopyBufferToImage(srcBuffer, dstImage, 
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage3d<?> dstImage,
+                                        final long srcOffset, final int dstOriginX, final int dstOriginY, final int dstOriginZ,
+                                        final int rangeX, final int rangeY, final int rangeZ) {
+        return putCopyBufferToImage(srcBuffer, dstImage,
                 srcOffset, dstOriginX, dstOriginY, dstOriginZ, rangeX, rangeY, rangeZ, null, null);
-        
+
     }
-    
+
     /**
      * Calls {@native clEnqueueCopyBufferToImage}.
      */
-    public CLCommandQueue putCopyBufferToImage(CLBuffer<?> srcBuffer, CLImage3d<?> dstImage,
-                                        long srcOffset, int dstOriginX, int dstOriginY, int dstOriginZ,
-                                        int rangeX, int rangeY, int rangeZ, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyBufferToImage(final CLBuffer<?> srcBuffer, final CLImage3d<?> dstImage,
+                                        final long srcOffset, final int dstOriginX, final int dstOriginY, final int dstOriginZ,
+                                        final int rangeX, final int rangeY, final int rangeZ, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -974,7 +974,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibA, dstOriginX, dstOriginY, dstOriginZ);
         copy2NIO(ibB, rangeX, rangeY, rangeZ);
 
-        int ret = cl.clEnqueueCopyBufferToImage(ID, srcBuffer.ID, dstImage.ID,
+        final int ret = cl.clEnqueueCopyBufferToImage(ID, srcBuffer.ID, dstImage.ID,
                                          srcOffset, ibA, ibB,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
@@ -993,40 +993,40 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage2d<?> srcImage, CLBuffer<?> dstBuffer) {
+    public CLCommandQueue putCopyImageToBuffer(final CLImage2d<?> srcImage, final CLBuffer<?> dstBuffer) {
         return putCopyImageToBuffer(srcImage, dstBuffer, null);
     }
-    
+
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage2d<?> srcImage, CLBuffer<?> dstBuffer, CLEventList events) {
+    public CLCommandQueue putCopyImageToBuffer(final CLImage2d<?> srcImage, final CLBuffer<?> dstBuffer, final CLEventList events) {
         return putCopyImageToBuffer(srcImage, dstBuffer, 0, 0, srcImage.width, srcImage.height, 0, null, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage2d<?> srcImage, CLBuffer<?> dstBuffer, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyImageToBuffer(final CLImage2d<?> srcImage, final CLBuffer<?> dstBuffer, final CLEventList condition, final CLEventList events) {
         return putCopyImageToBuffer(srcImage, dstBuffer, 0, 0, srcImage.width, srcImage.height, 0, condition, events);
     }
-        
+
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage2d<?> srcImage, CLBuffer<?> dstBuffer,
-                                        int srcOriginX, int srcOriginY,
-                                        int rangeX, int rangeY, long dstOffset) {
-        return putCopyImageToBuffer(srcImage, dstBuffer, 
+    public CLCommandQueue putCopyImageToBuffer(final CLImage2d<?> srcImage, final CLBuffer<?> dstBuffer,
+                                        final int srcOriginX, final int srcOriginY,
+                                        final int rangeX, final int rangeY, final long dstOffset) {
+        return putCopyImageToBuffer(srcImage, dstBuffer,
                 srcOriginX, srcOriginY, rangeX, rangeY, dstOffset, null, null);
     }
-    
+
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage2d<?> srcImage, CLBuffer<?> dstBuffer,
-                                        int srcOriginX, int srcOriginY,
-                                        int rangeX, int rangeY, long dstOffset, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyImageToBuffer(final CLImage2d<?> srcImage, final CLBuffer<?> dstBuffer,
+                                        final int srcOriginX, final int srcOriginY,
+                                        final int rangeX, final int rangeY, final long dstOffset, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1040,7 +1040,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibA, srcOriginX, srcOriginY, 0);
         copy2NIO(ibB, rangeX, rangeY, 1);
 
-        int ret = cl.clEnqueueCopyImageToBuffer(ID, srcImage.ID, dstBuffer.ID,
+        final int ret = cl.clEnqueueCopyImageToBuffer(ID, srcImage.ID, dstBuffer.ID,
                                          ibA, ibB, dstOffset,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
@@ -1054,47 +1054,47 @@ public class CLCommandQueue extends CLObjectResource {
         }
         return this;
     }
-    
+
     //3D
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage3d<?> srcImage, CLBuffer<?> dstBuffer) {
+    public CLCommandQueue putCopyImageToBuffer(final CLImage3d<?> srcImage, final CLBuffer<?> dstBuffer) {
         return putCopyImageToBuffer(srcImage, dstBuffer, 0, 0, 0, srcImage.width, srcImage.height, srcImage.depth, 0, null, null);
     }
-    
+
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage3d<?> srcImage, CLBuffer<?> dstBuffer, CLEventList events) {
+    public CLCommandQueue putCopyImageToBuffer(final CLImage3d<?> srcImage, final CLBuffer<?> dstBuffer, final CLEventList events) {
         return putCopyImageToBuffer(srcImage, dstBuffer, 0, 0, 0, srcImage.width, srcImage.height, srcImage.depth, 0, null, events);
     }
 
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage3d<?> srcImage, CLBuffer<?> dstBuffer, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putCopyImageToBuffer(final CLImage3d<?> srcImage, final CLBuffer<?> dstBuffer, final CLEventList condition, final CLEventList events) {
         return putCopyImageToBuffer(srcImage, dstBuffer, 0, 0, 0, srcImage.width, srcImage.height, srcImage.depth, 0, condition, events);
     }
-        
+
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage3d<?> srcImage, CLBuffer<?> dstBuffer,
-                                        int srcOriginX, int srcOriginY, int srcOriginZ,
-                                        int rangeX, int rangeY, int rangeZ, long dstOffset) {
-        return putCopyImageToBuffer(srcImage, dstBuffer, 
+    public CLCommandQueue putCopyImageToBuffer(final CLImage3d<?> srcImage, final CLBuffer<?> dstBuffer,
+                                        final int srcOriginX, final int srcOriginY, final int srcOriginZ,
+                                        final int rangeX, final int rangeY, final int rangeZ, final long dstOffset) {
+        return putCopyImageToBuffer(srcImage, dstBuffer,
                 srcOriginX, srcOriginY, srcOriginZ, rangeX, rangeY, rangeZ, dstOffset, null, null);
-        
+
     }
-    
+
     /**
      * Calls {@native clEnqueueCopyImageToBuffer}.
      */
-    public CLCommandQueue putCopyImageToBuffer(CLImage3d<?> srcImage, CLBuffer<?> dstBuffer,
-                                        int srcOriginX, int srcOriginY, int srcOriginZ, 
-                                        int rangeX, int rangeY, int rangeZ, long dstOffset, CLEventList condition, CLEventList events) {
-        
+    public CLCommandQueue putCopyImageToBuffer(final CLImage3d<?> srcImage, final CLBuffer<?> dstBuffer,
+                                        final int srcOriginX, final int srcOriginY, final int srcOriginZ,
+                                        final int rangeX, final int rangeY, final int rangeZ, final long dstOffset, final CLEventList condition, final CLEventList events) {
+
         PointerBuffer conditionIDs = null;
         int conditions = 0;
         if(condition != null) {
@@ -1105,7 +1105,7 @@ public class CLCommandQueue extends CLObjectResource {
         copy2NIO(ibA, srcOriginX, srcOriginY, srcOriginZ);
         copy2NIO(ibB, rangeX, rangeY, rangeZ);
 
-        int ret = cl.clEnqueueCopyImageToBuffer(ID, srcImage.ID, dstBuffer.ID,
+        final int ret = cl.clEnqueueCopyImageToBuffer(ID, srcImage.ID, dstBuffer.ID,
                                          ibA, ibB, dstOffset,
                                          conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
@@ -1123,35 +1123,35 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueMapBuffer}.
      */
-    public ByteBuffer putMapBuffer(CLBuffer<?> buffer, CLMemory.Map flag, boolean blockingMap) {
+    public ByteBuffer putMapBuffer(final CLBuffer<?> buffer, final CLMemory.Map flag, final boolean blockingMap) {
         return putMapBuffer(buffer, flag, blockingMap, null);
     }
 
     /**
      * Calls {@native clEnqueueMapBuffer}.
      */
-    public ByteBuffer putMapBuffer(CLBuffer<?> buffer, CLMemory.Map flag, boolean blockingMap, CLEventList events) {
+    public ByteBuffer putMapBuffer(final CLBuffer<?> buffer, final CLMemory.Map flag, final boolean blockingMap, final CLEventList events) {
         return putMapBuffer(buffer, flag, 0, buffer.getCLSize(), blockingMap, null, events);
     }
 
     /**
      * Calls {@native clEnqueueMapBuffer}.
      */
-    public ByteBuffer putMapBuffer(CLBuffer<?> buffer, CLMemory.Map flag, boolean blockingMap, CLEventList condition, CLEventList events) {
+    public ByteBuffer putMapBuffer(final CLBuffer<?> buffer, final CLMemory.Map flag, final boolean blockingMap, final CLEventList condition, final CLEventList events) {
         return putMapBuffer(buffer, flag, 0, buffer.getCLSize(), blockingMap, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueMapBuffer}.
      */
-    public ByteBuffer putMapBuffer(CLBuffer<?> buffer, CLMemory.Map flag, long offset, long length, boolean blockingMap) {
+    public ByteBuffer putMapBuffer(final CLBuffer<?> buffer, final CLMemory.Map flag, final long offset, final long length, final boolean blockingMap) {
         return putMapBuffer(buffer, flag, offset, length, blockingMap, null, null);
     }
 
     /**
      * Calls {@native clEnqueueMapBuffer}.
      */
-    public ByteBuffer putMapBuffer(CLBuffer<?> buffer, CLMemory.Map flag, long offset, long length, boolean blockingMap, CLEventList condition, CLEventList events) {
+    public ByteBuffer putMapBuffer(final CLBuffer<?> buffer, final CLMemory.Map flag, final long offset, final long length, final boolean blockingMap, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1160,8 +1160,8 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        IntBuffer error = pbA;
-        ByteBuffer mappedBuffer = cl.clEnqueueMapBuffer(ID, buffer.ID, clBoolean(blockingMap),
+        final IntBuffer error = pbA;
+        final ByteBuffer mappedBuffer = cl.clEnqueueMapBuffer(ID, buffer.ID, clBoolean(blockingMap),
                                          flag.FLAGS, offset, length,
                                          conditions, conditionIDs, events==null ? null : events.IDs, error);
         if(error.get(0) != CL_SUCCESS) {
@@ -1180,48 +1180,48 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage2d<?> image, CLMemory.Map flag, boolean blockingMap) {
+    public ByteBuffer putMapImage(final CLImage2d<?> image, final CLMemory.Map flag, final boolean blockingMap) {
         return putMapImage(image, flag, blockingMap, null);
     }
 
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage2d<?> image, CLMemory.Map flag, boolean blockingMap, CLEventList events) {
+    public ByteBuffer putMapImage(final CLImage2d<?> image, final CLMemory.Map flag, final boolean blockingMap, final CLEventList events) {
         return putMapImage(image, flag, 0, 0, image.width, image.height, blockingMap, null, events);
     }
 
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage2d<?> image, CLMemory.Map flag, boolean blockingMap, CLEventList condition, CLEventList events) {
+    public ByteBuffer putMapImage(final CLImage2d<?> image, final CLMemory.Map flag, final boolean blockingMap, final CLEventList condition, final CLEventList events) {
         return putMapImage(image, flag, 0, 0, image.width, image.height, blockingMap, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage2d<?> buffer, CLMemory.Map flag, int offsetX, int offsetY,
-                                    int rangeX, int rangeY, boolean blockingMap) {
+    public ByteBuffer putMapImage(final CLImage2d<?> buffer, final CLMemory.Map flag, final int offsetX, final int offsetY,
+                                    final int rangeX, final int rangeY, final boolean blockingMap) {
         return putMapImage(buffer, flag, offsetX, offsetY, rangeX, rangeY, blockingMap, null, null);
     }
 
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage2d<?> image, CLMemory.Map flag,
-                                    int offsetX, int offsetY,
-                                    int rangeX, int rangeY, boolean blockingMap, CLEventList condition, CLEventList events) {
+    public ByteBuffer putMapImage(final CLImage2d<?> image, final CLMemory.Map flag,
+                                    final int offsetX, final int offsetY,
+                                    final int rangeX, final int rangeY, final boolean blockingMap, final CLEventList condition, final CLEventList events) {
         return putMapImage(image, flag, offsetX, offsetY, rangeX, rangeY, blockingMap, condition, events, null, null);
     }
-    
+
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage2d<?> image, CLMemory.Map flag,
-                                    int offsetX, int offsetY,
-                                    int rangeX, int rangeY, boolean blockingMap, CLEventList condition, CLEventList events, 
-                                    long[] imageRowPitch, long[] imageSlicePitch ) {
+    public ByteBuffer putMapImage(final CLImage2d<?> image, final CLMemory.Map flag,
+                                    final int offsetX, final int offsetY,
+                                    final int rangeX, final int rangeY, final boolean blockingMap, final CLEventList condition, final CLEventList events,
+                                    final long[] imageRowPitch, final long[] imageSlicePitch ) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1230,23 +1230,23 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        IntBuffer error = pbA;
+        final IntBuffer error = pbA;
 
         // spec: CL_INVALID_VALUE if image is a 2D image object and origin[2] is not equal to 0 or region[2] is not equal to 1
         copy2NIO(ibB, offsetX, offsetY, 0);
         copy2NIO(ibC, rangeX, rangeY, 1);
-        
+
         final PointerBuffer _imageRowPitch = PointerBuffer.allocateDirect(1); // size_t*
         final PointerBuffer _imageSlicePitch = PointerBuffer.allocateDirect(1); // size_t*
 
-        ByteBuffer mappedImage = cl.clEnqueueMapImage(ID, image.ID, clBoolean(blockingMap),
+        final ByteBuffer mappedImage = cl.clEnqueueMapImage(ID, image.ID, clBoolean(blockingMap),
                                          flag.FLAGS, ibB, ibC, _imageRowPitch, _imageSlicePitch,
                                          conditions, conditionIDs, events==null ? null : events.IDs, error);
         if(error.get(0) != CL_SUCCESS) {
             throw newException(error.get(0), "can not map " + image + " with: " + flag
                     + " offset: " + toStr(offsetX, offsetY) + " range: " + toStr(rangeX, rangeY) + toStr(condition, events));
         }
-        
+
         if( null != imageRowPitch ) {
             imageRowPitch[0] = _imageRowPitch.get(0);
         }
@@ -1265,39 +1265,39 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage3d<?> image, CLMemory.Map flag, boolean blockingMap) {
+    public ByteBuffer putMapImage(final CLImage3d<?> image, final CLMemory.Map flag, final boolean blockingMap) {
         return putMapImage(image, flag, blockingMap, null);
     }
 
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage3d<?> image, CLMemory.Map flag, boolean blockingMap, CLEventList events) {
+    public ByteBuffer putMapImage(final CLImage3d<?> image, final CLMemory.Map flag, final boolean blockingMap, final CLEventList events) {
         return putMapImage(image, flag, 0, 0, 0, image.width, image.height, image.depth, blockingMap, null, events);
     }
 
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage3d<?> image, CLMemory.Map flag, boolean blockingMap, CLEventList condition, CLEventList events) {
+    public ByteBuffer putMapImage(final CLImage3d<?> image, final CLMemory.Map flag, final boolean blockingMap, final CLEventList condition, final CLEventList events) {
         return putMapImage(image, flag, 0, 0, 0, image.width, image.height, image.depth, blockingMap, condition, events);
     }
 
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage3d<?> image, CLMemory.Map flag,
-                                    int offsetX, int offsetY, int offsetZ,
-                                    int rangeX, int rangeY, int rangeZ, boolean blockingMap) {
+    public ByteBuffer putMapImage(final CLImage3d<?> image, final CLMemory.Map flag,
+                                    final int offsetX, final int offsetY, final int offsetZ,
+                                    final int rangeX, final int rangeY, final int rangeZ, final boolean blockingMap) {
         return putMapImage(image, flag, offsetX, offsetY, offsetZ, rangeX, rangeY, rangeZ, blockingMap, null, null);
     }
 
     /**
      * Calls {@native clEnqueueMapImage}.
      */
-    public ByteBuffer putMapImage(CLImage3d<?> image, CLMemory.Map flag,
-                                    int offsetX, int offsetY, int offsetZ,
-                                    int rangeX, int rangeY, int rangeZ, boolean blockingMap, CLEventList condition, CLEventList events) {
+    public ByteBuffer putMapImage(final CLImage3d<?> image, final CLMemory.Map flag,
+                                    final int offsetX, final int offsetY, final int offsetZ,
+                                    final int rangeX, final int rangeY, final int rangeZ, final boolean blockingMap, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1306,10 +1306,10 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        IntBuffer error = pbA;
+        final IntBuffer error = pbA;
         copy2NIO(ibB, offsetX, offsetY, offsetZ);
         copy2NIO(ibC, rangeX, rangeY, rangeZ);
-        ByteBuffer mappedImage = cl.clEnqueueMapImage(ID, image.ID, clBoolean(blockingMap),
+        final ByteBuffer mappedImage = cl.clEnqueueMapImage(ID, image.ID, clBoolean(blockingMap),
                                          flag.FLAGS, ibB, ibC, null, null,
                                          conditions, conditionIDs, events==null ? null : events.IDs, error);
         if(error.get(0) != CL_SUCCESS) {
@@ -1327,21 +1327,21 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueUnmapMemObject}.
      */
-    public CLCommandQueue putUnmapMemory(CLMemory<?> memory, Buffer mapped) {
+    public CLCommandQueue putUnmapMemory(final CLMemory<?> memory, final Buffer mapped) {
         return putUnmapMemory(memory, mapped, null, null);
     }
 
     /**
      * Calls {@native clEnqueueUnmapMemObject}.
      */
-    public CLCommandQueue putUnmapMemory(CLMemory<?> memory, Buffer mapped, CLEventList events) {
+    public CLCommandQueue putUnmapMemory(final CLMemory<?> memory, final Buffer mapped, final CLEventList events) {
         return putUnmapMemory(memory, mapped, null, events);
     }
 
     /**
      * Calls {@native clEnqueueUnmapMemObject}.
      */
-    public CLCommandQueue putUnmapMemory(CLMemory<?> memory, Buffer mapped, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putUnmapMemory(final CLMemory<?> memory, final Buffer mapped, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1350,7 +1350,7 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        int ret = cl.clEnqueueUnmapMemObject(ID, memory.ID, mapped,
+        final int ret = cl.clEnqueueUnmapMemObject(ID, memory.ID, mapped,
                                         conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not unmap " + memory + toStr(condition, events));
@@ -1365,8 +1365,8 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueMarker}.
      */
-    public CLCommandQueue putMarker(CLEventList events) {
-        int ret = cl.clEnqueueMarker(ID, events.IDs);
+    public CLCommandQueue putMarker(final CLEventList events) {
+        final int ret = cl.clEnqueueMarker(ID, events.IDs);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not enqueue marker " + events);
         }
@@ -1377,13 +1377,13 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clWaitForEvents} if blockingWait equals true otherwise {@native clEnqueueWaitForEvents}.
      */
-    public CLCommandQueue putWaitForEvent(CLEventList list, int index, boolean blockingWait) {
+    public CLCommandQueue putWaitForEvent(final CLEventList list, final int index, final boolean blockingWait) {
 
         if(blockingWait) {
             list.waitForEvent(index);
         } else {
-            PointerBuffer ids = list.getEventBuffer(index);
-            int ret = cl.clEnqueueWaitForEvents(ID, 1, ids);
+            final PointerBuffer ids = list.getEventBuffer(index);
+            final int ret = cl.clEnqueueWaitForEvents(ID, 1, ids);
             if(ret != CL_SUCCESS) {
                 throw newException(ret, "can not "+ (blockingWait?"blocking": "") +" wait for event #" + index+ " in "+list);
             }
@@ -1395,11 +1395,11 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clWaitForEvents} if blockingWait equals true otherwise {@native clEnqueueWaitForEvents}.
      */
-    public CLCommandQueue putWaitForEvents(CLEventList list, boolean blockingWait) {
+    public CLCommandQueue putWaitForEvents(final CLEventList list, final boolean blockingWait) {
         if(blockingWait) {
             list.waitForEvents();
         }else{
-            int ret = cl.clEnqueueWaitForEvents(ID, list.size, list.IDsView);
+            final int ret = cl.clEnqueueWaitForEvents(ID, list.size, list.IDsView);
             if(ret != CL_SUCCESS) {
                 throw newException(ret, "can not "+ (blockingWait?"blocking": "") +" wait for events " + list);
             }
@@ -1411,7 +1411,7 @@ public class CLCommandQueue extends CLObjectResource {
      * Calls {@native clEnqueueBarrier}.
      */
     public CLCommandQueue putBarrier() {
-        int ret = cl.clEnqueueBarrier(ID);
+        final int ret = cl.clEnqueueBarrier(ID);
         checkForError(ret, "can not enqueue Barrier");
         return this;
     }
@@ -1422,7 +1422,7 @@ public class CLCommandQueue extends CLObjectResource {
      * with globalWorkOffset = null, globalWorkSize set to 1, and localWorkSize set to 1.
      * <p>Calls {@native clEnqueueTask}.</p>
      */
-    public CLCommandQueue putTask(CLKernel kernel) {
+    public CLCommandQueue putTask(final CLKernel kernel) {
         putTask(kernel, null, null);
         return this;
     }
@@ -1431,7 +1431,7 @@ public class CLCommandQueue extends CLObjectResource {
      * <p>Calls {@native clEnqueueTask}.</p>
      * @see #putTask(com.jogamp.opencl.CLKernel)
      */
-    public CLCommandQueue putTask(CLKernel kernel, CLEventList events) {
+    public CLCommandQueue putTask(final CLKernel kernel, final CLEventList events) {
         putTask(kernel, null, events);
         return this;
     }
@@ -1440,7 +1440,7 @@ public class CLCommandQueue extends CLObjectResource {
      * Calls {@native clEnqueueTask}.
      * @see #putTask(com.jogamp.opencl.CLKernel)
      */
-    public CLCommandQueue putTask(CLKernel kernel, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putTask(final CLKernel kernel, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1449,7 +1449,7 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        int ret = cl.clEnqueueTask(ID, kernel.ID, conditions, conditionIDs, events==null ? null : events.IDs);
+        final int ret = cl.clEnqueueTask(ID, kernel.ID, conditions, conditionIDs, events==null ? null : events.IDs);
         if(ret != CL_SUCCESS) {
             checkForError(ret, "can not enqueue Task: " + kernel + toStr(condition, events));
         }
@@ -1462,7 +1462,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put1DRangeKernel(CLKernel kernel, long globalWorkOffset, long globalWorkSize, long localWorkSize) {
+    public CLCommandQueue put1DRangeKernel(final CLKernel kernel, final long globalWorkOffset, final long globalWorkSize, final long localWorkSize) {
         this.put1DRangeKernel(kernel, globalWorkOffset, globalWorkSize, localWorkSize, null, null);
         return this;
     }
@@ -1470,7 +1470,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put1DRangeKernel(CLKernel kernel, long globalWorkOffset, long globalWorkSize, long localWorkSize, CLEventList events) {
+    public CLCommandQueue put1DRangeKernel(final CLKernel kernel, final long globalWorkOffset, final long globalWorkSize, final long localWorkSize, final CLEventList events) {
         this.put1DRangeKernel(kernel, globalWorkOffset, globalWorkSize, localWorkSize, null, events);
         return this;
     }
@@ -1478,7 +1478,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put1DRangeKernel(CLKernel kernel, long globalWorkOffset, long globalWorkSize, long localWorkSize, CLEventList condition, CLEventList events) {
+    public CLCommandQueue put1DRangeKernel(final CLKernel kernel, final long globalWorkOffset, final long globalWorkSize, final long localWorkSize, final CLEventList condition, final CLEventList events) {
         PointerBuffer globWO = null;
         PointerBuffer globWS = null;
         PointerBuffer locWS = null;
@@ -1500,9 +1500,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put2DRangeKernel(CLKernel kernel, long globalWorkOffsetX, long globalWorkOffsetY,
-                                                            long globalWorkSizeX, long globalWorkSizeY,
-                                                            long localWorkSizeX, long localWorkSizeY) {
+    public CLCommandQueue put2DRangeKernel(final CLKernel kernel, final long globalWorkOffsetX, final long globalWorkOffsetY,
+                                                            final long globalWorkSizeX, final long globalWorkSizeY,
+                                                            final long localWorkSizeX, final long localWorkSizeY) {
         this.put2DRangeKernel(kernel,
                 globalWorkOffsetX, globalWorkOffsetY,
                 globalWorkSizeX, globalWorkSizeY,
@@ -1514,22 +1514,22 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put2DRangeKernel(CLKernel kernel, long globalWorkOffsetX, long globalWorkOffsetY,
-                                                            long globalWorkSizeX, long globalWorkSizeY,
-                                                            long localWorkSizeX, long localWorkSizeY, CLEventList events) {
+    public CLCommandQueue put2DRangeKernel(final CLKernel kernel, final long globalWorkOffsetX, final long globalWorkOffsetY,
+                                                            final long globalWorkSizeX, final long globalWorkSizeY,
+                                                            final long localWorkSizeX, final long localWorkSizeY, final CLEventList events) {
         this.put2DRangeKernel(kernel,
                 globalWorkOffsetX, globalWorkOffsetY,
                 globalWorkSizeX, globalWorkSizeY,
                 localWorkSizeX, localWorkSizeY, null, events);
         return this;
     }
-    
+
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put2DRangeKernel(CLKernel kernel, long globalWorkOffsetX, long globalWorkOffsetY,
-                                                            long globalWorkSizeX, long globalWorkSizeY,
-                                                            long localWorkSizeX, long localWorkSizeY, CLEventList condition, CLEventList events) {
+    public CLCommandQueue put2DRangeKernel(final CLKernel kernel, final long globalWorkOffsetX, final long globalWorkOffsetY,
+                                                            final long globalWorkSizeX, final long globalWorkSizeY,
+                                                            final long localWorkSizeX, final long localWorkSizeY, final CLEventList condition, final CLEventList events) {
         PointerBuffer globalWorkOffset = null;
         PointerBuffer globalWorkSize = null;
         PointerBuffer localWorkSize = null;
@@ -1550,9 +1550,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put3DRangeKernel(CLKernel kernel, long globalWorkOffsetX, long globalWorkOffsetY, long globalWorkOffsetZ,
-                                                            long globalWorkSizeX, long globalWorkSizeY, long globalWorkSizeZ,
-                                                            long localWorkSizeX, long localWorkSizeY, long localWorkSizeZ) {
+    public CLCommandQueue put3DRangeKernel(final CLKernel kernel, final long globalWorkOffsetX, final long globalWorkOffsetY, final long globalWorkOffsetZ,
+                                                            final long globalWorkSizeX, final long globalWorkSizeY, final long globalWorkSizeZ,
+                                                            final long localWorkSizeX, final long localWorkSizeY, final long localWorkSizeZ) {
         this.put3DRangeKernel(kernel,
                 globalWorkOffsetX, globalWorkOffsetY, globalWorkOffsetZ,
                 globalWorkSizeX, globalWorkSizeY, globalWorkSizeZ,
@@ -1564,9 +1564,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put3DRangeKernel(CLKernel kernel, long globalWorkOffsetX, long globalWorkOffsetY, long globalWorkOffsetZ,
-                                                            long globalWorkSizeX, long globalWorkSizeY, long globalWorkSizeZ,
-                                                            long localWorkSizeX, long localWorkSizeY, long localWorkSizeZ, CLEventList events) {
+    public CLCommandQueue put3DRangeKernel(final CLKernel kernel, final long globalWorkOffsetX, final long globalWorkOffsetY, final long globalWorkOffsetZ,
+                                                            final long globalWorkSizeX, final long globalWorkSizeY, final long globalWorkSizeZ,
+                                                            final long localWorkSizeX, final long localWorkSizeY, final long localWorkSizeZ, final CLEventList events) {
         this.put3DRangeKernel(kernel,
                 globalWorkOffsetX, globalWorkOffsetY, globalWorkOffsetZ,
                 globalWorkSizeX, globalWorkSizeY, globalWorkSizeZ,
@@ -1577,9 +1577,9 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue put3DRangeKernel(CLKernel kernel, long globalWorkOffsetX, long globalWorkOffsetY, long globalWorkOffsetZ,
-                                                            long globalWorkSizeX, long globalWorkSizeY, long globalWorkSizeZ,
-                                                            long localWorkSizeX, long localWorkSizeY, long localWorkSizeZ, CLEventList condition, CLEventList events) {
+    public CLCommandQueue put3DRangeKernel(final CLKernel kernel, final long globalWorkOffsetX, final long globalWorkOffsetY, final long globalWorkOffsetZ,
+                                                            final long globalWorkSizeX, final long globalWorkSizeY, final long globalWorkSizeZ,
+                                                            final long localWorkSizeX, final long localWorkSizeY, final long localWorkSizeZ, final CLEventList condition, final CLEventList events) {
         PointerBuffer globalWorkOffset = null;
         PointerBuffer globalWorkSize = null;
         PointerBuffer localWorkSize = null;
@@ -1600,7 +1600,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, PointerBuffer globalWorkOffset, PointerBuffer globalWorkSize, PointerBuffer localWorkSize) {
+    public CLCommandQueue putNDRangeKernel(final CLKernel kernel, final int workDimension, final PointerBuffer globalWorkOffset, final PointerBuffer globalWorkSize, final PointerBuffer localWorkSize) {
         this.putNDRangeKernel(kernel, workDimension, globalWorkOffset, globalWorkSize, localWorkSize, null, null);
         return this;
     }
@@ -1608,7 +1608,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, PointerBuffer globalWorkOffset, PointerBuffer globalWorkSize, PointerBuffer localWorkSize, CLEventList events) {
+    public CLCommandQueue putNDRangeKernel(final CLKernel kernel, final int workDimension, final PointerBuffer globalWorkOffset, final PointerBuffer globalWorkSize, final PointerBuffer localWorkSize, final CLEventList events) {
         this.putNDRangeKernel(kernel, workDimension, globalWorkOffset, globalWorkSize, localWorkSize, null, events);
         return this;
     }
@@ -1616,8 +1616,8 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueNDRangeKernel}.
      */
-    public CLCommandQueue putNDRangeKernel(CLKernel kernel, int workDimension, PointerBuffer globalWorkOffset,
-            PointerBuffer globalWorkSize, PointerBuffer localWorkSize, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putNDRangeKernel(final CLKernel kernel, final int workDimension, final PointerBuffer globalWorkOffset,
+            final PointerBuffer globalWorkSize, final PointerBuffer localWorkSize, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1626,11 +1626,11 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        int ret = cl.clEnqueueNDRangeKernel(
+        final int ret = cl.clEnqueueNDRangeKernel(
                 ID, kernel.ID, workDimension,
                 globalWorkOffset,
-                globalWorkSize, 
-                localWorkSize, 
+                globalWorkSize,
+                localWorkSize,
                 conditions, conditionIDs,
                 events==null ? null : events.IDs);
 
@@ -1652,7 +1652,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putAcquireGLObject(CLGLObject glObject) {
+    public CLCommandQueue putAcquireGLObject(final CLGLObject glObject) {
         this.putAcquireGLObject(glObject, null, null);
         return this;
     }
@@ -1660,7 +1660,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putAcquireGLObject(CLGLObject glObject, CLEventList events) {
+    public CLCommandQueue putAcquireGLObject(final CLGLObject glObject, final CLEventList events) {
         this.putAcquireGLObject(glObject, null, events);
         return this;
     }
@@ -1668,7 +1668,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putAcquireGLObject(CLGLObject glObject, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putAcquireGLObject(final CLGLObject glObject, final CLEventList condition, final CLEventList events) {
         this.putAcquireGLObjects(copy2NIO(ibA, glObject.getID()), condition, events);
         return this;
     }
@@ -1676,7 +1676,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putAcquireGLObjects(CLGLObject glObject1, CLGLObject glObject2, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putAcquireGLObjects(final CLGLObject glObject1, final CLGLObject glObject2, final CLEventList condition, final CLEventList events) {
         this.putAcquireGLObjects(copy2NIO(ibA, glObject1.getID(), glObject2.getID()), condition, events);
         return this;
     }
@@ -1684,7 +1684,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putAcquireGLObjects(CLGLObject glObject1, CLGLObject glObject2, CLGLObject glObject3, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putAcquireGLObjects(final CLGLObject glObject1, final CLGLObject glObject2, final CLGLObject glObject3, final CLEventList condition, final CLEventList events) {
         this.putAcquireGLObjects(copy2NIO(ibA, glObject1.getID(), glObject2.getID(), glObject3.getID()), condition, events);
         return this;
     }
@@ -1692,7 +1692,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putAcquireGLObjects(PointerBuffer glObjectIDs, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putAcquireGLObjects(final PointerBuffer glObjectIDs, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1701,9 +1701,9 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        CLGL xl = (CLGL) cl;
+        final CLGL xl = (CLGL) cl;
 
-        int ret = xl.clEnqueueAcquireGLObjects(ID, glObjectIDs.remaining(), glObjectIDs,
+        final int ret = xl.clEnqueueAcquireGLObjects(ID, glObjectIDs.remaining(), glObjectIDs,
                     conditions, conditionIDs,
                     events==null ? null : events.IDs);
 
@@ -1721,7 +1721,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReleaseGLObjects}.
      */
-    public CLCommandQueue putReleaseGLObject(CLGLObject glObject) {
+    public CLCommandQueue putReleaseGLObject(final CLGLObject glObject) {
         this.putReleaseGLObject(glObject, null);
         return this;
     }
@@ -1729,7 +1729,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReleaseGLObjects}.
      */
-    public CLCommandQueue putReleaseGLObject(CLGLObject glObject, CLEventList events) {
+    public CLCommandQueue putReleaseGLObject(final CLGLObject glObject, final CLEventList events) {
         this.putReleaseGLObject(glObject, null, events);
         return this;
     }
@@ -1737,7 +1737,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReleaseGLObjects}.
      */
-    public CLCommandQueue putReleaseGLObject(CLGLObject glObject, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReleaseGLObject(final CLGLObject glObject, final CLEventList condition, final CLEventList events) {
         this.putReleaseGLObjects(copy2NIO(ibA, glObject.getID()), condition, events);
         return this;
     }
@@ -1745,7 +1745,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putReleaseGLObjects(CLGLObject glObject1, CLGLObject glObject2, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReleaseGLObjects(final CLGLObject glObject1, final CLGLObject glObject2, final CLEventList condition, final CLEventList events) {
         this.putReleaseGLObjects(copy2NIO(ibA, glObject1.getID(), glObject2.getID()), condition, events);
         return this;
     }
@@ -1753,7 +1753,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueAcquireGLObjects}.
      */
-    public CLCommandQueue putReleaseGLObjects(CLGLObject glObject1, CLGLObject glObject2, CLGLObject glObject3, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReleaseGLObjects(final CLGLObject glObject1, final CLGLObject glObject2, final CLGLObject glObject3, final CLEventList condition, final CLEventList events) {
         this.putReleaseGLObjects(copy2NIO(ibA, glObject1.getID(), glObject2.getID(), glObject3.getID()), condition, events);
         return this;
     }
@@ -1761,7 +1761,7 @@ public class CLCommandQueue extends CLObjectResource {
     /**
      * Calls {@native clEnqueueReleaseGLObjects}.
      */
-    public CLCommandQueue putReleaseGLObjects(PointerBuffer glObjectIDs, CLEventList condition, CLEventList events) {
+    public CLCommandQueue putReleaseGLObjects(final PointerBuffer glObjectIDs, final CLEventList condition, final CLEventList events) {
 
         PointerBuffer conditionIDs = null;
         int conditions = 0;
@@ -1770,9 +1770,9 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        CLGL xl = (CLGL) cl;
+        final CLGL xl = (CLGL) cl;
 
-        int ret = xl.clEnqueueReleaseGLObjects(ID, glObjectIDs.remaining(), glObjectIDs,
+        final int ret = xl.clEnqueueReleaseGLObjects(ID, glObjectIDs.remaining(), glObjectIDs,
                 conditions, conditionIDs,
                 events==null ? null : events.IDs);
 
@@ -1791,7 +1791,7 @@ public class CLCommandQueue extends CLObjectResource {
      * Calls {@native clFinish}.
      */
     public CLCommandQueue finish() {
-        int ret = cl.clFinish(ID);
+        final int ret = cl.clFinish(ID);
         checkForError(ret, "can not finish command queue");
         return this;
     }
@@ -1800,7 +1800,7 @@ public class CLCommandQueue extends CLObjectResource {
      * Calls {@native clFlush}.
      */
     public CLCommandQueue flush() {
-        int ret = cl.clFlush(ID);
+        final int ret = cl.clFlush(ID);
         checkForError(ret, "can not flush command queue");
         return this;
     }
@@ -1822,30 +1822,30 @@ public class CLCommandQueue extends CLObjectResource {
     @Override
     public void release() {
         super.release();
-        int ret = cl.clReleaseCommandQueue(ID);
+        final int ret = cl.clReleaseCommandQueue(ID);
         context.onCommandQueueReleased(device, this);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not release "+this);
         }
     }
 
-    private static PointerBuffer copy2NIO(PointerBuffer buffer, long a) {
+    private static PointerBuffer copy2NIO(final PointerBuffer buffer, final long a) {
         return buffer.put(2, a).position(2);
     }
 
-    private static PointerBuffer copy2NIO(PointerBuffer buffer, long a, long b) {
+    private static PointerBuffer copy2NIO(final PointerBuffer buffer, final long a, final long b) {
         return buffer.position(1).put(a).put(b).position(1);
     }
 
-    private static PointerBuffer copy2NIO(PointerBuffer buffer, long a, long b, long c) {
+    private static PointerBuffer copy2NIO(final PointerBuffer buffer, final long a, final long b, final long c) {
         return buffer.rewind().put(a).put(b).put(c).rewind();
     }
 
-    private static String toStr(PointerBuffer buffer) {
+    private static String toStr(final PointerBuffer buffer) {
         if(buffer == null) {
             return null;
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append('{');
         for (int i = buffer.position(); i < buffer.capacity(); i++) {
             sb.append(buffer.get(i));
@@ -1856,18 +1856,18 @@ public class CLCommandQueue extends CLObjectResource {
         return sb.append('}').toString();
     }
 
-    private static String toStr(CLEventList condition, CLEventList events) {
+    private static String toStr(final CLEventList condition, final CLEventList events) {
         return "\ncond.: " + condition +" events: "+events;
     }
 
-    private String toStr(Integer... values) {
+    private String toStr(final Integer... values) {
         return Arrays.asList(values).toString();
     }
 
-    private String bufferRectToString(String action, CLBuffer<?> buffer,
-            long rowPitch, long slicePitch, long hostRowPitch, long hostSlicePitch,
-            int originX, int originY, int originZ, int hostX, int hostY, int hostZ,
-            int rangeX, int rangeY, int rangeZ, CLEventList condition, CLEventList events) {
+    private String bufferRectToString(final String action, final CLBuffer<?> buffer,
+            final long rowPitch, final long slicePitch, final long hostRowPitch, final long hostSlicePitch,
+            final int originX, final int originY, final int originZ, final int hostX, final int hostY, final int hostZ,
+            final int rangeX, final int rangeY, final int rangeZ, final CLEventList condition, final CLEventList events) {
         return "can not enqueue "+action+"-buffer-rect: " + buffer + "\n"
                 + " with rowPitch: " + rowPitch + " slicePitch: " + slicePitch
                 + " hostRowPitch: " + hostRowPitch + " hostSlicePitch: " + hostSlicePitch + "\n"
@@ -1895,7 +1895,7 @@ public class CLCommandQueue extends CLObjectResource {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -1946,11 +1946,11 @@ public class CLCommandQueue extends CLObjectResource {
          */
         public final int QUEUE_MODE;
 
-        private Mode(int value) {
+        private Mode(final int value) {
             this.QUEUE_MODE = value;
         }
 
-        public static Mode valueOf(int queueMode) {
+        public static Mode valueOf(final int queueMode) {
             switch(queueMode) {
                 case(CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE):
                     return OUT_OF_ORDER_MODE;
@@ -1960,10 +1960,10 @@ public class CLCommandQueue extends CLObjectResource {
             return null;
         }
 
-        public static EnumSet<Mode> valuesOf(long bitfield) {
-            List<Mode> matching = new ArrayList<Mode>();
-            Mode[] values = Mode.values();
-            for (Mode value : values) {
+        public static EnumSet<Mode> valuesOf(final long bitfield) {
+            final List<Mode> matching = new ArrayList<Mode>();
+            final Mode[] values = Mode.values();
+            for (final Mode value : values) {
                 if((value.QUEUE_MODE & bitfield) != 0)
                     matching.add(value);
             }

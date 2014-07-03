@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -63,11 +63,11 @@ public class CLKernel extends CLObjectResource implements Cloneable {
     private int argIndex;
     private boolean force32BitArgs;
 
-    CLKernel(CLProgram program, long id) {
+    CLKernel(final CLProgram program, final long id) {
         this(program, null, id);
     }
 
-    CLKernel(CLProgram program, String name, long id) {
+    CLKernel(final CLProgram program, final String name, final long id) {
         super(program.getContext(), id);
 
         this.program = program;
@@ -77,22 +77,22 @@ public class CLKernel extends CLObjectResource implements Cloneable {
 
         if(name == null) {
             // get function name
-            PointerBuffer size = PointerBuffer.wrap(buffer);
+            final PointerBuffer size = PointerBuffer.wrap(buffer);
             int ret = binding.clGetKernelInfo(ID, CL_KERNEL_FUNCTION_NAME, 0, null, size);
             checkForError(ret, "error while asking for kernel function name");
 
-            ByteBuffer bb = Buffers.newDirectByteBuffer((int)size.get(0));
+            final ByteBuffer bb = Buffers.newDirectByteBuffer((int)size.get(0));
 
             ret = binding.clGetKernelInfo(ID, CL_KERNEL_FUNCTION_NAME, bb.capacity(), bb, null);
             checkForError(ret, "error while asking for kernel function name");
-            
+
             this.name = CLUtil.clString2JavaString(bb, bb.capacity());
         }else{
             this.name = name;
         }
 
         // get number of arguments
-        int ret = binding.clGetKernelInfo(ID, CL_KERNEL_NUM_ARGS, buffer.capacity(), buffer, null);
+        final int ret = binding.clGetKernelInfo(ID, CL_KERNEL_NUM_ARGS, buffer.capacity(), buffer, null);
         checkForError(ret, "error while asking for number of function arguments.");
 
         numArgs = buffer.getInt(0);
@@ -103,50 +103,50 @@ public class CLKernel extends CLObjectResource implements Cloneable {
 //        setArg(argIndex++, value);
 //        return this;
 //    }
-    
-    public CLKernel putArg(CLMemory<?> value) {
+
+    public CLKernel putArg(final CLMemory<?> value) {
         setArg(argIndex, value);
         argIndex++;
         return this;
     }
 
-    public CLKernel putArg(short value) {
+    public CLKernel putArg(final short value) {
         setArg(argIndex, value);
         argIndex++;
         return this;
     }
 
-    public CLKernel putArg(int value) {
+    public CLKernel putArg(final int value) {
         setArg(argIndex, value);
         argIndex++;
         return this;
     }
 
-    public CLKernel putArg(long value) {
+    public CLKernel putArg(final long value) {
         setArg(argIndex, value);
         argIndex++;
         return this;
     }
 
-    public CLKernel putArg(float value) {
+    public CLKernel putArg(final float value) {
         setArg(argIndex, value);
         argIndex++;
         return this;
     }
 
-    public CLKernel putArg(double value) {
+    public CLKernel putArg(final double value) {
         setArg(argIndex, value);
         argIndex++;
         return this;
     }
 
-    public CLKernel putNullArg(int size) {
+    public CLKernel putNullArg(final int size) {
         setNullArg(argIndex, size);
         argIndex++;
         return this;
     }
 
-    public CLKernel putArgs(CLMemory<?>... values) {
+    public CLKernel putArgs(final CLMemory<?>... values) {
         setArgs(argIndex, values);
         argIndex += values.length;
         return this;
@@ -172,22 +172,22 @@ public class CLKernel extends CLObjectResource implements Cloneable {
 //        return this;
 //    }
 
-    public CLKernel setArg(int argumentIndex, CLMemory<?> value) {
+    public CLKernel setArg(final int argumentIndex, final CLMemory<?> value) {
         setArgument(argumentIndex, is32Bit()?4:8, wrap(value.ID));
         return this;
     }
 
-    public CLKernel setArg(int argumentIndex, short value) {
+    public CLKernel setArg(final int argumentIndex, final short value) {
         setArgument(argumentIndex, 2, wrap(value));
         return this;
     }
 
-    public CLKernel setArg(int argumentIndex, int value) {
+    public CLKernel setArg(final int argumentIndex, final int value) {
         setArgument(argumentIndex, 4, wrap(value));
         return this;
     }
 
-    public CLKernel setArg(int argumentIndex, long value) {
+    public CLKernel setArg(final int argumentIndex, final long value) {
         if(force32BitArgs) {
             setArgument(argumentIndex, 4, wrap((int)value));
         }else{
@@ -196,12 +196,12 @@ public class CLKernel extends CLObjectResource implements Cloneable {
         return this;
     }
 
-    public CLKernel setArg(int argumentIndex, float value) {
+    public CLKernel setArg(final int argumentIndex, final float value) {
         setArgument(argumentIndex, 4, wrap(value));
         return this;
     }
 
-    public CLKernel setArg(int argumentIndex, double value) {
+    public CLKernel setArg(final int argumentIndex, final double value) {
         if(force32BitArgs) {
             setArgument(argumentIndex, 4, wrap((float)value));
         }else{
@@ -210,22 +210,22 @@ public class CLKernel extends CLObjectResource implements Cloneable {
         return this;
     }
 
-    public CLKernel setNullArg(int argumentIndex, int size) {
+    public CLKernel setNullArg(final int argumentIndex, final int size) {
         setArgument(argumentIndex, size, null);
         return this;
     }
 
-    public CLKernel setArgs(CLMemory<?>... values) {
+    public CLKernel setArgs(final CLMemory<?>... values) {
         setArgs(0, values);
         return this;
     }
 
-    public CLKernel setArgs(Object... values) {
+    public CLKernel setArgs(final Object... values) {
         if(values == null || values.length == 0) {
             throw new IllegalArgumentException("values array was empty or null.");
         }
         for (int i = 0; i < values.length; i++) {
-            Object value = values[i];
+            final Object value = values[i];
             if(value instanceof CLMemory<?>) {
                 setArg(i, (CLMemory<?>)value);
             }else if(value instanceof Short) {
@@ -245,13 +245,13 @@ public class CLKernel extends CLObjectResource implements Cloneable {
         return this;
     }
 
-    private void setArgs(int startIndex, CLMemory<?>... values) {
+    private void setArgs(final int startIndex, final CLMemory<?>... values) {
         for (int i = 0; i < values.length; i++) {
             setArg(i+startIndex, values[i]);
         }
     }
 
-    private void setArgument(int argumentIndex, int size, Buffer value) {
+    private void setArgument(final int argumentIndex, final int size, final Buffer value) {
         if(argumentIndex >= numArgs || argumentIndex < 0) {
             throw new IndexOutOfBoundsException("kernel "+ this +" has "+numArgs+
                     " arguments, can not set argument with index "+argumentIndex);
@@ -261,7 +261,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
                     " arguments for a not executable program. "+program);
         }
 
-        int ret = binding.clSetKernelArg(ID, argumentIndex, size, value);
+        final int ret = binding.clSetKernelArg(ID, argumentIndex, size, value);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "error setting arg "+argumentIndex+" to value "+value+" of size "+size+" of "+this);
         }
@@ -271,39 +271,39 @@ public class CLKernel extends CLObjectResource implements Cloneable {
      * Forces double and long arguments to be passed as float and int to the OpenCL kernel.
      * This can be used in applications which want to mix kernels with different floating point precision.
      */
-    public CLKernel setForce32BitArgs(boolean force) {
+    public CLKernel setForce32BitArgs(final boolean force) {
         this.force32BitArgs = force;
         return this;
     }
-    
+
     public CLProgram getProgram() {
         return program;
     }
 
     /**
-     * @see #setForce32BitArgs(boolean) 
+     * @see #setForce32BitArgs(boolean)
      */
     public boolean isForce32BitArgsEnabled() {
         return force32BitArgs;
     }
 
-    private Buffer wrap(float value) {
+    private Buffer wrap(final float value) {
         return buffer.putFloat(0, value);
     }
 
-    private Buffer wrap(double value) {
+    private Buffer wrap(final double value) {
         return buffer.putDouble(0, value);
     }
 
-    private Buffer wrap(short value) {
+    private Buffer wrap(final short value) {
         return buffer.putShort(0, value);
     }
 
-    private Buffer wrap(int value) {
+    private Buffer wrap(final int value) {
         return buffer.putInt(0, value);
     }
 
-    private Buffer wrap(long value) {
+    private Buffer wrap(final long value) {
         return buffer.putLong(0, value);
     }
 
@@ -316,7 +316,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
      * If the local memory size, for any pointer argument to the kernel declared with
      * the <code>__local</code> address qualifier, is not specified, its size is assumed to be 0.
      */
-    public long getLocalMemorySize(CLDevice device) {
+    public long getLocalMemorySize(final CLDevice device) {
         return getWorkGroupInfo(device, CL_KERNEL_LOCAL_MEM_SIZE);
     }
 
@@ -325,9 +325,9 @@ public class CLKernel extends CLObjectResource implements Cloneable {
      * This provides a mechanism for the application to query the work-group size
      * that can be used to execute a kernel on a specific device given by device.
      * The OpenCL implementation uses the resource requirements of the kernel
-     * (register usage etc.) to determine what this work-group size should be. 
+     * (register usage etc.) to determine what this work-group size should be.
      */
-    public long getWorkGroupSize(CLDevice device) {
+    public long getWorkGroupSize(final CLDevice device) {
         return getWorkGroupInfo(device, CL_KERNEL_WORK_GROUP_SIZE);
     }
 
@@ -336,8 +336,8 @@ public class CLKernel extends CLObjectResource implements Cloneable {
      * If the work-group size is not specified using the above attribute qualifier <code>new long[]{(0, 0, 0)}</code> is returned.
      * The returned array has always three elements.
      */
-    public long[] getCompileWorkGroupSize(CLDevice device) {
-        int ret = binding.clGetKernelWorkGroupInfo(ID, device.ID, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, (is32Bit()?4:8)*3, buffer, null);
+    public long[] getCompileWorkGroupSize(final CLDevice device) {
+        final int ret = binding.clGetKernelWorkGroupInfo(ID, device.ID, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, (is32Bit()?4:8)*3, buffer, null);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "error while asking for CL_KERNEL_COMPILE_WORK_GROUP_SIZE of "+this+" on "+device);
         }
@@ -349,8 +349,8 @@ public class CLKernel extends CLObjectResource implements Cloneable {
         }
     }
 
-    private long getWorkGroupInfo(CLDevice device, int flag) {
-        int ret = binding.clGetKernelWorkGroupInfo(ID, device.ID, flag, 8, buffer, null);
+    private long getWorkGroupInfo(final CLDevice device, final int flag) {
+        final int ret = binding.clGetKernelWorkGroupInfo(ID, device.ID, flag, 8, buffer, null);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "error while asking for clGetKernelWorkGroupInfo of "+this+" on "+device);
         }
@@ -363,7 +363,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
     @Override
     public void release() {
         super.release();
-        int ret = binding.clReleaseKernel(ID);
+        final int ret = binding.clReleaseKernel(ID);
         program.onKernelReleased(this);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not release "+this);
@@ -377,7 +377,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }

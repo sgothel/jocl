@@ -49,9 +49,9 @@ public class MiscUtils {
 
     public final static int NUM_ELEMENTS = 10000000;
 
-    public static final void fillBuffer(ByteBuffer buffer, int seed) {
+    public static final void fillBuffer(final ByteBuffer buffer, final int seed) {
 
-        Random rnd = new Random(seed);
+        final Random rnd = new Random(seed);
 
         while(buffer.remaining() != 0)
             buffer.putInt(rnd.nextInt());
@@ -59,8 +59,8 @@ public class MiscUtils {
         buffer.rewind();
     }
 
-    public static final int roundUp(int groupSize, int globalSize) {
-        int r = globalSize % groupSize;
+    public static final int roundUp(final int groupSize, final int globalSize) {
+        final int r = globalSize % groupSize;
         if (r == 0) {
             return globalSize;
         } else {
@@ -68,10 +68,10 @@ public class MiscUtils {
         }
     }
 
-    public static final void checkIfEqual(ByteBuffer a, ByteBuffer b, int elements) {
+    public static final void checkIfEqual(final ByteBuffer a, final ByteBuffer b, final int elements) {
         for(int i = 0; i < elements; i++) {
-            int aVal = a.getInt();
-            int bVal = b.getInt();
+            final int aVal = a.getInt();
+            final int bVal = b.getInt();
             if(aVal != bVal) {
                 out.println("a: "+aVal);
                 out.println("b: "+bVal);

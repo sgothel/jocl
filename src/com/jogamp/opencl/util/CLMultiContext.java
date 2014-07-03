@@ -34,7 +34,7 @@ public class CLMultiContext implements CLResource {
     /**
      * Creates a multi context with all devices of the specified platforms.
      */
-    public static CLMultiContext create(CLPlatform... platforms) {
+    public static CLMultiContext create(final CLPlatform... platforms) {
         return create(platforms, ALL);
     }
 
@@ -42,7 +42,7 @@ public class CLMultiContext implements CLResource {
      * Creates a multi context with all devices of the specified platforms and types.
      */
     @SuppressWarnings("unchecked")
-    public static CLMultiContext create(CLPlatform[] platforms, CLDevice.Type... types) {
+    public static CLMultiContext create(final CLPlatform[] platforms, final CLDevice.Type... types) {
         return create(platforms, CLDeviceFilters.type(types));
     }
 
@@ -50,7 +50,7 @@ public class CLMultiContext implements CLResource {
      * Creates a multi context with all matching devices of the specified platforms.
      */
     @SuppressWarnings("unchecked")
-    public static CLMultiContext create(CLPlatform[] platforms, Filter<CLDevice>... filters) {
+    public static CLMultiContext create(final CLPlatform[] platforms, final Filter<CLDevice>... filters) {
 
         if(platforms == null) {
             throw new NullPointerException("platform list was null");
@@ -58,8 +58,8 @@ public class CLMultiContext implements CLResource {
             throw new IllegalArgumentException("platform list was empty");
         }
 
-        List<CLDevice> devices = new ArrayList<CLDevice>();
-        for (CLPlatform platform : platforms) {
+        final List<CLDevice> devices = new ArrayList<CLDevice>();
+        for (final CLPlatform platform : platforms) {
             devices.addAll(asList(platform.listCLDevices(filters)));
         }
         return create(devices);
@@ -69,21 +69,21 @@ public class CLMultiContext implements CLResource {
      * Creates a multi context with the specified devices.
      * The devices don't have to be from the same platform.
      */
-    public static CLMultiContext create(Collection<CLDevice> devices) {
+    public static CLMultiContext create(final Collection<CLDevice> devices) {
 
         if(devices.isEmpty()) {
             throw new IllegalArgumentException("device list was empty");
         }
 
-        Map<CLPlatform, List<CLDevice>> platformDevicesMap = filterPlatformConflicts(devices);
+        final Map<CLPlatform, List<CLDevice>> platformDevicesMap = filterPlatformConflicts(devices);
 
         // create contexts
-        CLMultiContext mc = new CLMultiContext();
-        for (Map.Entry<CLPlatform, List<CLDevice>> entry : platformDevicesMap.entrySet()) {
-            List<CLDevice> list = entry.getValue();
+        final CLMultiContext mc = new CLMultiContext();
+        for (final Map.Entry<CLPlatform, List<CLDevice>> entry : platformDevicesMap.entrySet()) {
+            final List<CLDevice> list = entry.getValue();
             // one context per device to workaround driver bugs
-            for (CLDevice device : list) {
-                CLContext context = CLContext.create(device);
+            for (final CLDevice device : list) {
+                final CLContext context = CLContext.create(device);
                 mc.contexts.add(context);
             }
         }
@@ -94,8 +94,8 @@ public class CLMultiContext implements CLResource {
     /**
      * Creates a multi context with specified contexts.
      */
-    public static CLMultiContext wrap(CLContext... contexts) {
-        CLMultiContext mc = new CLMultiContext();
+    public static CLMultiContext wrap(final CLContext... contexts) {
+        final CLMultiContext mc = new CLMultiContext();
         mc.contexts.addAll(asList(contexts));
         return mc;
     }
@@ -104,19 +104,19 @@ public class CLMultiContext implements CLResource {
      * filter devices; don't allow the same device to be used in more than one platform.
      * example: a CPU available via the AMD and Intel SDKs shouldn't end up in two contexts
      */
-    private static Map<CLPlatform, List<CLDevice>> filterPlatformConflicts(Collection<CLDevice> devices) {
+    private static Map<CLPlatform, List<CLDevice>> filterPlatformConflicts(final Collection<CLDevice> devices) {
 
         // FIXME: devicename-platform is used as unique device identifier - replace if we have something better
-        
-        Map<CLPlatform, List<CLDevice>> filtered = new HashMap<CLPlatform, List<CLDevice>>();
-        Map<String, CLPlatform> used = new HashMap<String, CLPlatform>();
 
-        for (CLDevice device : devices) {
+        final Map<CLPlatform, List<CLDevice>> filtered = new HashMap<CLPlatform, List<CLDevice>>();
+        final Map<String, CLPlatform> used = new HashMap<String, CLPlatform>();
 
-            String name = device.getName(); 
+        for (final CLDevice device : devices) {
 
-            CLPlatform platform = device.getPlatform();
-            CLPlatform usedPlatform = used.get(name);
+            final String name = device.getName();
+
+            final CLPlatform platform = device.getPlatform();
+            final CLPlatform usedPlatform = used.get(name);
 
             if(usedPlatform == null || platform.equals(usedPlatform)) {
                 if(!filtered.containsKey(platform)) {
@@ -125,7 +125,7 @@ public class CLMultiContext implements CLResource {
                 filtered.get(platform).add(device);
                 used.put(name, platform);
             }
-            
+
         }
         return filtered;
     }
@@ -141,7 +141,7 @@ public class CLMultiContext implements CLResource {
             throw new RuntimeException(getClass().getSimpleName()+" already released");
         }
         released = true;
-        for (CLContext context : contexts) {
+        for (final CLContext context : contexts) {
             context.release();
         }
         contexts.clear();
@@ -155,8 +155,8 @@ public class CLMultiContext implements CLResource {
      * Returns a list containing all devices used in this multi context.
      */
     public List<CLDevice> getDevices() {
-        List<CLDevice> devices = new ArrayList<CLDevice>();
-        for (CLContext context : contexts) {
+        final List<CLDevice> devices = new ArrayList<CLDevice>();
+        for (final CLContext context : contexts) {
             devices.addAll(asList(context.getDevices()));
         }
         return devices;

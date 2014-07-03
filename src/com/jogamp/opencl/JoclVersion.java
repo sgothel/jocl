@@ -47,7 +47,7 @@ public class JoclVersion extends JogampVersion {
 
     protected static volatile JoclVersion jogampCommonVersionInfo;
 
-    protected JoclVersion(String packageName, Manifest mf) {
+    protected JoclVersion(final String packageName, final Manifest mf) {
         super(packageName, mf);
     }
 
@@ -76,7 +76,7 @@ public class JoclVersion extends JogampVersion {
             sb.append(Platform.getNewline());
             toString(sb);
             sb.append(Platform.getNewline());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             sb.append(e.getMessage());
             e.printStackTrace();
         }
@@ -94,7 +94,7 @@ public class JoclVersion extends JogampVersion {
         final CLPlatform[] platforms;
         try {
             platforms = CLPlatform.listCLPlatforms();
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             final Throwable cause;
             {
                 Throwable pre = null;
@@ -108,7 +108,7 @@ public class JoclVersion extends JogampVersion {
             System.err.println("CLPlatform.listCLPlatforms() failed, exception: "+cause.getMessage());
             t.printStackTrace();
             sb.append("CLPlatform.listCLPlatforms() failed, exception: "+cause.getMessage());
-            StringWriter stackTrace = new StringWriter();
+            final StringWriter stackTrace = new StringWriter();
             cause.printStackTrace(new PrintWriter(stackTrace));
             sb.append(stackTrace.toString());
             return sb;
@@ -119,13 +119,13 @@ public class JoclVersion extends JogampVersion {
         if( 0 > maxKeyStrlen ) {
             synchronized(this) {
                 if( 0 > maxKeyStrlen ) {
-                    for (CLPlatform p : platforms) {
+                    for (final CLPlatform p : platforms) {
                         platProps.add(p.getProperties());
                         final CLDevice[] devices = p.listCLDevices();
-                        for (CLDevice d : devices) {
+                        for (final CLDevice d : devices) {
                             final Map<String,String> props = d.getProperties();
                             final Set<Map.Entry<String, String>> entries =  props.entrySet();
-                            for(Map.Entry<String, String> e : entries) {
+                            for(final Map.Entry<String, String> e : entries) {
                                 maxKeyStrlen = Math.max(maxKeyStrlen, e.getKey().length());
                             }
                         }
@@ -135,17 +135,17 @@ public class JoclVersion extends JogampVersion {
         }
         sb.append(String.format("PP:DD:EE  -  Platform (PP), Device (DD), Entry (EE)%n"));
         int pI = 0;
-        for (CLPlatform p : platforms) {
+        for (final CLPlatform p : platforms) {
             pI++;
             platProps.add(p.getProperties());
-            CLDevice[] devices = p.listCLDevices();
+            final CLDevice[] devices = p.listCLDevices();
             int dI = 0;
-            for (CLDevice d : devices) {
+            for (final CLDevice d : devices) {
                 dI++;
                 final Map<String,String> props = d.getProperties();
                 final Set<Map.Entry<String, String>> entries =  props.entrySet();
                 int eI = 0;
-                for(Map.Entry<String, String> e : entries) {
+                for(final Map.Entry<String, String> e : entries) {
                     eI++;
                     sb.append(String.format("%02d:%02d:%02d %"+maxKeyStrlen+"s: %s%n", pI, dI, eI, e.getKey(), e.getValue()));
                 }
@@ -162,7 +162,7 @@ public class JoclVersion extends JogampVersion {
         final CLPlatform[] platforms;
         try {
             platforms = CLPlatform.listCLPlatforms();
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             final Throwable cause;
             {
                 Throwable pre = null;
@@ -176,7 +176,7 @@ public class JoclVersion extends JogampVersion {
             System.err.println("CLPlatform.listCLPlatforms() failed, exception: "+cause.getMessage());
             t.printStackTrace();
             sb.append("<pre>CLPlatform.listCLPlatforms() failed, exception: "+cause.getMessage());
-            StringWriter stackTrace = new StringWriter();
+            final StringWriter stackTrace = new StringWriter();
             cause.printStackTrace(new PrintWriter(stackTrace));
             sb.append(stackTrace.toString()).append("</pre>");
             return sb;
@@ -184,19 +184,19 @@ public class JoclVersion extends JogampVersion {
         sb.append("<table border=\"1\">");
 
         // platforms
-        List<Map<String, String>> platProps = new ArrayList<Map<String, String>>();
-        List<Integer> spans = new ArrayList<Integer>();
-        for (CLPlatform p : platforms) {
+        final List<Map<String, String>> platProps = new ArrayList<Map<String, String>>();
+        final List<Integer> spans = new ArrayList<Integer>();
+        for (final CLPlatform p : platforms) {
             platProps.add(p.getProperties());
             spans.add(p.listCLDevices().length);
         }
         fillHtmlTable(platProps, spans, sb);
 
         // devices
-        ArrayList<Map<String, String>> devProps = new ArrayList<Map<String, String>>();
-        for (CLPlatform p : platforms) {
-            CLDevice[] devices = p.listCLDevices();
-            for (CLDevice d : devices) {
+        final ArrayList<Map<String, String>> devProps = new ArrayList<Map<String, String>>();
+        for (final CLPlatform p : platforms) {
+            final CLDevice[] devices = p.listCLDevices();
+            for (final CLDevice d : devices) {
                 devProps.add(d.getProperties());
             }
         }
@@ -206,21 +206,21 @@ public class JoclVersion extends JogampVersion {
         return sb;
     }
 
-    private static void fillHtmlTable(List<Map<String, String>> properties, StringBuilder sb) {
-        ArrayList<Integer> spans = new ArrayList<Integer>(properties.size());
+    private static void fillHtmlTable(final List<Map<String, String>> properties, final StringBuilder sb) {
+        final ArrayList<Integer> spans = new ArrayList<Integer>(properties.size());
         for (int i = 0; i < properties.size(); i++) {
             spans.add(1);
         }
         fillHtmlTable(properties, spans, sb);
     }
 
-    private static void fillHtmlTable(List<Map<String, String>> properties, List<Integer> spans, StringBuilder sb) {
+    private static void fillHtmlTable(final List<Map<String, String>> properties, final List<Integer> spans, final StringBuilder sb) {
         boolean header = true;
-        for (String key : properties.get(0).keySet()) {
+        for (final String key : properties.get(0).keySet()) {
             sb.append("<tr>");
                 htmlCell(sb, key);
                 int i = 0;
-                for (Map<String, String> map : properties) {
+                for (final Map<String, String> map : properties) {
                     htmlCell(sb, spans.get(i), map.get(key), header);
                     i++;
                 }
@@ -229,11 +229,11 @@ public class JoclVersion extends JogampVersion {
         }
     }
 
-    private static void htmlCell(StringBuilder sb, String value) {
+    private static void htmlCell(final StringBuilder sb, final String value) {
         sb.append("<td>").append(value).append("</td>");
     }
 
-    private static void htmlCell(StringBuilder sb, int span, String value, boolean header) {
+    private static void htmlCell(final StringBuilder sb, final int span, final String value, final boolean header) {
         if(header) {
             sb.append("<th colspan=\"").append(span).append("\">").append(value).append("</th>");
         }else{
@@ -241,7 +241,7 @@ public class JoclVersion extends JogampVersion {
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(final String args[]) {
         System.err.println(VersionUtil.getPlatformInfo());
         System.err.println(GlueGenVersion.getInstance());
         // System.err.println(NativeWindowVersion.getInstance());

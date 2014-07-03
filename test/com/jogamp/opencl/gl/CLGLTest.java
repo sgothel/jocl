@@ -57,9 +57,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
+import javax.media.opengl.GL;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.GLContext;
+import javax.media.opengl.fixedfunc.GLPointerFunc;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -116,8 +118,10 @@ public class CLGLTest extends UITestCase {
         initGL();
 
         @SuppressWarnings("unchecked")
+        final
         CLPlatform platform = CLPlatform.getDefault(CLPlatformFilters.glSharing());
         @SuppressWarnings("unchecked")
+        final
         CLDevice device = platform.getMaxFlopsDevice(CLDeviceFilters.glSharing());
 
         if(device == null) {
@@ -133,7 +137,7 @@ public class CLGLTest extends UITestCase {
         makeGLCurrent();
         assertTrue(glcontext.isCurrent());
 
-        CLContext context = CLGLContext.create(glcontext, device);
+        final CLContext context = CLGLContext.create(glcontext, device);
         assertNotNull(context);
 
         try{
@@ -162,6 +166,7 @@ public class CLGLTest extends UITestCase {
         assertTrue(glcontext.isCurrent());
 
         @SuppressWarnings("unchecked")
+        final
         CLPlatform platform = CLPlatform.getDefault(glSharing(glcontext));
         if(platform == null) {
             out.println("test aborted");
@@ -169,40 +174,41 @@ public class CLGLTest extends UITestCase {
         }
 
         @SuppressWarnings("unchecked")
+        final
         CLDevice theChosenOne = platform.getMaxFlopsDevice(CLDeviceFilters.glSharing());
         out.println(theChosenOne);
 
-        CLGLContext context = CLGLContext.create(glcontext, theChosenOne);
+        final CLGLContext context = CLGLContext.create(glcontext, theChosenOne);
 
         try{
             out.println(context);
 
-            GL2 gl = glcontext.getGL().getGL2();
+            final GL2 gl = glcontext.getGL().getGL2();
 
-            int[] id = new int[1];
+            final int[] id = new int[1];
             gl.glGenBuffers(id.length, id, 0);
 
-            IntBuffer glData = Buffers.newDirectIntBuffer(new int[] {0,1,2,3,4,5,6,7,8});
+            final IntBuffer glData = Buffers.newDirectIntBuffer(new int[] {0,1,2,3,4,5,6,7,8});
             glData.rewind();
 
             // create and write GL buffer
-            gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
-                gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, id[0]);
-                gl.glBufferData(GL2.GL_ARRAY_BUFFER, glData.capacity()*4, glData, GL2.GL_STATIC_DRAW);
-                gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
-            gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
+            gl.glEnableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
+                gl.glBindBuffer(GL.GL_ARRAY_BUFFER, id[0]);
+                gl.glBufferData(GL.GL_ARRAY_BUFFER, glData.capacity()*4, glData, GL.GL_STATIC_DRAW);
+                gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+            gl.glDisableClientState(GLPointerFunc.GL_VERTEX_ARRAY);
             gl.glFinish();
 
 
             // create CLGL buffer
-            IntBuffer clData = Buffers.newDirectIntBuffer(9);
-            CLGLBuffer<IntBuffer> clBuffer = context.createFromGLBuffer(clData, id[0], glData.capacity()*4, Mem.READ_ONLY);
+            final IntBuffer clData = Buffers.newDirectIntBuffer(9);
+            final CLGLBuffer<IntBuffer> clBuffer = context.createFromGLBuffer(clData, id[0], glData.capacity()*4, Mem.READ_ONLY);
 
             assertEquals(glData.capacity(), clBuffer.getCLCapacity());
             assertEquals(glData.capacity()*4, clBuffer.getCLSize());
 
 
-            CLCommandQueue queue = theChosenOne.createCommandQueue();
+            final CLCommandQueue queue = theChosenOne.createCommandQueue();
 
             // read gl buffer into cl nio buffer
             queue.putAcquireGLObject(clBuffer)
@@ -238,52 +244,54 @@ public class CLGLTest extends UITestCase {
         assertTrue(glcontext.isCurrent());
 
         @SuppressWarnings("unchecked")
+        final
         CLPlatform [] clplatforms = CLPlatform.listCLPlatforms(glSharing(glcontext));
         if(clplatforms.length == 0) {
             out.println("no platform that supports OpenGL-OpenCL interoperability");
             return;
         }
 
-        for(CLPlatform clplatform : clplatforms) {
-    
+        for(final CLPlatform clplatform : clplatforms) {
+
             @SuppressWarnings("unchecked")
+            final
             CLDevice [] cldevices = clplatform.listCLDevices(CLDeviceFilters.glSharing());
-    
-            for(CLDevice cldevice : cldevices) {
+
+            for(final CLDevice cldevice : cldevices) {
                 out.println(cldevice);
                 textureSharingInner(cldevice);
             }
         }
-        
+
         deinitGL();
     }
 
-    public void textureSharingInner(CLDevice cldevice) {
+    public void textureSharingInner(final CLDevice cldevice) {
 
-        CLGLContext clglcontext = CLGLContext.create(glcontext, cldevice);
+        final CLGLContext clglcontext = CLGLContext.create(glcontext, cldevice);
 
         try {
             out.println(clglcontext);
 
-            GL2 gl = glcontext.getGL().getGL2();
+            final GL2 gl = glcontext.getGL().getGL2();
 
             // create and write GL texture
-            int[] id = new int[1];
+            final int[] id = new int[1];
             gl.glGenTextures(id.length, id, 0);
-            gl.glActiveTexture(GL2.GL_TEXTURE0);
-            gl.glBindTexture  (GL2.GL_TEXTURE_2D, id[0]);
-            int texWidth = 2;
-            int texHeight = 2;
-            gl.glTexImage2D(GL2.GL_TEXTURE_2D, 0, GL2.GL_RGBA, texWidth, texHeight, 0, GL2.GL_RGBA, GL2.GL_UNSIGNED_BYTE, null );
-            gl.glBindTexture(GL2.GL_TEXTURE_2D, 0);
+            gl.glActiveTexture(GL.GL_TEXTURE0);
+            gl.glBindTexture  (GL.GL_TEXTURE_2D, id[0]);
+            final int texWidth = 2;
+            final int texHeight = 2;
+            gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, texWidth, texHeight, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null );
+            gl.glBindTexture(GL.GL_TEXTURE_2D, 0);
             gl.glFinish();
 
             // create CLGL buffer
-            ByteBuffer bufferCL = Buffers.newDirectByteBuffer(texWidth*texHeight*4);
-            CLGLTexture2d<ByteBuffer> clTexture = clglcontext.createFromGLTexture2d(bufferCL, GL2.GL_TEXTURE_2D, id[0], 0, CLBuffer.Mem.WRITE_ONLY);
+            final ByteBuffer bufferCL = Buffers.newDirectByteBuffer(texWidth*texHeight*4);
+            final CLGLTexture2d<ByteBuffer> clTexture = clglcontext.createFromGLTexture2d(bufferCL, GL.GL_TEXTURE_2D, id[0], 0, CLBuffer.Mem.WRITE_ONLY);
 
             // set texel values to a formula that can be read back and verified
-            String sourceCL = "__kernel void writeTexture (__write_only image2d_t imageTex, unsigned w, unsigned h ) \n" +
+            final String sourceCL = "__kernel void writeTexture (__write_only image2d_t imageTex, unsigned w, unsigned h ) \n" +
                     "{                                                                        \n" +
                     "    for(unsigned y=1; y<=h; ++y) {                                       \n" +
                     "        for(unsigned x=1; x<=w; ++x) {                                   \n" +
@@ -291,19 +299,19 @@ public class CLGLTest extends UITestCase {
                     "        }                                                                \n" +
                     "    }                                                                    \n" +
                     "}";
-            CLProgram program = clglcontext.createProgram(sourceCL);
+            final CLProgram program = clglcontext.createProgram(sourceCL);
             program.build();
             System.out.println(program.getBuildStatus());
             System.out.println(program.getBuildLog());
             assertTrue(program.isExecutable());
 
-            CLKernel clkernel = program.createCLKernel("writeTexture")
+            final CLKernel clkernel = program.createCLKernel("writeTexture")
                     .putArg(clTexture)
                     .putArg(texWidth)
                     .putArg(texHeight)
                     .rewind();
 
-            CLCommandQueue queue = cldevice.createCommandQueue();
+            final CLCommandQueue queue = cldevice.createCommandQueue();
 
             // write gl texture with cl kernel, then read it to host buffer
             queue.putAcquireGLObject(clTexture)
@@ -314,12 +322,12 @@ public class CLGLTest extends UITestCase {
 
             for(int y = 1; y <= texHeight; y++) {
                 for(int x = 1; x <= texWidth; x++) {
-                    byte bX = bufferCL.get();
-                    byte bY = bufferCL.get();
-                    byte bZero = bufferCL.get();
-                    byte bMinusOne = bufferCL.get();
-                    byte bXCheck = (byte)(((float)x)/((float)(4*texWidth))*256);
-                    byte bYCheck = (byte)(((float)y)/((float)(4*texHeight))*256);
+                    final byte bX = bufferCL.get();
+                    final byte bY = bufferCL.get();
+                    final byte bZero = bufferCL.get();
+                    final byte bMinusOne = bufferCL.get();
+                    final byte bXCheck = (byte)(((float)x)/((float)(4*texWidth))*256);
+                    final byte bYCheck = (byte)(((float)y)/((float)(4*texHeight))*256);
                     assertEquals(bXCheck, bX);
                     assertEquals(bYCheck, bY);
                     assertEquals(0, bZero);
@@ -343,17 +351,17 @@ public class CLGLTest extends UITestCase {
             try{
                 glcontext.makeCurrent();
                 break;
-            }catch(RuntimeException ex) {
+            }catch(final RuntimeException ex) {
                 try {
                     Thread.sleep(200);
                     // I don't give up yet!
-                } catch (InterruptedException ignore) { }
+                } catch (final InterruptedException ignore) { }
             }
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        String tstname = CLGLTest.class.getName();
+    public static void main(final String[] args) throws IOException {
+        final String tstname = CLGLTest.class.getName();
         org.junit.runner.JUnitCore.main(tstname);
     }
 

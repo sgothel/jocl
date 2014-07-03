@@ -49,19 +49,19 @@ public class CLMultiContextTest extends UITestCase {
     @Test
     public void createMultiContextTest() {
 
-        CLMultiContext mc = CLMultiContext.create(CLPlatform.listCLPlatforms());
+        final CLMultiContext mc = CLMultiContext.create(CLPlatform.listCLPlatforms());
 
         try{
-            List<CLContext> contexts = mc.getContexts();
-            List<CLDevice> devices = mc.getDevices();
+            final List<CLContext> contexts = mc.getContexts();
+            final List<CLDevice> devices = mc.getDevices();
 
             assertFalse(contexts.isEmpty());
             assertFalse(devices.isEmpty());
 
-            for (CLContext context : contexts) {
+            for (final CLContext context : contexts) {
                 out.println(context);
             }
-            for (CLDevice device : devices) {
+            for (final CLDevice device : devices) {
                 out.println(device);
             }
 
@@ -84,20 +84,20 @@ public class CLMultiContextTest extends UITestCase {
 
         private final Buffer data;
 
-        public CLTestTask(Buffer buffer) {
+        public CLTestTask(final Buffer buffer) {
             this.data = buffer;
         }
 
-        public Buffer execute(CLSimpleQueueContext qc) {
+        public Buffer execute(final CLSimpleQueueContext qc) {
 
-            CLCommandQueue queue = qc.getQueue();
-            CLContext context = qc.getCLContext();
-            CLKernel kernel = qc.getKernel("compute");
+            final CLCommandQueue queue = qc.getQueue();
+            final CLContext context = qc.getCLContext();
+            final CLKernel kernel = qc.getKernel("compute");
 
             CLBuffer<Buffer> buffer = null;
             try{
                 buffer = context.createBuffer(data);
-                int gws = buffer.getCLCapacity();
+                final int gws = buffer.getCLCapacity();
 
                 kernel.putArg(buffer).putArg(gws).rewind();
 
@@ -118,12 +118,12 @@ public class CLMultiContextTest extends UITestCase {
     @Test
     public void commandQueuePoolTest() throws InterruptedException, ExecutionException {
 
-        CLMultiContext mc = CLMultiContext.create(CLPlatform.listCLPlatforms());
+        final CLMultiContext mc = CLMultiContext.create(CLPlatform.listCLPlatforms());
 
         try {
 
             CLSimpleContextFactory factory = CLQueueContextFactory.createSimple(programSource);
-            CLCommandQueuePool<CLSimpleQueueContext> pool = CLCommandQueuePool.create(factory, mc);
+            final CLCommandQueuePool<CLSimpleQueueContext> pool = CLCommandQueuePool.create(factory, mc);
 
             assertTrue(pool.getSize() > 0);
 
@@ -131,12 +131,12 @@ public class CLMultiContextTest extends UITestCase {
             final int tasksPerQueue = 10;
             final int taskCount = pool.getSize() * tasksPerQueue;
 
-            IntBuffer data = Buffers.newDirectIntBuffer(slice*taskCount);
+            final IntBuffer data = Buffers.newDirectIntBuffer(slice*taskCount);
 
-            List<CLTestTask> tasks = new ArrayList<CLTestTask>(taskCount);
+            final List<CLTestTask> tasks = new ArrayList<CLTestTask>(taskCount);
 
             for (int i = 0; i < taskCount; i++) {
-                IntBuffer subBuffer = Buffers.slice(data, i*slice, slice);
+                final IntBuffer subBuffer = Buffers.slice(data, i*slice, slice);
                 assertEquals(slice, subBuffer.capacity());
                 tasks.add(new CLTestTask(subBuffer));
             }
@@ -148,14 +148,14 @@ public class CLMultiContextTest extends UITestCase {
             checkBuffer(1, data);
 
             // submit blocking emediatly
-            for (CLTestTask task : tasks) {
+            for (final CLTestTask task : tasks) {
                 pool.submit(task).get();
             }
             checkBuffer(2, data);
 
             // submitAll using futures
-            List<Future<Buffer>> futures = pool.submitAll(tasks);
-            for (Future<Buffer> future : futures) {
+            final List<Future<Buffer>> futures = pool.submitAll(tasks);
+            for (final Future<Buffer> future : futures) {
                 future.get();
             }
             checkBuffer(3, data);
@@ -172,15 +172,15 @@ public class CLMultiContextTest extends UITestCase {
         }
     }
 
-    private void checkBuffer(int expected, IntBuffer data) {
+    private void checkBuffer(final int expected, final IntBuffer data) {
         while(data.hasRemaining()) {
             assertEquals(expected, data.get());
         }
         data.rewind();
     }
 
-    public static void main(String[] args) throws IOException {
-        String tstname = CLMultiContextTest.class.getName();
+    public static void main(final String[] args) throws IOException {
+        final String tstname = CLMultiContextTest.class.getName();
         org.junit.runner.JUnitCore.main(tstname);
     }
 

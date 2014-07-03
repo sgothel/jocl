@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -51,7 +51,7 @@ public class CLEvent extends CLObjectResource {
     private final CLEventProfilingInfoAccessor eventProfilingInfo;
     private final CLEventBinding binding;
 
-    CLEvent(CLContext context, long id) {
+    CLEvent(final CLContext context, final long id) {
         super(context, id);
         binding = context.getPlatform().getEventBinding();
         this.eventInfo = new CLEventInfoAccessor();
@@ -66,9 +66,9 @@ public class CLEvent extends CLObjectResource {
     }
 
     // apparently only ExecutionStatus.COMPLETE is allowed -> private
-    private void registerCallback(final CLEventListener callback, ExecutionStatus trigger) {
+    private void registerCallback(final CLEventListener callback, final ExecutionStatus trigger) {
         binding.clSetEventCallback(ID, trigger.STATUS, new CLEventCallback() {
-            @Override public void eventStateChanged(long event, int status) {
+            @Override public void eventStateChanged(final long event, final int status) {
                 callback.eventStateChanged(CLEvent.this, status);
             }
         });
@@ -77,7 +77,7 @@ public class CLEvent extends CLObjectResource {
     @Override
     public void release() {
         super.release();
-        int ret = binding.clReleaseEvent(ID);
+        final int ret = binding.clReleaseEvent(ID);
         checkForError(ret, "can not release event");
     }
 
@@ -94,17 +94,17 @@ public class CLEvent extends CLObjectResource {
     public boolean isComplete() {
         return ExecutionStatus.COMPLETE.equals(getStatus());
     }
-    
+
     public int getStatusCode() {
         return (int)eventInfo.getLong(CL_EVENT_COMMAND_EXECUTION_STATUS);
     }
 
     public CommandType getType() {
-        int status = (int)eventInfo.getLong(CL_EVENT_COMMAND_TYPE);
+        final int status = (int)eventInfo.getLong(CL_EVENT_COMMAND_TYPE);
         return CommandType.valueOf(status);
     }
 
-    public long getProfilingInfo(ProfilingCommand command) {
+    public long getProfilingInfo(final ProfilingCommand command) {
         return eventProfilingInfo.getLong(command.COMMAND);
     }
 
@@ -117,7 +117,7 @@ public class CLEvent extends CLObjectResource {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -142,12 +142,12 @@ public class CLEvent extends CLObjectResource {
         return hash;
     }
 
-    
+
 
     private class CLEventInfoAccessor extends CLTLInfoAccessor {
 
         @Override
-        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
+        protected int getInfo(final int name, final long valueSize, final Buffer value, final PointerBuffer valueSizeRet) {
             return binding.clGetEventInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
@@ -156,7 +156,7 @@ public class CLEvent extends CLObjectResource {
     private class CLEventProfilingInfoAccessor extends CLTLInfoAccessor {
 
         @Override
-        protected int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
+        protected int getInfo(final int name, final long valueSize, final Buffer value, final PointerBuffer valueSizeRet) {
             return binding.clGetEventProfilingInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
@@ -196,11 +196,11 @@ public class CLEvent extends CLObjectResource {
          */
         public final int COMMAND;
 
-        private ProfilingCommand(int command) {
+        private ProfilingCommand(final int command) {
             this.COMMAND = command;
         }
 
-        public static ProfilingCommand valueOf(int status) {
+        public static ProfilingCommand valueOf(final int status) {
             switch(status) {
                 case(CL_PROFILING_COMMAND_QUEUED):
                     return QUEUED;
@@ -230,7 +230,7 @@ public class CLEvent extends CLObjectResource {
          * associated with the command-queue.
          */
         SUBMITTED(CL_SUBMITTED),
-        
+
         /**
          * Device is currently executing this command.
          */
@@ -252,11 +252,11 @@ public class CLEvent extends CLObjectResource {
          */
         public final int STATUS;
 
-        private ExecutionStatus(int status) {
+        private ExecutionStatus(final int status) {
             this.STATUS = status;
         }
 
-        public static ExecutionStatus valueOf(int status) {
+        public static ExecutionStatus valueOf(final int status) {
             switch(status) {
                 case(CL_QUEUED):
                     return QUEUED;
@@ -304,13 +304,13 @@ public class CLEvent extends CLObjectResource {
          */
         public final int TYPE;
 
-        private CommandType(int type) {
+        private CommandType(final int type) {
             this.TYPE = type;
         }
 
-        public static CommandType valueOf(int commandType) {
-            CommandType[] values = CommandType.values();
-            for (CommandType value : values) {
+        public static CommandType valueOf(final int commandType) {
+            final CommandType[] values = CommandType.values();
+            for (final CommandType value : values) {
                 if(value.TYPE == commandType)
                     return value;
             }

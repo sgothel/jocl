@@ -27,6 +27,8 @@
  */
 package jogamp.opencl.os.android;
 
+import jogamp.common.os.PlatformPropsImpl;
+
 import com.jogamp.common.GlueGenVersion;
 import com.jogamp.common.os.Platform;
 import com.jogamp.common.util.VersionUtil;
@@ -42,7 +44,7 @@ import android.widget.TextView;
 public class JoclVersionActivity extends JoclBaseActivity {
 
    @Override
-   public void onCreate(Bundle savedInstanceState) {
+   public void onCreate(final Bundle savedInstanceState) {
        super.onCreate(savedInstanceState);
 
        setFullscreenFeature(getWindow(), true);
@@ -61,11 +63,11 @@ public class JoclVersionActivity extends JoclBaseActivity {
        setContentView(scroller);
 
        final JoclVersion joclVersion = JoclVersion.getInstance();
-       final String info1 = "JOCL Version Info"+Platform.NEWLINE+
-                            VersionUtil.getPlatformInfo()+Platform.NEWLINE+
-                            GlueGenVersion.getInstance()+Platform.NEWLINE+
-                            joclVersion.toString()+Platform.NEWLINE+
-                            joclVersion.getOpenCLTextInfo(null).toString()+Platform.NEWLINE;
+       final String info1 = "JOCL Version Info"+PlatformPropsImpl.NEWLINE+
+                            VersionUtil.getPlatformInfo()+PlatformPropsImpl.NEWLINE+
+                            GlueGenVersion.getInstance()+PlatformPropsImpl.NEWLINE+
+                            joclVersion.toString()+PlatformPropsImpl.NEWLINE+
+                            joclVersion.getOpenCLTextInfo(null).toString()+PlatformPropsImpl.NEWLINE;
        System.err.println(info1);
        tv.setText(info1);
 

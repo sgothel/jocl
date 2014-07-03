@@ -57,6 +57,7 @@ import com.jogamp.opencl.CLSampler.AddressingMode;
 import com.jogamp.opencl.CLSampler.FilteringMode;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.llb.CLContextBinding;
+import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
 
 /**
@@ -91,7 +92,7 @@ public class CLContext extends CLObjectResource {
 
     private final ErrorDispatcher errorHandler;
 
-    protected CLContext(CLPlatform platform, long contextID, ErrorDispatcher dispatcher) {
+    protected CLContext(final CLPlatform platform, final long contextID, final ErrorDispatcher dispatcher) {
         super(contextID);
         this.platform = platform;
 
@@ -113,17 +114,17 @@ public class CLContext extends CLObjectResource {
 
     }
 
-    private synchronized void initDevices(CLContextBinding cl) {
+    private synchronized void initDevices(final CLContextBinding cl) {
 
         if (devices == null) {
 
             final PointerBuffer deviceCount = PointerBuffer.allocateDirect(1);
 
-            int ret = cl.clGetContextInfo(ID, CL.CL_CONTEXT_DEVICES, 0, null, deviceCount);
+            int ret = cl.clGetContextInfo(ID, CLContextBinding.CL_CONTEXT_DEVICES, 0, null, deviceCount);
             CLException.checkForError(ret, "can not enumerate devices");
 
-            ByteBuffer deviceIDs = Buffers.newDirectByteBuffer((int)deviceCount.get());
-            ret = cl.clGetContextInfo(ID, CL.CL_CONTEXT_DEVICES, deviceIDs.capacity(), deviceIDs, null);
+            final ByteBuffer deviceIDs = Buffers.newDirectByteBuffer((int)deviceCount.get());
+            ret = cl.clGetContextInfo(ID, CLContextBinding.CL_CONTEXT_DEVICES, deviceIDs.capacity(), deviceIDs, null);
             CLException.checkForError(ret, "can not enumerate devices");
 
             devices = new CLDevice[deviceIDs.capacity() / (Platform.is32Bit() ? 4 : 8)];
@@ -145,14 +146,14 @@ public class CLContext extends CLObjectResource {
      * Creates a context on the specified device types.
      * The platform to be used is implementation dependent.
      */
-    public static CLContext create(Type... deviceTypes) {
+    public static CLContext create(final Type... deviceTypes) {
         return create(null, deviceTypes);
     }
 
     /**
      * Creates a context on the specified platform on all available devices (CL_DEVICE_TYPE_ALL).
      */
-    public static CLContext create(CLPlatform platform) {
+    public static CLContext create(final CLPlatform platform) {
         return create(platform, Type.ALL);
     }
 
@@ -160,23 +161,23 @@ public class CLContext extends CLObjectResource {
      * Creates a context on the specified platform and with the specified
      * device types.
      */
-    public static CLContext create(CLPlatform platform, Type... deviceTypes) {
+    public static CLContext create(CLPlatform platform, final Type... deviceTypes) {
 
         if(platform == null) {
             platform = CLPlatform.getDefault();
         }
 
-        long type = toDeviceBitmap(deviceTypes);
+        final long type = toDeviceBitmap(deviceTypes);
 
-        PointerBuffer properties = setupContextProperties(platform);
-        ErrorDispatcher dispatcher = new ErrorDispatcher();
+        final PointerBuffer properties = setupContextProperties(platform);
+        final ErrorDispatcher dispatcher = new ErrorDispatcher();
         return new CLContext(platform, createContextFromType(platform, dispatcher, properties, type), dispatcher);
     }
 
     /**
      * Creates a context on the specified devices.
      */
-    public static CLContext create(CLDevice... devices) {
+    public static CLContext create(final CLDevice... devices) {
 
         if(devices == null) {
             throw new IllegalArgumentException("no devices specified");
@@ -184,11 +185,11 @@ public class CLContext extends CLObjectResource {
             throw new IllegalArgumentException("first device was null");
         }
 
-        CLPlatform platform = devices[0].getPlatform();
+        final CLPlatform platform = devices[0].getPlatform();
 
-        PointerBuffer properties = setupContextProperties(platform);
-        ErrorDispatcher dispatcher = new ErrorDispatcher();
-        CLContext context = new CLContext(platform, createContext(platform, dispatcher, properties, devices), dispatcher);
+        final PointerBuffer properties = setupContextProperties(platform);
+        final ErrorDispatcher dispatcher = new ErrorDispatcher();
+        final CLContext context = new CLContext(platform, createContext(platform, dispatcher, properties, devices), dispatcher);
         if(devices != null) {
             for (int i = 0; i < devices.length; i++) {
                 devices[i].setContext(context);
@@ -197,43 +198,43 @@ public class CLContext extends CLObjectResource {
         return context;
     }
 
-    protected static long createContextFromType(CLPlatform platform, CLErrorHandler handler, PointerBuffer properties, long deviceType) {
-        IntBuffer status = Buffers.newDirectIntBuffer(1);
-        CLContextBinding cl = platform.getContextBinding();
-        long context = cl.clCreateContextFromType(properties, deviceType, handler, status);
+    protected static long createContextFromType(final CLPlatform platform, final CLErrorHandler handler, final PointerBuffer properties, final long deviceType) {
+        final IntBuffer status = Buffers.newDirectIntBuffer(1);
+        final CLContextBinding cl = platform.getContextBinding();
+        final long context = cl.clCreateContextFromType(properties, deviceType, handler, status);
 
         CLException.checkForError(status.get(), "can not create CL context");
 
         return context;
     }
 
-    protected static long createContext(CLPlatform platform, CLErrorHandler handler, PointerBuffer properties, CLDevice... devices) {
-        IntBuffer status = Buffers.newDirectIntBuffer(1);
+    protected static long createContext(final CLPlatform platform, final CLErrorHandler handler, final PointerBuffer properties, final CLDevice... devices) {
+        final IntBuffer status = Buffers.newDirectIntBuffer(1);
         PointerBuffer pb = null;
         if(devices != null && devices.length != 0) {
             pb = PointerBuffer.allocateDirect(devices.length);
             for (int i = 0; i < devices.length; i++) {
-                CLDevice device = devices[i];
+                final CLDevice device = devices[i];
                 if(device == null) {
                     throw new IllegalArgumentException("device at index "+i+" was null.");
                 }
                 pb.put(i, device.ID);
             }
         }
-        CLContextBinding cl = platform.getContextBinding();
-        long context = cl.clCreateContext(properties, pb, handler, status);
+        final CLContextBinding cl = platform.getContextBinding();
+        final long context = cl.clCreateContext(properties, pb, handler, status);
 
         CLException.checkForError(status.get(), "can not create CL context");
 
         return context;
     }
 
-    private static PointerBuffer setupContextProperties(CLPlatform platform) {
+    private static PointerBuffer setupContextProperties(final CLPlatform platform) {
         if(platform == null) {
             throw new RuntimeException("no OpenCL installation found");
         }
 
-        return PointerBuffer.allocateDirect(3).put(CL.CL_CONTEXT_PLATFORM)
+        return PointerBuffer.allocateDirect(3).put(CLContextBinding.CL_CONTEXT_PLATFORM)
                                               .put(platform.ID).put(0) // 0 terminated array
                                               .rewind();
     }
@@ -241,8 +242,8 @@ public class CLContext extends CLObjectResource {
     /**
      * Creates a program from the given sources, the returned program is not build yet.
      */
-    public CLProgram createProgram(String src) {
-        CLProgram program = CLProgram.create(this, src);
+    public CLProgram createProgram(final String src) {
+        final CLProgram program = CLProgram.create(this, src);
         programs.add(program);
         return program;
     }
@@ -252,13 +253,13 @@ public class CLContext extends CLObjectResource {
      * The InputStream is automatically closed after the sources have been read.
      * @throws IOException when a IOException occurred while reading or closing the stream.
      */
-    public CLProgram createProgram(InputStream source) throws IOException {
+    public CLProgram createProgram(final InputStream source) throws IOException {
 
         if(source == null)
             throw new IllegalArgumentException("input stream for program source must not be null");
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(source));
-        StringBuilder sb = new StringBuilder(2048);
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(source));
+        final StringBuilder sb = new StringBuilder(2048);
 
         String line;
         try {
@@ -280,8 +281,8 @@ public class CLContext extends CLObjectResource {
      * <li>binaries are missing for one or more CLDevices</li>
      * </ul>
      */
-    public CLProgram createProgram(Map<CLDevice, byte[]> binaries) {
-        CLProgram program = CLProgram.create(this, binaries);
+    public CLProgram createProgram(final Map<CLDevice, byte[]> binaries) {
+        final CLProgram program = CLProgram.create(this, binaries);
         program.setNoSource();
         programs.add(program);
         return program;
@@ -290,64 +291,64 @@ public class CLContext extends CLObjectResource {
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
-    public final CLBuffer<ShortBuffer> createShortBuffer(int size, Mem... flags) {
+    public final CLBuffer<ShortBuffer> createShortBuffer(final int size, final Mem... flags) {
         return createBuffer(Buffers.newDirectShortBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
-    public final CLBuffer<IntBuffer> createIntBuffer(int size, Mem... flags) {
+    public final CLBuffer<IntBuffer> createIntBuffer(final int size, final Mem... flags) {
         return createBuffer(Buffers.newDirectIntBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
-    public final CLBuffer<LongBuffer> createLongBuffer(int size, Mem... flags) {
+    public final CLBuffer<LongBuffer> createLongBuffer(final int size, final Mem... flags) {
         return createBuffer(Buffers.newDirectLongBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
-    public final CLBuffer<FloatBuffer> createFloatBuffer(int size, Mem... flags) {
+    public final CLBuffer<FloatBuffer> createFloatBuffer(final int size, final Mem... flags) {
         return createBuffer(Buffers.newDirectFloatBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and element count. No flags creates a MEM.READ_WRITE buffer.
      */
-    public final CLBuffer<DoubleBuffer> createDoubleBuffer(int size, Mem... flags) {
+    public final CLBuffer<DoubleBuffer> createDoubleBuffer(final int size, final Mem... flags) {
         return createBuffer(Buffers.newDirectDoubleBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags and buffer size in bytes. No flags creates a MEM.READ_WRITE buffer.
      */
-    public final CLBuffer<ByteBuffer> createByteBuffer(int size, Mem... flags) {
+    public final CLBuffer<ByteBuffer> createByteBuffer(final int size, final Mem... flags) {
         return createByteBuffer(size, Mem.flagsToInt(flags));
     }
 
     /**
      * Creates a CLBuffer with the specified flags and buffer size in bytes.
      */
-    public final CLBuffer<ByteBuffer> createByteBuffer(int size, int flags) {
+    public final CLBuffer<ByteBuffer> createByteBuffer(final int size, final int flags) {
         return createBuffer(Buffers.newDirectByteBuffer(size), flags);
     }
 
     /**
      * Creates a CLBuffer with the specified flags. No flags creates a MEM.READ_WRITE buffer.
      */
-    public final CLBuffer<?> createBuffer(int size, Mem... flags) {
+    public final CLBuffer<?> createBuffer(final int size, final Mem... flags) {
         return createBuffer(size, Mem.flagsToInt(flags));
     }
 
     /**
      * Creates a CLBuffer with the specified flags.
      */
-    public final CLBuffer<?> createBuffer(int size, int flags) {
-        CLBuffer<?> buffer = CLBuffer.create(this, size, flags);
+    public final CLBuffer<?> createBuffer(final int size, final int flags) {
+        final CLBuffer<?> buffer = CLBuffer.create(this, size, flags);
         memoryObjects.add(buffer);
         return buffer;
     }
@@ -355,15 +356,15 @@ public class CLContext extends CLObjectResource {
     /**
      * Creates a CLBuffer with the specified flags. No flags creates a MEM.READ_WRITE buffer.
      */
-    public final <B extends Buffer> CLBuffer<B> createBuffer(B directBuffer, Mem... flags) {
+    public final <B extends Buffer> CLBuffer<B> createBuffer(final B directBuffer, final Mem... flags) {
         return createBuffer(directBuffer, Mem.flagsToInt(flags));
     }
 
     /**
      * Creates a CLBuffer with the specified flags.
      */
-    public final <B extends Buffer> CLBuffer<B> createBuffer(B directBuffer, int flags) {
-        CLBuffer<B> buffer = CLBuffer.create(this, directBuffer, flags);
+    public final <B extends Buffer> CLBuffer<B> createBuffer(final B directBuffer, final int flags) {
+        final CLBuffer<B> buffer = CLBuffer.create(this, directBuffer, flags);
         memoryObjects.add(buffer);
         return buffer;
     }
@@ -371,29 +372,29 @@ public class CLContext extends CLObjectResource {
     /**
      * Creates a CLImage2d with the specified format, dimension and flags.
      */
-    public final CLImage2d<?> createImage2d(int width, int height, CLImageFormat format, Mem... flags) {
+    public final CLImage2d<?> createImage2d(final int width, final int height, final CLImageFormat format, final Mem... flags) {
         return createImage2d(null, width, height, 0, format, flags);
     }
 
     /**
      * Creates a CLImage2d with the specified format, dimension and flags.
      */
-    public final CLImage2d<?> createImage2d(int width, int height, int rowPitch, CLImageFormat format, Mem... flags) {
+    public final CLImage2d<?> createImage2d(final int width, final int height, final int rowPitch, final CLImageFormat format, final Mem... flags) {
         return createImage2d(null, width, height, rowPitch, format, flags);
     }
 
     /**
      * Creates a CLImage2d with the specified format, dimension and flags.
      */
-    public final <B extends Buffer> CLImage2d<B> createImage2d(B directBuffer, int width, int height, CLImageFormat format, Mem... flags) {
+    public final <B extends Buffer> CLImage2d<B> createImage2d(final B directBuffer, final int width, final int height, final CLImageFormat format, final Mem... flags) {
         return createImage2d(directBuffer, width, height, 0, format, flags);
     }
 
     /**
      * Creates a CLImage2d with the specified format, dimension and flags.
      */
-    public final <B extends Buffer> CLImage2d<B> createImage2d(B directBuffer, int width, int height, int rowPitch, CLImageFormat format, Mem... flags) {
-        CLImage2d<B> image = CLImage2d.createImage(this, directBuffer, width, height, rowPitch, format, Mem.flagsToInt(flags));
+    public final <B extends Buffer> CLImage2d<B> createImage2d(final B directBuffer, final int width, final int height, final int rowPitch, final CLImageFormat format, final Mem... flags) {
+        final CLImage2d<B> image = CLImage2d.createImage(this, directBuffer, width, height, rowPitch, format, Mem.flagsToInt(flags));
         memoryObjects.add(image);
         return image;
     }
@@ -401,36 +402,36 @@ public class CLContext extends CLObjectResource {
     /**
      * Creates a CLImage3d with the specified format, dimension and flags.
      */
-    public final CLImage3d<?> createImage3d(int width, int height, int depth, CLImageFormat format, Mem... flags) {
+    public final CLImage3d<?> createImage3d(final int width, final int height, final int depth, final CLImageFormat format, final Mem... flags) {
         return createImage3d(null, width, height, depth, format, flags);
     }
 
     /**
      * Creates a CLImage3d with the specified format, dimension and flags.
      */
-    public final CLImage3d<?> createImage3d(int width, int height, int depth, int rowPitch, int slicePitch, CLImageFormat format, Mem... flags) {
+    public final CLImage3d<?> createImage3d(final int width, final int height, final int depth, final int rowPitch, final int slicePitch, final CLImageFormat format, final Mem... flags) {
         return createImage3d(null, width, height, depth, rowPitch, slicePitch, format, flags);
     }
 
     /**
      * Creates a CLImage3d with the specified format, dimension and flags.
      */
-    public final <B extends Buffer> CLImage3d<B> createImage3d(B directBuffer, int width, int height, int depth, CLImageFormat format, Mem... flags) {
+    public final <B extends Buffer> CLImage3d<B> createImage3d(final B directBuffer, final int width, final int height, final int depth, final CLImageFormat format, final Mem... flags) {
         return createImage3d(directBuffer, width, height, depth, 0, 0, format, flags);
     }
 
     /**
      * Creates a CLImage3d with the specified format, dimension and flags.
      */
-    public final <B extends Buffer> CLImage3d<B> createImage3d(B directBuffer, int width, int height, int depth, int rowPitch, int slicePitch, CLImageFormat format, Mem... flags) {
-        CLImage3d<B> image = CLImage3d.createImage(this, directBuffer, width, height, depth, rowPitch, slicePitch, format, Mem.flagsToInt(flags));
+    public final <B extends Buffer> CLImage3d<B> createImage3d(final B directBuffer, final int width, final int height, final int depth, final int rowPitch, final int slicePitch, final CLImageFormat format, final Mem... flags) {
+        final CLImage3d<B> image = CLImage3d.createImage(this, directBuffer, width, height, depth, rowPitch, slicePitch, format, Mem.flagsToInt(flags));
         memoryObjects.add(image);
         return image;
     }
 
-    CLCommandQueue createCommandQueue(CLDevice device, long properties) {
+    CLCommandQueue createCommandQueue(final CLDevice device, final long properties) {
 
-        CLCommandQueue queue = CLCommandQueue.create(this, device, properties);
+        final CLCommandQueue queue = CLCommandQueue.create(this, device, properties);
 
         synchronized(queuesMap) {
             List<CLCommandQueue> list = queuesMap.get(device);
@@ -444,23 +445,23 @@ public class CLContext extends CLObjectResource {
         return queue;
     }
 
-    public CLSampler createSampler(AddressingMode addrMode, FilteringMode filtMode, boolean normalizedCoords) {
-        CLSampler sampler = CLSampler.create(this, addrMode, filtMode, normalizedCoords);
+    public CLSampler createSampler(final AddressingMode addrMode, final FilteringMode filtMode, final boolean normalizedCoords) {
+        final CLSampler sampler = CLSampler.create(this, addrMode, filtMode, normalizedCoords);
         samplers.add(sampler);
         return sampler;
     }
 
-    void onProgramReleased(CLProgram program) {
+    void onProgramReleased(final CLProgram program) {
         programs.remove(program);
     }
 
-    void onMemoryReleased(CLMemory<?> buffer) {
+    void onMemoryReleased(final CLMemory<?> buffer) {
         memoryObjects.remove(buffer);
     }
 
-    void onCommandQueueReleased(CLDevice device, CLCommandQueue queue) {
+    void onCommandQueueReleased(final CLDevice device, final CLCommandQueue queue) {
         synchronized(queuesMap) {
-            List<CLCommandQueue> list = queuesMap.get(device);
+            final List<CLCommandQueue> list = queuesMap.get(device);
             list.remove(queue);
             // remove empty lists from map
             if(list.isEmpty())
@@ -468,19 +469,19 @@ public class CLContext extends CLObjectResource {
         }
     }
 
-    void onSamplerReleased(CLSampler sampler) {
+    void onSamplerReleased(final CLSampler sampler) {
         samplers.remove(sampler);
     }
 
-    public void addCLErrorHandler(CLErrorHandler handler) {
+    public void addCLErrorHandler(final CLErrorHandler handler) {
         errorHandler.addHandler(handler);
     }
 
-    public void removeCLErrorHandler(CLErrorHandler handler) {
+    public void removeCLErrorHandler(final CLErrorHandler handler) {
         errorHandler.removeHandler(handler);
     }
 
-    private void release(Collection<? extends CLResource> resources) {
+    private void release(final Collection<? extends CLResource> resources) {
         // resources remove themselves when released, see above
         while(!resources.isEmpty()) {
             resources.iterator().next().release();
@@ -507,39 +508,39 @@ public class CLContext extends CLObjectResource {
             }
 
         } finally {
-            int ret = platform.getContextBinding().clReleaseContext(ID);
+            final int ret = platform.getContextBinding().clReleaseContext(ID);
             CLException.checkForError(ret, "error releasing context");
         }
 
     }
 
-    protected void overrideContext(CLDevice device) {
+    protected void overrideContext(final CLDevice device) {
         device.setContext(this);
     }
 
-    private CLImageFormat[] getSupportedImageFormats(int flags, int type) {
+    private CLImageFormat[] getSupportedImageFormats(final int flags, final int type) {
 
-        CLContextBinding binding = platform.getContextBinding();
+        final CLContextBinding binding = platform.getContextBinding();
 
-        int[] entries = new int[1];
+        final int[] entries = new int[1];
         int ret = binding.clGetSupportedImageFormats(ID, flags, type, 0, null, entries, 0);
         if(ret != CL.CL_SUCCESS) {
             throw CLException.newException(ret, "error calling clGetSupportedImageFormats");
         }
 
-        int count = entries[0];
+        final int count = entries[0];
         if(count == 0) {
             return new CLImageFormat[0];
         }
 
-        CLImageFormat[] formats = new CLImageFormat[count];
-        CLImageFormatImpl impl = CLImageFormatImpl.create(Buffers.newDirectByteBuffer(count * CLImageFormatImpl.size()));
+        final CLImageFormat[] formats = new CLImageFormat[count];
+        final CLImageFormatImpl impl = CLImageFormatImpl.create(Buffers.newDirectByteBuffer(count * CLImageFormatImpl.size()));
         ret = binding.clGetSupportedImageFormats(ID, flags, type, count, impl, null);
         if(ret != CL.CL_SUCCESS) {
             throw CLException.newException(ret, "error calling clGetSupportedImageFormats");
         }
 
-        ByteBuffer buffer = impl.getBuffer();
+        final ByteBuffer buffer = impl.getBuffer();
         for (int i = 0; i < formats.length; i++) {
             formats[i] = new CLImageFormat(CLImageFormatImpl.create(buffer.slice()));
             buffer.position(i*CLImageFormatImpl.size());
@@ -552,15 +553,15 @@ public class CLContext extends CLObjectResource {
     /**
      * Returns all supported 2d image formats with the (optional) memory allocation flags.
      */
-    public CLImageFormat[] getSupportedImage2dFormats(Mem... flags) {
-        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CL.CL_MEM_OBJECT_IMAGE2D);
+    public CLImageFormat[] getSupportedImage2dFormats(final Mem... flags) {
+        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CLMemObjBinding.CL_MEM_OBJECT_IMAGE2D);
     }
 
     /**
      * Returns all supported 3d image formats with the (optional) memory allocation flags.
      */
-    public CLImageFormat[] getSupportedImage3dFormats(Mem... flags) {
-        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CL.CL_MEM_OBJECT_IMAGE3D);
+    public CLImageFormat[] getSupportedImage3dFormats(final Mem... flags) {
+        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CLMemObjBinding.CL_MEM_OBJECT_IMAGE3D);
     }
 
     /**
@@ -618,7 +619,7 @@ public class CLContext extends CLObjectResource {
      * The device speed is estimated by calculating the product of
      * MAX_COMPUTE_UNITS and MAX_CLOCK_FREQUENCY.
      */
-    public CLDevice getMaxFlopsDevice(CLDevice.Type type) {
+    public CLDevice getMaxFlopsDevice(final CLDevice.Type type) {
         return CLPlatform.findMaxFlopsDevice(getDevices(), type);
     }
 
@@ -627,7 +628,7 @@ public class CLContext extends CLObjectResource {
      */
     public long getMaxMemBaseAddrAlign() {
         long maxAlignment = 0;
-        for (CLDevice device : getDevices()) {
+        for (final CLDevice device : getDevices()) {
             maxAlignment = Math.max(maxAlignment, device.getMemBaseAddrAlign());
         }
         return maxAlignment;
@@ -648,8 +649,8 @@ public class CLContext extends CLObjectResource {
         return getPlatform().getCLBinding();
     }
 
-    CLDevice getDevice(long dID) {
-        CLDevice[] deviceArray = getDevices();
+    CLDevice getDevice(final long dID) {
+        final CLDevice[] deviceArray = getDevices();
         for (int i = 0; i < deviceArray.length; i++) {
             if(dID == deviceArray[i].ID)
                 return deviceArray[i];
@@ -657,11 +658,11 @@ public class CLContext extends CLObjectResource {
         return null;
     }
 
-    protected static long toDeviceBitmap(Type[] deviceTypes) {
+    protected static long toDeviceBitmap(final Type[] deviceTypes) {
         long bitmap = 0;
         if (deviceTypes != null) {
             for (int i = 0; i < deviceTypes.length; i++) {
-                Type type = deviceTypes[i];
+                final Type type = deviceTypes[i];
                 if(type == null) {
                     throw new IllegalArgumentException("Device type at index "+i+" was null.");
                 }
@@ -681,7 +682,7 @@ public class CLContext extends CLObjectResource {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -711,26 +712,26 @@ public class CLContext extends CLObjectResource {
         private CLErrorHandler[] clientHandlers = new CLErrorHandler[0];
 
         @Override
-        public synchronized void onError(String errinfo, ByteBuffer private_info, long cb) {
-            CLErrorHandler[] handlers = this.clientHandlers;
+        public synchronized void onError(final String errinfo, final ByteBuffer private_info, final long cb) {
+            final CLErrorHandler[] handlers = this.clientHandlers;
             for (int i = 0; i < handlers.length; i++) {
                 handlers[i].onError(errinfo, private_info, cb);
             }
         }
 
-        private synchronized void addHandler(CLErrorHandler handler) {
+        private synchronized void addHandler(final CLErrorHandler handler) {
 
             if(handler == null) {
                 throw new IllegalArgumentException("handler was null.");
             }
 
-            CLErrorHandler[] handlers = new CLErrorHandler[clientHandlers.length+1];
+            final CLErrorHandler[] handlers = new CLErrorHandler[clientHandlers.length+1];
             System.arraycopy(clientHandlers, 0, handlers, 0, clientHandlers.length);
             handlers[handlers.length-1] = handler;
             clientHandlers = handlers;
         }
 
-        private synchronized void removeHandler(CLErrorHandler handler) {
+        private synchronized void removeHandler(final CLErrorHandler handler) {
 
             if(handler == null) {
                 throw new IllegalArgumentException("handler was null.");
@@ -738,7 +739,7 @@ public class CLContext extends CLObjectResource {
 
             for (int i = 0; i < clientHandlers.length; i++) {
                 if(handler.equals(clientHandlers[i])) {
-                    CLErrorHandler[] handlers = new CLErrorHandler[clientHandlers.length-1];
+                    final CLErrorHandler[] handlers = new CLErrorHandler[clientHandlers.length-1];
                     System.arraycopy(clientHandlers, 0, handlers, 0, i);
                     System.arraycopy(clientHandlers, i, handlers, 0, handlers.length-i);
                     clientHandlers = handlers;

@@ -70,7 +70,7 @@ public class CLProgramTest extends UITestCase {
     public void enumsTest() {
 
         // CLProgram enums
-        for (Status e : Status.values()) {
+        for (final Status e : Status.values()) {
             assertEquals(e, Status.valueOf(e.STATUS));
         }
     }
@@ -80,8 +80,8 @@ public class CLProgramTest extends UITestCase {
 
         out.println(" - - - CLProgramTest; rebuild program test - - - ");
 
-        CLContext context = CLContext.create();
-        CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"));
+        final CLContext context = CLContext.create();
+        final CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"));
 
         // only test kernel creation error on unbuilt program if we're not on AMD -- as of
         // 3/8/2014, AMD drivers segfault on this instead of returning CL_INVALID_PROGRAM_EXECUTABLE
@@ -89,7 +89,7 @@ public class CLProgramTest extends UITestCase {
             try{
                 program.createCLKernels();
                 fail("expected exception but got none :(");
-            }catch(CLException ex) {
+            }catch(final CLException ex) {
                 out.println("got expected exception:  "+ex.getCLErrorString());
                 assertEquals(ex.errorcode, CL.CL_INVALID_PROGRAM_EXECUTABLE);
             }
@@ -123,16 +123,16 @@ public class CLProgramTest extends UITestCase {
 
         out.println(" - - - CLProgramTest; down-/upload binaries test - - - ");
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"))
                                    .build(ENABLE_MAD, WARNINGS_ARE_ERRORS);
 
         // obtain binaries
-        Map<CLDevice, byte[]> binaries = program.getBinaries();
+        final Map<CLDevice, byte[]> binaries = program.getBinaries();
         assertFalse(binaries.isEmpty());
 
-        CLDevice[] devices = program.getCLDevices();
-        for (CLDevice device : devices) {
+        final CLDevice[] devices = program.getCLDevices();
+        for (final CLDevice device : devices) {
             assertTrue(binaries.containsKey(device));
         }
 
@@ -155,7 +155,7 @@ public class CLProgramTest extends UITestCase {
         assertEquals(program.getCLDevices().length, 0);
 
         {
-            Map<String, CLKernel> kernels = program.createCLKernels();
+            final Map<String, CLKernel> kernels = program.createCLKernels();
             assertNotNull(kernels);
             assertEquals(kernels.size(), 0);
         }
@@ -181,9 +181,9 @@ public class CLProgramTest extends UITestCase {
         // 3/8/2014, AMD drivers segfault on this instead of returning CL_INVALID_PROGRAM_EXECUTABLE
         if(!context.getPlatform().isVendorAMD()) {
             try{
-                Map<String, CLKernel> kernels = program.createCLKernels();
+                final Map<String, CLKernel> kernels = program.createCLKernels();
                 fail("expected an exception from createCLKernels but got: "+kernels);
-            }catch(CLException ex) {
+            }catch(final CLException ex) {
                 // expected, not built yet
             }
         }
@@ -204,7 +204,7 @@ public class CLProgramTest extends UITestCase {
     public void builderTest() throws IOException, ClassNotFoundException, InterruptedException {
         out.println(" - - - CLProgramTest; program builder test - - - ");
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"));
 
         // same as program.build()
@@ -223,7 +223,7 @@ public class CLProgramTest extends UITestCase {
         assertTrue(program.isExecutable());
 
         // reusable builder
-        CLBuildConfiguration builder = CLProgramBuilder.createConfiguration()
+        final CLBuildConfiguration builder = CLProgramBuilder.createConfiguration()
                                      .withOption(ENABLE_MAD)
                                      .forDevices(context.getDevices())
                                      .withDefine("RADIUS", 5)
@@ -236,9 +236,9 @@ public class CLProgramTest extends UITestCase {
             final CountDownLatch countdown = new CountDownLatch(1);
             final CLProgram outerProgram = program;
 
-            CLBuildListener buildCallback = new CLBuildListener() {
+            final CLBuildListener buildCallback = new CLBuildListener() {
                 @Override
-                public void buildFinished(CLProgram program) {
+                public void buildFinished(final CLProgram program) {
                     assertEquals(outerProgram, program);
                     countdown.countDown();
                 }
@@ -251,14 +251,14 @@ public class CLProgramTest extends UITestCase {
         assertTrue(program.isExecutable());
 
         // serialization test
-        File file = tmpFolder.newFile("foobar.builder");
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
+        final File file = tmpFolder.newFile("foobar.builder");
+        final ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
         builder.save(oos);
         oos.close();
 
         // build configuration
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-        CLBuildConfiguration buildConfig = CLProgramBuilder.loadConfiguration(ois);
+        final CLBuildConfiguration buildConfig = CLProgramBuilder.loadConfiguration(ois);
         ois.close();
 
         assertEquals(builder, buildConfig);
@@ -268,7 +268,7 @@ public class CLProgramTest extends UITestCase {
 
         // program configuration
         ois = new ObjectInputStream(new FileInputStream(file));
-        CLProgramConfiguration programConfig = CLProgramBuilder.loadConfiguration(ois, context);
+        final CLProgramConfiguration programConfig = CLProgramBuilder.loadConfiguration(ois, context);
         assertNotNull(programConfig.getProgram());
         ois.close();
         program = programConfig.build();
@@ -284,18 +284,18 @@ public class CLProgramTest extends UITestCase {
 
     @Test
     public void kernelTest() {
-        String source = "__attribute__((reqd_work_group_size(1, 1, 1))) kernel void foo(float a, int b, short c) { }\n";
+        final String source = "__attribute__((reqd_work_group_size(1, 1, 1))) kernel void foo(float a, int b, short c) { }\n";
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
 
         try{
-            CLProgram program = context.createProgram(source).build();
+            final CLProgram program = context.createProgram(source).build();
             assertTrue(program.isExecutable());
 
-            CLKernel kernel = program.createCLKernel("foo");
+            final CLKernel kernel = program.createCLKernel("foo");
             assertNotNull(kernel);
 
-            long[] wgs = kernel.getCompileWorkGroupSize(context.getDevices()[0]);
+            final long[] wgs = kernel.getCompileWorkGroupSize(context.getDevices()[0]);
 
             out.println("compile workgroup size: " + wgs[0]+" "+wgs[1]+" "+wgs[2]);
 
@@ -318,7 +318,7 @@ public class CLProgramTest extends UITestCase {
             try{
                 kernel.putArg(3);
                 fail("exception not thrown");
-            }catch (IndexOutOfBoundsException expected){ }
+            }catch (final IndexOutOfBoundsException expected){ }
 
             assertEquals(3, kernel.position());
             assertEquals(0, kernel.rewind().position());
@@ -332,16 +332,16 @@ public class CLProgramTest extends UITestCase {
     @Test
     public void createAllKernelsTest() {
 
-        String source = "kernel void foo(int a) { }\n"+
+        final String source = "kernel void foo(int a) { }\n"+
                         "kernel void bar(float b) { }\n";
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
         try{
-            CLProgram program = context.createProgram(source).build();
+            final CLProgram program = context.createProgram(source).build();
             assertTrue(program.isExecutable());
 
-            Map<String, CLKernel> kernels = program.createCLKernels();
-            for (CLKernel kernel : kernels.values()) {
+            final Map<String, CLKernel> kernels = program.createCLKernels();
+            for (final CLKernel kernel : kernels.values()) {
                 out.println("kernel: "+kernel.toString());
             }
 
@@ -367,8 +367,8 @@ public class CLProgramTest extends UITestCase {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        String tstname = CLProgramTest.class.getName();
+    public static void main(final String[] args) throws IOException {
+        final String tstname = CLProgramTest.class.getName();
         org.junit.runner.JUnitCore.main(tstname);
     }
 

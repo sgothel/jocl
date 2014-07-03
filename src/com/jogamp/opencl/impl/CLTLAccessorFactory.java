@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -50,12 +50,12 @@ import static com.jogamp.opencl.CLException.*;
 public class CLTLAccessorFactory implements CLAccessorFactory {
 
     @Override
-    public CLInfoAccessor createDeviceInfoAccessor(CLDeviceBinding cl, long id) {
+    public CLInfoAccessor createDeviceInfoAccessor(final CLDeviceBinding cl, final long id) {
         return new CLDeviceInfoAccessor(cl, id);
     }
 
     @Override
-    public CLPlatformInfoAccessor createPlatformInfoAccessor(CL cl, long id) {
+    public CLPlatformInfoAccessor createPlatformInfoAccessor(final CL cl, final long id) {
         return new CLTLPlatformInfoAccessor(cl, id);
     }
 
@@ -64,13 +64,13 @@ public class CLTLAccessorFactory implements CLAccessorFactory {
         private final CLDeviceBinding cl;
         private final long ID;
 
-        private CLDeviceInfoAccessor(CLDeviceBinding cl, long id) {
+        private CLDeviceInfoAccessor(final CLDeviceBinding cl, final long id) {
             this.cl = cl;
             this.ID = id;
         }
 
         @Override
-        public int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
+        public int getInfo(final int name, final long valueSize, final Buffer value, final PointerBuffer valueSizeRet) {
             return cl.clGetDeviceInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
@@ -81,34 +81,34 @@ public class CLTLAccessorFactory implements CLAccessorFactory {
         private final long ID;
         private final CL cl;
 
-        private CLTLPlatformInfoAccessor(CL cl, long id) {
+        private CLTLPlatformInfoAccessor(final CL cl, final long id) {
             this.ID = id;
             this.cl = cl;
         }
 
         @Override
-        public int getInfo(int name, long valueSize, Buffer value, PointerBuffer valueSizeRet) {
+        public int getInfo(final int name, final long valueSize, final Buffer value, final PointerBuffer valueSizeRet) {
             return cl.clGetPlatformInfo(ID, name, valueSize, value, valueSizeRet);
         }
 
         @Override
-        public long[] getDeviceIDs(long type) {
+        public long[] getDeviceIDs(final long type) {
 
-            IntBuffer buffer = getBB(4).asIntBuffer();
+            final IntBuffer buffer = getBB(4).asIntBuffer();
             int ret = cl.clGetDeviceIDs(ID, type, 0, null, buffer);
-            int count = buffer.get(0);
+            final int count = buffer.get(0);
 
             // return an empty buffer rather than throwing an exception
-            if(ret == CL.CL_DEVICE_NOT_FOUND || count == 0) {
+            if(ret == CLDeviceBinding.CL_DEVICE_NOT_FOUND || count == 0) {
                 return new long[0];
             }else{
                 checkForError(ret, "error while enumerating devices");
 
-                PointerBuffer deviceIDs = PointerBuffer.wrap(getBB(count*PointerBuffer.ELEMENT_SIZE));
+                final PointerBuffer deviceIDs = PointerBuffer.wrap(getBB(count*PointerBuffer.ELEMENT_SIZE));
                 ret = cl.clGetDeviceIDs(ID, type, count, deviceIDs, null);
                 checkForError(ret, "error while enumerating devices");
 
-                long[] ids = new long[count];
+                final long[] ids = new long[count];
                 for (int i = 0; i < ids.length; i++) {
                     ids[i] = deviceIDs.get(i);
                 }

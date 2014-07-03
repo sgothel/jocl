@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -48,22 +48,22 @@ import static com.jogamp.opencl.llb.gl.CLGL.*;
  * @author Michael Bien, et al.
  */
 public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
-    
+
     B buffer;
     protected final int FLAGS;
     protected long size;
-    
+
     // depends on the nio buffer type
     protected int elementSize;
     protected int clCapacity;
 
     private final CLMemObjBinding binding;
-    
-    protected <Buffer> CLMemory(CLContext context, long size, long id, int flags) {
+
+    protected <Buffer> CLMemory(final CLContext context, final long size, final long id, final int flags) {
         this(context, null, size, id, flags);
     }
-    
-    protected CLMemory(CLContext context, B directBuffer, long size, long id, int flags) {
+
+    protected CLMemory(final CLContext context, final B directBuffer, final long size, final long id, final int flags) {
         super(context, id);
         this.buffer = directBuffer;
         this.FLAGS = flags;
@@ -84,20 +84,20 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
     /**
      * Returns true if a host pointer must be specified on mem object creation.
      */
-    protected static boolean isHostPointerFlag(int flags) {
+    protected static boolean isHostPointerFlag(final int flags) {
         return (flags & CL_MEM_COPY_HOST_PTR) != 0
             || (flags & CL_MEM_USE_HOST_PTR)  != 0;
     }
 
-    protected static long getSizeImpl(CLContext context, long id) {
-        PointerBuffer pb = PointerBuffer.allocateDirect(1);
-        CLMemObjBinding binding = context.getPlatform().getMemObjectBinding(); // FIXME: CL separation makes this pretty complicated !
-        int ret = binding.clGetMemObjectInfo(id, CL_MEM_SIZE, pb.elementSize(), pb.getBuffer(), null);
+    protected static long getSizeImpl(final CLContext context, final long id) {
+        final PointerBuffer pb = PointerBuffer.allocateDirect(1);
+        final CLMemObjBinding binding = context.getPlatform().getMemObjectBinding(); // FIXME: CL separation makes this pretty complicated !
+        final int ret = binding.clGetMemObjectInfo(id, CL_MEM_SIZE, pb.elementSize(), pb.getBuffer(), null);
         checkForError(ret, "can not obtain buffer info");
         return pb.get();
     }
 
-    protected static CL getCL(CLContext context) {
+    protected static CL getCL(final CLContext context) {
         return context.getCL();
     }
 
@@ -108,7 +108,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
     public void registerDestructorCallback(final CLMemObjectListener listener) {
         binding.clSetMemObjectDestructorCallback(ID, new CLMemObjectDestructorCallback() {
             @Override
-            public void memoryDeallocated(long memObjID) {
+            public void memoryDeallocated(final long memObjID) {
                 listener.memoryDeallocated(CLMemory.this);
             }
         });
@@ -120,7 +120,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
     public abstract <T extends Buffer> CLMemory<T> cloneWith(T directBuffer);
 
 
-    public CLMemory<B> use(B buffer) {
+    public CLMemory<B> use(final B buffer) {
         if(this.buffer != null && buffer != null && this.buffer.getClass() != buffer.getClass()) {
             throw new IllegalArgumentException(
                     "expected a Buffer of class " + this.buffer.getClass()
@@ -172,7 +172,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
     public int getCLCapacity() {
         return clCapacity;
     }
-    
+
     /**
      * Returns the size in bytes of a single buffer element.
      * This method returns 1 if no buffer is available indicating regular byte access.
@@ -193,8 +193,8 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
      * It is unsuitable for general use in applications. This feature is provided for debugging.
      */
     public int getMapCount() {
-        IntBuffer value = Buffers.newDirectIntBuffer(1);
-        int ret = binding.clGetMemObjectInfo(ID, CL_MEM_MAP_COUNT, 4, value, null);
+        final IntBuffer value = Buffers.newDirectIntBuffer(1);
+        final int ret = binding.clGetMemObjectInfo(ID, CL_MEM_MAP_COUNT, 4, value, null);
         checkForError(ret, "can not obtain buffer map count.");
         return value.get();
     }
@@ -223,7 +223,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
     @Override
     public void release() {
         super.release();
-        int ret = binding.clReleaseMemObject(ID);
+        final int ret = binding.clReleaseMemObject(ID);
         context.onMemoryReleased(this);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not release "+this);
@@ -254,7 +254,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
 //    }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -345,11 +345,11 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
          */
         public final int CONFIG;
 
-        private Mem(int config) {
+        private Mem(final int config) {
             this.CONFIG = config;
         }
 
-        public static Mem valueOf(int bufferFlag) {
+        public static Mem valueOf(final int bufferFlag) {
             switch (bufferFlag) {
                 case CL_MEM_READ_WRITE:
                     return Mem.READ_WRITE;
@@ -367,10 +367,10 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
             return null;
         }
 
-        public static EnumSet<Mem> valuesOf(int bitfield) {
-            List<Mem> matching = new ArrayList<Mem>();
-            Mem[] values = Mem.values();
-            for (Mem value : values) {
+        public static EnumSet<Mem> valuesOf(final int bitfield) {
+            final List<Mem> matching = new ArrayList<Mem>();
+            final Mem[] values = Mem.values();
+            for (final Mem value : values) {
                 if((value.CONFIG & bitfield) != 0)
                     matching.add(value);
             }
@@ -380,7 +380,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
                 return EnumSet.copyOf(matching);
         }
 
-        public static int flagsToInt(Mem[] flags) {
+        public static int flagsToInt(final Mem[] flags) {
             int clFlags = 0;
             if (flags != null) {
                 for (int i = 0; i < flags.length; i++) {
@@ -425,11 +425,11 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
          */
         public final int FLAGS;
 
-        private Map(int flags) {
+        private Map(final int flags) {
             this.FLAGS = flags;
         }
 
-        public Map valueOf(int flag) {
+        public Map valueOf(final int flag) {
             if(flag == WRITE.FLAGS)
                 return WRITE;
             else if(flag == READ.FLAGS)
@@ -450,11 +450,11 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
 
         public final int TYPE;
 
-        private GLObjectType(int type) {
+        private GLObjectType(final int type) {
             this.TYPE = type;
         }
 
-        public static GLObjectType valueOf(int type) {
+        public static GLObjectType valueOf(final int type) {
             if(type == CL_GL_OBJECT_BUFFER)
                 return GL_OBJECT_BUFFER;
             else if(type == CL_GL_OBJECT_TEXTURE2D)

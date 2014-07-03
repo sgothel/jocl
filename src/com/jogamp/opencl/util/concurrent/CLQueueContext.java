@@ -24,7 +24,7 @@ public abstract class CLQueueContext implements CLResource {
 
     public final CLCommandQueue queue;
 
-    public CLQueueContext(CLCommandQueue queue) {
+    public CLQueueContext(final CLCommandQueue queue) {
         this.queue = queue;
     }
 
@@ -45,7 +45,7 @@ public abstract class CLQueueContext implements CLResource {
         public final CLProgram program;
         public final Map<String, CLKernel> kernels;
 
-        public CLSimpleQueueContext(CLCommandQueue queue, CLProgram program) {
+        public CLSimpleQueueContext(final CLCommandQueue queue, final CLProgram program) {
             super(queue);
             this.program = program;
             this.kernels = program.createCLKernels();
@@ -55,7 +55,7 @@ public abstract class CLQueueContext implements CLResource {
             return kernels;
         }
 
-        public CLKernel getKernel(String name) {
+        public CLKernel getKernel(final String name) {
             return kernels.get(name);
         }
 

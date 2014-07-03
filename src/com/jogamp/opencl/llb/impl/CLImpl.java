@@ -56,7 +56,7 @@ public class CLImpl extends CLAbstractImpl {
     }
 
     @Override
-    public long clCreateContext(PointerBuffer properties, PointerBuffer devices, CLErrorHandler pfn_notify, IntBuffer errcode_ret) {
+    public long clCreateContext(final PointerBuffer properties, final PointerBuffer devices, final CLErrorHandler pfn_notify, final IntBuffer errcode_ret) {
 
         if (properties != null && !properties.isDirect()) {
             throw new RuntimeException("Argument \"properties\" was not a direct buffer");
@@ -71,8 +71,8 @@ public class CLImpl extends CLAbstractImpl {
             throw new UnsupportedOperationException("Method not available");
         }
 
-        long[] global = new long[1];
-        long ctx = this.clCreateContext0(
+        final long[] global = new long[1];
+        final long ctx = this.clCreateContext0(
                 properties != null ? properties.getBuffer() : null, getDirectBufferByteOffset(properties),
                 devices != null ? devices.remaining() : 0, devices != null ? devices.getBuffer() : null, getDirectBufferByteOffset(devices),
                 pfn_notify, global, errcode_ret, getDirectBufferByteOffset(errcode_ret), address);
@@ -88,7 +88,7 @@ public class CLImpl extends CLAbstractImpl {
     private native long clCreateContext0(Object cl_context_properties, int props_offset, int numDevices, Object devices, int devices_offset, Object pfn_notify, long[] global, Object errcode_ret, int err_offset, long address);
 
     @Override
-    public long clCreateContextFromType(PointerBuffer properties, long device_type, CLErrorHandler pfn_notify, IntBuffer errcode_ret) {
+    public long clCreateContextFromType(final PointerBuffer properties, final long device_type, final CLErrorHandler pfn_notify, final IntBuffer errcode_ret) {
         if (properties != null && !properties.isDirect()) {
             throw new RuntimeException("Argument \"properties\" was not a direct buffer");
         }
@@ -102,8 +102,8 @@ public class CLImpl extends CLAbstractImpl {
             throw new UnsupportedOperationException("Method not available");
         }
 
-        long[] global = new long[1];
-        long ctx = this.clCreateContextFromType0(
+        final long[] global = new long[1];
+        final long ctx = this.clCreateContextFromType0(
                 properties != null ? properties.getBuffer() : null, getDirectBufferByteOffset(properties),
                 device_type, pfn_notify, global, errcode_ret, getDirectBufferByteOffset(errcode_ret), address);
 
@@ -118,7 +118,7 @@ public class CLImpl extends CLAbstractImpl {
     private native long clCreateContextFromType0(Object properties, int props_offset, long device_type, Object pfn_notify, long[] global, Object errcode_ret, int err_offset, long address);
 
     @Override
-    public int clReleaseContext(long context) {
+    public int clReleaseContext(final long context) {
         long global = 0;
         synchronized (contextCallbackMap) {
             global = contextCallbackMap.remove(context);
@@ -136,7 +136,7 @@ public class CLImpl extends CLAbstractImpl {
 
     /** Interface to C language function: <br> <code> int32_t clBuildProgram(cl_program, uint32_t, cl_device_id * , const char * , void * ); </code>    */
     @Override
-    public int clBuildProgram(long program, int deviceCount, PointerBuffer deviceList, String options, BuildProgramCallback cb) {
+    public int clBuildProgram(final long program, final int deviceCount, final PointerBuffer deviceList, final String options, final BuildProgramCallback cb) {
         if (deviceList != null && !deviceList.isDirect()) {
             throw new RuntimeException("Argument \"properties\" was not a direct buffer");
         }
@@ -154,7 +154,7 @@ public class CLImpl extends CLAbstractImpl {
 
 
     @Override
-    public int clSetEventCallback(long event, int trigger, CLEventCallback callback) {
+    public int clSetEventCallback(final long event, final int trigger, final CLEventCallback callback) {
         final long address = addressTable._addressof_clSetEventCallback;
         if (address == 0) {
             throw new UnsupportedOperationException("Method not available");
@@ -166,7 +166,7 @@ public class CLImpl extends CLAbstractImpl {
 
 
     @Override
-    public int clSetMemObjectDestructorCallback(long memObjID, CLMemObjectDestructorCallback cb) {
+    public int clSetMemObjectDestructorCallback(final long memObjID, final CLMemObjectDestructorCallback cb) {
         final long address = addressTable._addressof_clSetMemObjectDestructorCallback;
         if (address == 0) {
             throw new UnsupportedOperationException("Method not available");
@@ -186,11 +186,11 @@ public class CLImpl extends CLAbstractImpl {
     @param event a direct {@link com.jogamp.common.nio.PointerBuffer}
     @param errcode_ret a direct {@link java.nio.IntBuffer}   */
     @Override
-    public ByteBuffer clEnqueueMapImage(long command_queue, long image, int blocking_map, long map_flags,
-            PointerBuffer origin, PointerBuffer range,
-            PointerBuffer image_row_pitch, PointerBuffer image_slice_pitch,
-            int num_events_in_wait_list,
-            PointerBuffer event_wait_list, PointerBuffer event, IntBuffer errcode_ret) {
+    public ByteBuffer clEnqueueMapImage(final long command_queue, final long image, final int blocking_map, final long map_flags,
+            final PointerBuffer origin, final PointerBuffer range,
+            final PointerBuffer image_row_pitch, final PointerBuffer image_slice_pitch,
+            final int num_events_in_wait_list,
+            final PointerBuffer event_wait_list, final PointerBuffer event, final IntBuffer errcode_ret) {
 
         if (origin != null && !origin.isDirect()) {
             throw new CLException("Argument \"origin\" was not a direct buffer");

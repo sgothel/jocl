@@ -69,18 +69,18 @@ public class CLBufferTest extends UITestCase {
 
         out.println(" - - - highLevelTest; create buffer test - - - ");
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
         try{
-            int size = 6;
+            final int size = 6;
 
-            CLBuffer<ByteBuffer> bb = context.createByteBuffer(size);
-            CLBuffer<ShortBuffer> sb = context.createShortBuffer(size);
-            CLBuffer<IntBuffer> ib = context.createIntBuffer(size);
-            CLBuffer<LongBuffer> lb = context.createLongBuffer(size);
-            CLBuffer<FloatBuffer> fb = context.createFloatBuffer(size);
-            CLBuffer<DoubleBuffer> db = context.createDoubleBuffer(size);
+            final CLBuffer<ByteBuffer> bb = context.createByteBuffer(size);
+            final CLBuffer<ShortBuffer> sb = context.createShortBuffer(size);
+            final CLBuffer<IntBuffer> ib = context.createIntBuffer(size);
+            final CLBuffer<LongBuffer> lb = context.createLongBuffer(size);
+            final CLBuffer<FloatBuffer> fb = context.createFloatBuffer(size);
+            final CLBuffer<DoubleBuffer> db = context.createDoubleBuffer(size);
 
-            List<CLMemory<? extends Buffer>> buffers = context.getMemoryObjects();
+            final List<CLMemory<? extends Buffer>> buffers = context.getMemoryObjects();
             assertEquals(6, buffers.size());
 
             assertEquals(1, bb.getElementSize());
@@ -90,19 +90,19 @@ public class CLBufferTest extends UITestCase {
             assertEquals(4, fb.getElementSize());
             assertEquals(8, db.getElementSize());
 
-            ByteBuffer anotherNIO = newDirectByteBuffer(2);
+            final ByteBuffer anotherNIO = newDirectByteBuffer(2);
 
-            for (CLMemory<? extends Buffer> memory : buffers) {
+            for (final CLMemory<? extends Buffer> memory : buffers) {
 
-                CLBuffer<? extends Buffer> buffer = (CLBuffer<? extends Buffer>) memory;
-                Buffer nio = buffer.getBuffer();
+                final CLBuffer<? extends Buffer> buffer = (CLBuffer<? extends Buffer>) memory;
+                final Buffer nio = buffer.getBuffer();
 
                 assertEquals(nio.capacity(), buffer.getCLCapacity());
                 assertEquals(buffer.getNIOSize(), buffer.getCLSize());
                 assertEquals(sizeOfBufferElem(nio), buffer.getElementSize());
                 assertEquals(nio.capacity() * sizeOfBufferElem(nio), buffer.getCLSize());
 
-                CLBuffer<ByteBuffer> clone = buffer.cloneWith(anotherNIO);
+                final CLBuffer<ByteBuffer> clone = buffer.cloneWith(anotherNIO);
 
                 assertEquals(buffer.ID, clone.ID);
                 assertTrue(clone.equals(buffer));
@@ -126,16 +126,16 @@ public class CLBufferTest extends UITestCase {
 
         final int elements = NUM_ELEMENTS;
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
 
          // the CL.MEM_* flag is probably completely irrelevant in our case since we do not use a kernel in this test
-        CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements*SIZEOF_INT, Mem.READ_ONLY);
-        CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements*SIZEOF_INT, Mem.READ_ONLY);
+        final CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements*SIZEOF_INT, Mem.READ_ONLY);
+        final CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements*SIZEOF_INT, Mem.READ_ONLY);
 
         // fill only first read buffer -> we will copy the payload to the second later.
         fillBuffer(clBufferA.buffer, 12345);
 
-        CLCommandQueue queue = context.getDevices()[0].createCommandQueue();
+        final CLCommandQueue queue = context.getDevices()[0].createCommandQueue();
 
         // asynchronous write of data to GPU device, blocking read later to get the computed results back.
         queue.putWriteBuffer(clBufferA, false)                                 // write A
@@ -158,22 +158,22 @@ public class CLBufferTest extends UITestCase {
 
         final int elements = NUM_ELEMENTS;
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
 
-        ByteBuffer buffer = Buffers.newDirectByteBuffer(elements*SIZEOF_INT);
+        final ByteBuffer buffer = Buffers.newDirectByteBuffer(elements*SIZEOF_INT);
         // fill only first read buffer -> we will copy the payload to the second later.
         fillBuffer(buffer, 12345);
 
-        CLCommandQueue queue = context.getDevices()[0].createCommandQueue();
+        final CLCommandQueue queue = context.getDevices()[0].createCommandQueue();
 
-        Mem[] bufferConfig = new Mem[] {Mem.COPY_BUFFER, Mem.USE_BUFFER};
+        final Mem[] bufferConfig = new Mem[] {Mem.COPY_BUFFER, Mem.USE_BUFFER};
 
         for(int i = 0; i < bufferConfig.length; i++) {
 
             out.println("testing with "+bufferConfig[i] + " config");
 
-            CLBuffer<ByteBuffer> clBufferA = context.createBuffer(buffer, Mem.READ_ONLY, bufferConfig[i]);
-            CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements*SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferA = context.createBuffer(buffer, Mem.READ_ONLY, bufferConfig[i]);
+            final CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements*SIZEOF_INT, Mem.READ_ONLY);
 
             // asynchronous write of data to GPU device, blocking read later to get the computed results back.
             queue.putCopyBuffer(clBufferA, clBufferB, clBufferA.buffer.capacity()) // copy A -> B
@@ -223,10 +223,10 @@ public class CLBufferTest extends UITestCase {
             clBufferB = context.createByteBuffer(sizeInBytes, Mem.READ_WRITE, Mem.USE_BUFFER);
         }
 
-        CLCommandQueue queue = context.getDevices()[0].createCommandQueue();
+        final CLCommandQueue queue = context.getDevices()[0].createCommandQueue();
 
         // fill only first buffer -> we will copy the payload to the second later.
-        ByteBuffer mappedBufferA = queue.putMapBuffer(clBufferA, Map.WRITE, true);
+        final ByteBuffer mappedBufferA = queue.putMapBuffer(clBufferA, Map.WRITE, true);
         assertEquals(sizeInBytes, mappedBufferA.capacity());
 
         fillBuffer(mappedBufferA, 12345);                // write to A
@@ -235,7 +235,7 @@ public class CLBufferTest extends UITestCase {
              .putCopyBuffer(clBufferA, clBufferB);    // copy A -> B
 
         // map B for read operations
-        ByteBuffer mappedBufferB = queue.putMapBuffer(clBufferB, Map.READ, true);
+        final ByteBuffer mappedBufferB = queue.putMapBuffer(clBufferB, Map.READ, true);
         assertEquals(sizeInBytes, mappedBufferB.capacity());
 
         out.println("validating computed results...");
@@ -254,13 +254,14 @@ public class CLBufferTest extends UITestCase {
         out.println(" - - - subBufferTest - - - ");
 
         @SuppressWarnings("unchecked")
+        final
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
             out.println("aborting subBufferTest");
             return;
         }
 
-        CLContext context = CLContext.create(platform);
+        final CLContext context = CLContext.create(platform);
         try{
             final int subelements = 5;
             final long lMaxAlignment = context.getMaxMemBaseAddrAlign();
@@ -270,13 +271,13 @@ public class CLBufferTest extends UITestCase {
                 throw new RuntimeException("Cannot handle MaxMemBaseAddrAlign > MAX_INT, has 0x"+Long.toHexString(lMaxAlignment));
             }
             // device only
-            CLBuffer<?> buffer = context.createBuffer(iMaxAlignment+subelements);
+            final CLBuffer<?> buffer = context.createBuffer(iMaxAlignment+subelements);
 
             assertFalse(buffer.isSubBuffer());
             assertNotNull(buffer.getSubBuffers());
             assertTrue(buffer.getSubBuffers().isEmpty());
 
-            CLSubBuffer<?> subBuffer = buffer.createSubBuffer(iMaxAlignment, subelements);
+            final CLSubBuffer<?> subBuffer = buffer.createSubBuffer(iMaxAlignment, subelements);
 
             assertTrue(subBuffer.isSubBuffer());
             assertEquals(subelements, subBuffer.getCLSize());
@@ -299,13 +300,14 @@ public class CLBufferTest extends UITestCase {
         out.println(" - - - subBufferTest - - - ");
 
         @SuppressWarnings("unchecked")
+        final
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
             out.println("aborting subBufferTest");
             return;
         }
 
-        CLContext context = CLContext.create(platform);
+        final CLContext context = CLContext.create(platform);
         try{
             final int subelements = 5;
             final long lMaxAlignment = context.getMaxMemBaseAddrAlign();
@@ -317,12 +319,12 @@ public class CLBufferTest extends UITestCase {
             // FIXME: See Bug 979: Offset/Alignment via offset calculation per element-count is faulty!
             final int floatsPerAlignment = iMaxAlignment / Buffers.SIZEOF_FLOAT;
             // device + direct buffer
-            CLBuffer<FloatBuffer> buffer = context.createFloatBuffer(floatsPerAlignment+subelements);
+            final CLBuffer<FloatBuffer> buffer = context.createFloatBuffer(floatsPerAlignment+subelements);
             assertFalse(buffer.isSubBuffer());
             assertNotNull(buffer.getSubBuffers());
             assertTrue(buffer.getSubBuffers().isEmpty());
 
-            CLSubBuffer<FloatBuffer> subBuffer = buffer.createSubBuffer(floatsPerAlignment, subelements);
+            final CLSubBuffer<FloatBuffer> subBuffer = buffer.createSubBuffer(floatsPerAlignment, subelements);
 
             assertTrue(subBuffer.isSubBuffer());
             assertEquals(subelements, subBuffer.getBuffer().capacity());
@@ -348,13 +350,14 @@ public class CLBufferTest extends UITestCase {
         out.println(" - - - destructorCallbackTest - - - ");
 
         @SuppressWarnings("unchecked")
+        final
         CLPlatform platform = CLPlatform.getDefault(version(CL_1_1));
         if(platform == null) {
             out.println("aborting destructorCallbackTest");
             return;
         }
 
-        CLContext context = CLContext.create(platform);
+        final CLContext context = CLContext.create(platform);
 
         try{
 
@@ -362,7 +365,7 @@ public class CLBufferTest extends UITestCase {
             final CountDownLatch countdown = new CountDownLatch(1);
 
             buffer.registerDestructorCallback(new CLMemObjectListener() {
-                public void memoryDeallocated(CLMemory<?> mem) {
+                public void memoryDeallocated(final CLMemory<?> mem) {
                     out.println("buffer released");
                     assertEquals(mem, buffer);
                     countdown.countDown();
@@ -380,8 +383,8 @@ public class CLBufferTest extends UITestCase {
 
     }
 
-    public static void main(String[] args) throws IOException {
-        String tstname = CLBufferTest.class.getName();
+    public static void main(final String[] args) throws IOException {
+        final String tstname = CLBufferTest.class.getName();
         org.junit.runner.JUnitCore.main(tstname);
     }
 }

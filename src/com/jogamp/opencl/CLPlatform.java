@@ -46,6 +46,7 @@ import com.jogamp.opencl.llb.CLEventBinding;
 import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.opencl.spi.CLPlatformInfoAccessor;
 import com.jogamp.opencl.util.CLUtil;
+import com.jogamp.opencl.llb.impl.CLAbstractImpl;
 import com.jogamp.opencl.llb.impl.CLImpl;
 import com.jogamp.opencl.spi.CLAccessorFactory;
 import com.jogamp.opencl.util.Filter;
@@ -117,11 +118,11 @@ public class CLPlatform {
 
     protected final CLPlatformInfoAccessor info;
 
-    private CLPlatform(long id) {
+    private CLPlatform(final long id) {
         this(id, null);
     }
 
-    protected CLPlatform(long id, CLAccessorFactory factory) {
+    protected CLPlatform(final long id, final CLAccessorFactory factory) {
         initialize();
         this.ID = id;
         if(factory == null) {
@@ -147,7 +148,7 @@ public class CLPlatform {
      * @param factory CLAccessorFactory used for creating the bindings.
      * @throws JogampRuntimeException if something went wrong in the initialization (e.g. OpenCL lib not found).
      */
-    synchronized static void initialize(CLAccessorFactory factory) throws JogampRuntimeException {
+    synchronized static void initialize(final CLAccessorFactory factory) throws JogampRuntimeException {
 
         if(cl != null) {
             return;
@@ -162,14 +163,14 @@ public class CLPlatform {
         }
 
         try {
-            if( null == CLImpl.getCLProcAddressTable() ) {
+            if( null == CLAbstractImpl.getCLProcAddressTable() ) {
                 throw new JogampRuntimeException("JOCL ProcAddressTable is NULL");
             }
             cl = new CLImpl();
-        }catch(UnsatisfiedLinkError ex) {
+        }catch(final UnsatisfiedLinkError ex) {
             System.err.println(JoclVersion.getInstance().getAllVersions(null).toString());
             throw ex;
-        }catch(Exception ex) {
+        }catch(final Exception ex) {
             System.err.println(JoclVersion.getInstance().getAllVersions(null).toString());
             throw new JogampRuntimeException("JOCL initialization error.", ex);
         }
@@ -188,8 +189,8 @@ public class CLPlatform {
      * Returns the default OpenCL platform or null when no platform found.
      */
     @SuppressWarnings("unchecked")
-    public static CLPlatform getDefault(Filter<CLPlatform>... filter) {
-        CLPlatform[] platforms = listCLPlatforms(filter);
+    public static CLPlatform getDefault(final Filter<CLPlatform>... filter) {
+        final CLPlatform[] platforms = listCLPlatforms(filter);
         if(platforms.length > 0) {
             return latest(platforms);
         }else{
@@ -197,9 +198,9 @@ public class CLPlatform {
         }
     }
 
-    private static CLPlatform latest(CLPlatform[] platforms) {
+    private static CLPlatform latest(final CLPlatform[] platforms) {
         CLPlatform best = platforms[0];
-        for (CLPlatform platform : platforms) {
+        for (final CLPlatform platform : platforms) {
             if (platform.version.compareTo(best.version) > 0) {
                 best = platform;
             }
@@ -221,23 +222,23 @@ public class CLPlatform {
      * @throws CLException if something went wrong initializing OpenCL
      */
     @SuppressWarnings("unchecked")
-    public static CLPlatform[] listCLPlatforms(Filter<CLPlatform>... filter) {
+    public static CLPlatform[] listCLPlatforms(final Filter<CLPlatform>... filter) {
         initialize();
 
-        IntBuffer ib = Buffers.newDirectIntBuffer(1);
+        final IntBuffer ib = Buffers.newDirectIntBuffer(1);
         // find all available OpenCL platforms
         int ret = cl.clGetPlatformIDs(0, null, ib);
         checkForError(ret, "can not enumerate platforms");
 
         // receive platform ids
-        PointerBuffer platformId = PointerBuffer.allocateDirect(ib.get(0));
+        final PointerBuffer platformId = PointerBuffer.allocateDirect(ib.get(0));
         ret = cl.clGetPlatformIDs(platformId.capacity(), platformId, null);
         checkForError(ret, "can not enumerate platforms");
 
-        List<CLPlatform> platforms = new ArrayList<CLPlatform>();
+        final List<CLPlatform> platforms = new ArrayList<CLPlatform>();
 
         for (int i = 0; i < platformId.capacity(); i++) {
-            CLPlatform platform = new CLPlatform(platformId.get(i));
+            final CLPlatform platform = new CLPlatform(platformId.get(i));
             addIfAccepted(platform, platforms, filter);
         }
 
@@ -258,7 +259,7 @@ public class CLPlatform {
      */
     public static void unloadCompiler() {
         initialize();
-        int ret = cl.clUnloadCompiler();
+        final int ret = cl.clUnloadCompiler();
         checkForError(ret, "error while sending unload compiler hint");
     }
 
@@ -273,15 +274,15 @@ public class CLPlatform {
     /**
      * Lists all physical devices available on this platform matching the given {@link CLDevice.Type}.
      */
-    public CLDevice[] listCLDevices(CLDevice.Type... types) {
+    public CLDevice[] listCLDevices(final CLDevice.Type... types) {
         initialize();
 
-        List<CLDevice> list = new ArrayList<CLDevice>();
+        final List<CLDevice> list = new ArrayList<CLDevice>();
 
         for(int t = 0; t < types.length; t++) {
-            CLDevice.Type type = types[t];
+            final CLDevice.Type type = types[t];
 
-            long[] deviceIDs = info.getDeviceIDs(type.TYPE);
+            final long[] deviceIDs = info.getDeviceIDs(type.TYPE);
 
             //add device to list
             for (int n = 0; n < deviceIDs.length; n++) {
@@ -297,16 +298,16 @@ public class CLPlatform {
      * Lists all physical devices available on this platform matching the given {@link Filter}.
      */
     @SuppressWarnings("unchecked")
-    public CLDevice[] listCLDevices(Filter<CLDevice>... filters) {
+    public CLDevice[] listCLDevices(final Filter<CLDevice>... filters) {
         initialize();
 
-        List<CLDevice> list = new ArrayList<CLDevice>();
+        final List<CLDevice> list = new ArrayList<CLDevice>();
 
-        long[] deviceIDs = info.getDeviceIDs(CL_DEVICE_TYPE_ALL);
+        final long[] deviceIDs = info.getDeviceIDs(CL_DEVICE_TYPE_ALL);
 
         //add device to list
         for (int n = 0; n < deviceIDs.length; n++) {
-            CLDevice device = createDevice(deviceIDs[n]);
+            final CLDevice device = createDevice(deviceIDs[n]);
             addIfAccepted(device, list, filters);
         }
 
@@ -314,16 +315,16 @@ public class CLPlatform {
 
     }
 
-    protected CLDevice createDevice(long id) {
+    protected CLDevice createDevice(final long id) {
         return new CLDevice(this, id);
     }
 
-    private static <I> void addIfAccepted(I item, List<I> list, Filter<I>[] filters) {
+    private static <I> void addIfAccepted(final I item, final List<I> list, final Filter<I>[] filters) {
         if(filters == null) {
             list.add(item);
         }else{
             boolean accepted = true;
-            for (Filter<I> filter : filters) {
+            for (final Filter<I> filter : filters) {
                 if(!filter.accept(item)) {
                     accepted = false;
                     break;
@@ -335,11 +336,11 @@ public class CLPlatform {
         }
     }
 
-    static CLDevice findMaxFlopsDevice(CLDevice[] devices) {
+    static CLDevice findMaxFlopsDevice(final CLDevice[] devices) {
         return findMaxFlopsDevice(devices, null);
     }
 
-    static CLDevice findMaxFlopsDevice(CLDevice[] devices, CLDevice.Type type) {
+    static CLDevice findMaxFlopsDevice(final CLDevice[] devices, final CLDevice.Type type) {
         initialize();
 
         CLDevice maxFLOPSDevice = null;
@@ -348,13 +349,13 @@ public class CLPlatform {
 
         for (int i = 0; i < devices.length; i++) {
 
-            CLDevice device = devices[i];
+            final CLDevice device = devices[i];
 
             if(type == null || type.equals(device.getType())) {
 
-                int maxComputeUnits     = device.getMaxComputeUnits();
-                int maxClockFrequency   = device.getMaxClockFrequency();
-                int flops = maxComputeUnits*maxClockFrequency;
+                final int maxComputeUnits     = device.getMaxComputeUnits();
+                final int maxClockFrequency   = device.getMaxClockFrequency();
+                final int flops = maxComputeUnits*maxClockFrequency;
 
                 if(flops > maxflops) {
                     maxflops = flops;
@@ -383,7 +384,7 @@ public class CLPlatform {
      * The device speed is estimated by calculating the product of
      * MAX_COMPUTE_UNITS and MAX_CLOCK_FREQUENCY.
      */
-    public CLDevice getMaxFlopsDevice(CLDevice.Type... types) {
+    public CLDevice getMaxFlopsDevice(final CLDevice.Type... types) {
         return findMaxFlopsDevice(listCLDevices(types));
     }
 
@@ -393,7 +394,7 @@ public class CLPlatform {
      * MAX_COMPUTE_UNITS and MAX_CLOCK_FREQUENCY.
      */
     @SuppressWarnings("unchecked")
-    public CLDevice getMaxFlopsDevice(Filter<CLDevice>... filter) {
+    public CLDevice getMaxFlopsDevice(final Filter<CLDevice>... filter) {
         return findMaxFlopsDevice(listCLDevices(filter));
     }
 
@@ -423,14 +424,14 @@ public class CLPlatform {
     /**
      * @see CLVersion#isAtLeast(com.jogamp.opencl.CLVersion)
      */
-    public boolean isAtLeast(CLVersion other) {
+    public boolean isAtLeast(final CLVersion other) {
         return version.isAtLeast(other);
     }
 
     /**
      * @see CLVersion#isAtLeast(int, int)
      */
-    public boolean isAtLeast(int major, int minor) {
+    public boolean isAtLeast(final int major, final int minor) {
         return version.isAtLeast(major, minor);
     }
 
@@ -467,7 +468,7 @@ public class CLPlatform {
     /**
      * Returns true if the extension is supported on this platform.
      */
-    public boolean isExtensionAvailable(String extension) {
+    public boolean isExtensionAvailable(final String extension) {
         return getExtensions().contains(extension);
     }
 
@@ -479,8 +480,8 @@ public class CLPlatform {
 
         if(extensions == null) {
             extensions = new HashSet<String>();
-            String ext = getInfoString(CL_PLATFORM_EXTENSIONS);
-            Scanner scanner = new Scanner(ext);
+            final String ext = getInfoString(CL_PLATFORM_EXTENSIONS);
+            final Scanner scanner = new Scanner(ext);
 
             while(scanner.hasNext())
                 extensions.add(scanner.next());
@@ -503,7 +504,7 @@ public class CLPlatform {
     /**
      * Returns a info string in exchange for a key (CL_PLATFORM_*).
      */
-    public final String getInfoString(int key) {
+    public final String getInfoString(final int key) {
         return info.getString(key);
     }
 
@@ -572,7 +573,7 @@ public class CLPlatform {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }

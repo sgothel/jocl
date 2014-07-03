@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -43,17 +43,17 @@ import com.jogamp.opencl.llb.CLEventBinding;
  */
 public class CLUserEvent extends CLEvent {
 
-    CLUserEvent(CLContext context, long ID) {
+    CLUserEvent(final CLContext context, final long ID) {
         super(context, ID);
     }
 
     /**
      * Creates a new user event.
      */
-    public static CLUserEvent create(CLContext context) {
-        CLEventBinding binding = context.getPlatform().getEventBinding();
-        int[] error = new int[1];
-        long ID = binding.clCreateUserEvent(context.ID, error, 0);
+    public static CLUserEvent create(final CLContext context) {
+        final CLEventBinding binding = context.getPlatform().getEventBinding();
+        final int[] error = new int[1];
+        final long ID = binding.clCreateUserEvent(context.ID, error, 0);
         checkForError(error[0], "can not create user event.");
         return new CLUserEvent(context, ID);
     }
@@ -62,9 +62,9 @@ public class CLUserEvent extends CLEvent {
      * Sets the event execution status.
      * Calls {@native clSetUserEventStatus}.
      */
-    public CLUserEvent setStatus(CLEvent.ExecutionStatus status) {
-        CLEventBinding binding = getPlatform().getEventBinding();
-        int err = binding.clSetUserEventStatus(ID, status.STATUS);
+    public CLUserEvent setStatus(final CLEvent.ExecutionStatus status) {
+        final CLEventBinding binding = getPlatform().getEventBinding();
+        final int err = binding.clSetUserEventStatus(ID, status.STATUS);
         if(err != CL_SUCCESS) {
             newException(err, "can not set status "+status);
         }

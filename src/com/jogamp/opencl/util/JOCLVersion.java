@@ -53,7 +53,7 @@ public class JOCLVersion extends JogampVersion {
 
     private static final String PACKAGE = "com.jogamp.opencl";
 
-    private JOCLVersion(Manifest mf) {
+    private JOCLVersion(final Manifest mf) {
         super(PACKAGE, mf);
     }
 
@@ -84,7 +84,7 @@ public class JOCLVersion extends JogampVersion {
             sb.append(Platform.getNewline());
             createInstance().toString(sb);
             sb.append(Platform.getNewline());
-        }catch(Exception e) {
+        }catch(final Exception e) {
             sb.append(e.getMessage());
             e.printStackTrace();
         }
@@ -92,7 +92,7 @@ public class JOCLVersion extends JogampVersion {
         return sb.toString();
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         System.out.println(JOCLVersion.getAllVersions());
     }
 }

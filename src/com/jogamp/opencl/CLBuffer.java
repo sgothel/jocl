@@ -48,16 +48,16 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
 
     private List<CLSubBuffer<B>> childs;
 
-    protected CLBuffer(CLContext context, long size, long id, int flags) {
+    protected CLBuffer(final CLContext context, final long size, final long id, final int flags) {
         this(context, null, size, id, flags);
     }
 
-    protected CLBuffer(CLContext context, B directBuffer, long size, long id, int flags) {
+    protected CLBuffer(final CLContext context, final B directBuffer, final long size, final long id, final int flags) {
         super(context, directBuffer, size, id, flags);
     }
 
     @SuppressWarnings("rawtypes")
-    static CLBuffer<?> create(CLContext context, int size, int flags) {
+    static CLBuffer<?> create(final CLContext context, final int size, final int flags) {
 
         if(isHostPointerFlag(flags)) {
             throw new IllegalArgumentException("no host pointer defined");
@@ -71,7 +71,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
         return new CLBuffer(context, size, id, flags);
     }
 
-    static <B extends Buffer> CLBuffer<B> create(CLContext context, B directBuffer, int flags) {
+    static <B extends Buffer> CLBuffer<B> create(final CLContext context, final B directBuffer, final int flags) {
 
         if(!directBuffer.isDirect())
             throw new IllegalArgumentException("buffer is not direct");
@@ -81,10 +81,10 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
             host_ptr = directBuffer;
         }
 
-        CLBufferBinding binding = context.getPlatform().getBufferBinding();
-        int[] result = new int[1];
-        int size = Buffers.sizeOfBufferElem(directBuffer) * directBuffer.capacity();
-        long id = binding.clCreateBuffer(context.ID, flags, size, host_ptr, result, 0);
+        final CLBufferBinding binding = context.getPlatform().getBufferBinding();
+        final int[] result = new int[1];
+        final int size = Buffers.sizeOfBufferElem(directBuffer) * directBuffer.capacity();
+        final long id = binding.clCreateBuffer(context.ID, flags, size, host_ptr, result, 0);
         CLException.checkForError(result[0], "can not create cl buffer");
 
         return new CLBuffer<B>(context, directBuffer, size, id, flags);
@@ -99,12 +99,12 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
      * @param offset The offset in buffer elements.
      * @param size The size in buffer elements.
      */
-    public CLSubBuffer<B> createSubBuffer(int offset, int size, Mem... flags) {
+    public CLSubBuffer<B> createSubBuffer(int offset, int size, final Mem... flags) {
 
         final B slice;
         if(buffer != null) {
             slice = Buffers.slice(buffer, offset, size);
-            int elemSize = Buffers.sizeOfBufferElem(buffer);
+            final int elemSize = Buffers.sizeOfBufferElem(buffer);
             offset *= elemSize;
             size *= elemSize;
         } else {
@@ -139,7 +139,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
         super.release();
     }
 
-    void onReleaseSubBuffer(CLSubBuffer<?> sub) {
+    void onReleaseSubBuffer(final CLSubBuffer<?> sub) {
         childs.remove(sub);
     }
 
@@ -163,7 +163,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
     }
 
     @Override
-    public <T extends Buffer> CLBuffer<T> cloneWith(T directBuffer) {
+    public <T extends Buffer> CLBuffer<T> cloneWith(final T directBuffer) {
         return new CLBuffer<T>(context, directBuffer, size, ID, FLAGS);
     }
 

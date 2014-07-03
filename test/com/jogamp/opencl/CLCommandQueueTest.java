@@ -43,6 +43,7 @@ import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.util.CLDeviceFilters;
 import com.jogamp.opencl.util.CLPlatformFilters;
 import com.jogamp.opencl.llb.CL;
+import com.jogamp.opencl.llb.CLCommandQueueBinding;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -73,26 +74,26 @@ public class CLCommandQueueTest extends UITestCase {
     public void enumsTest() {
 
         //CLCommandQueueEnums
-        EnumSet<Mode> queueMode = Mode.valuesOf(CL.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE | CL.CL_QUEUE_PROFILING_ENABLE);
+        final EnumSet<Mode> queueMode = Mode.valuesOf(CLCommandQueueBinding.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE | CLCommandQueueBinding.CL_QUEUE_PROFILING_ENABLE);
         assertTrue(queueMode.contains(OUT_OF_ORDER_MODE));
         assertTrue(queueMode.contains(PROFILING_MODE));
 
         assertNotNull(Mode.valuesOf(0));
         assertEquals(0, Mode.valuesOf(0).size());
-        for (Mode mode : Mode.values()) {
+        for (final Mode mode : Mode.values()) {
             assertEquals(mode, Mode.valueOf(mode.QUEUE_MODE));
         }
 
         // CLEvent enums
-        for (ProfilingCommand cmd : ProfilingCommand.values()) {
+        for (final ProfilingCommand cmd : ProfilingCommand.values()) {
             assertEquals(cmd, ProfilingCommand.valueOf(cmd.COMMAND));
         }
 
-        for (CommandType type : CommandType.values()) {
+        for (final CommandType type : CommandType.values()) {
             assertEquals(type, CommandType.valueOf(type.TYPE));
         }
 
-        for (ExecutionStatus status : ExecutionStatus.values()) {
+        for (final ExecutionStatus status : ExecutionStatus.values()) {
             assertEquals(status, ExecutionStatus.valueOf(status.STATUS));
         }
 
@@ -103,25 +104,25 @@ public class CLCommandQueueTest extends UITestCase {
 
         out.println(" - - - event synchronization test - - - ");
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
 
         try{
-            CLDevice device = context.getDevices()[0];
-            int groupSize = device.getMaxWorkItemSizes()[0];
+            final CLDevice device = context.getDevices()[0];
+            final int groupSize = device.getMaxWorkItemSizes()[0];
 
             final int elements = roundUp(groupSize, ONE_MB / SIZEOF_INT * 5); // 5MB per buffer
 
-            CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
-            CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
-            CLBuffer<ByteBuffer> clBufferC = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
-            CLBuffer<ByteBuffer> clBufferD = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferC = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferD = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
 
             fillBuffer(clBufferA.buffer, 12345);
             fillBuffer(clBufferB.buffer, 67890);
 
-            CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
-            CLKernel vectorAddKernel = program.createCLKernel("VectorAddGM").setArg(3, elements);
-            CLCommandQueue queue = device.createCommandQueue();
+            final CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
+            final CLKernel vectorAddKernel = program.createCLKernel("VectorAddGM").setArg(3, elements);
+            final CLCommandQueue queue = device.createCommandQueue();
 
             out.println(queue);
 
@@ -174,7 +175,7 @@ public class CLCommandQueueTest extends UITestCase {
 
         out.println(" - - - event conditions test - - - ");
 
-        CLPlatform platform = CLPlatform.getDefault(CLPlatformFilters.queueMode(OUT_OF_ORDER_MODE));
+        final CLPlatform platform = CLPlatform.getDefault(CLPlatformFilters.queueMode(OUT_OF_ORDER_MODE));
 
         CLDevice device = null;
         // we can still test this with in-order queues
@@ -184,15 +185,15 @@ public class CLCommandQueueTest extends UITestCase {
             device = platform.getMaxFlopsDevice(CLDeviceFilters.queueMode(OUT_OF_ORDER_MODE));
         }
 
-        CLContext context = CLContext.create(device);
+        final CLContext context = CLContext.create(device);
 
         try{
 
-            CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
+            final CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
 
-            CLBuffer<IntBuffer> buffer = context.createBuffer(newDirectIntBuffer(new int[]{ 1,1,1, 1,1,1, 1,1,1 }));
+            final CLBuffer<IntBuffer> buffer = context.createBuffer(newDirectIntBuffer(new int[]{ 1,1,1, 1,1,1, 1,1,1 }));
 
-            int elements = buffer.getNIOCapacity();
+            final int elements = buffer.getNIOCapacity();
 
             CLCommandQueue queue;
             if(device.getQueueProperties().contains(OUT_OF_ORDER_MODE)) {
@@ -202,11 +203,11 @@ public class CLCommandQueueTest extends UITestCase {
             }
 
             // simulate in-order queue by accumulating events of prior commands
-            CLEventList events = new CLEventList(3);
+            final CLEventList events = new CLEventList(3);
 
             // (1+1)*2 = 4; conditions enforce propper order
-            CLKernel addKernel = program.createCLKernel("add").putArg(buffer).putArg(1).putArg(elements);
-            CLKernel mulKernel = program.createCLKernel("mul").putArg(buffer).putArg(2).putArg(elements);
+            final CLKernel addKernel = program.createCLKernel("add").putArg(buffer).putArg(1).putArg(elements);
+            final CLKernel mulKernel = program.createCLKernel("mul").putArg(buffer).putArg(2).putArg(elements);
 
             queue.putWriteBuffer(buffer, false, events);
 
@@ -234,24 +235,24 @@ public class CLCommandQueueTest extends UITestCase {
 
         out.println(" - - - event synchronization test - - - ");
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
 
         try {
-            CLDevice device = context.getDevices()[0];
-            int groupSize = device.getMaxWorkItemSizes()[0];
+            final CLDevice device = context.getDevices()[0];
+            final int groupSize = device.getMaxWorkItemSizes()[0];
 
             final int elements = roundUp(groupSize, ONE_MB / SIZEOF_INT * 5); // 5MB per buffer
 
-            CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
-            CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
-            CLBuffer<ByteBuffer> clBufferC = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferC = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
 
             fillBuffer(clBufferA.buffer, 12345);
             fillBuffer(clBufferB.buffer, 67890);
 
-            CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
-            CLKernel vectorAddKernel = program.createCLKernel("VectorAddGM").setArg(3, elements);
-            CLCommandQueue queue = device.createCommandQueue(PROFILING_MODE);
+            final CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
+            final CLKernel vectorAddKernel = program.createCLKernel("VectorAddGM").setArg(3, elements);
+            final CLCommandQueue queue = device.createCommandQueue(PROFILING_MODE);
 
             out.println(queue);
 
@@ -266,14 +267,14 @@ public class CLCommandQueueTest extends UITestCase {
             queue.put1DRangeKernel(vectorAddKernel, 0, elements, groupSize, events);
 
             assertEquals(1, events.size());
-            CLEvent probe = events.getEvent(0);
+            final CLEvent probe = events.getEvent(0);
             out.println(probe);
 
             queue.putWaitForEvents(events, true);
             assertEquals(CLEvent.ExecutionStatus.COMPLETE, probe.getStatus());
 
             out.println(probe);
-            long time = probe.getProfilingInfo(CLEvent.ProfilingCommand.END)
+            final long time = probe.getProfilingInfo(CLEvent.ProfilingCommand.END)
                       - probe.getProfilingInfo(CLEvent.ProfilingCommand.START);
             out.println("time: "+time);
             assertTrue(time > 0);
@@ -289,9 +290,9 @@ public class CLCommandQueueTest extends UITestCase {
     public void customEventsTest() throws IOException, InterruptedException {
         out.println(" - - - user events test - - - ");
 
-        CLPlatform[] platforms = CLPlatform.listCLPlatforms();
+        final CLPlatform[] platforms = CLPlatform.listCLPlatforms();
         CLPlatform theChosenOne = platforms[0];
-        for (CLPlatform platform : platforms) {
+        for (final CLPlatform platform : platforms) {
             if(platform.isAtLeast(CL_1_1)) {
                 theChosenOne = platform;
                 break;
@@ -306,21 +307,21 @@ public class CLCommandQueueTest extends UITestCase {
         final CLContext context = CLContext.create(theChosenOne);
 
         try{
-            CLDevice device = context.getDevices()[0];
-            int groupSize = device.getMaxWorkItemSizes()[0];
+            final CLDevice device = context.getDevices()[0];
+            final int groupSize = device.getMaxWorkItemSizes()[0];
 
             final int elements = roundUp(groupSize, ONE_MB / SIZEOF_INT * 5); // 5MB per buffer
 
-            CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
-            CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
-            CLBuffer<ByteBuffer> clBufferC = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferA = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferB = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
+            final CLBuffer<ByteBuffer> clBufferC = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
 
             fillBuffer(clBufferA.buffer, 12345);
             fillBuffer(clBufferB.buffer, 67890);
 
-            CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
-            CLKernel vectorAddKernel = program.createCLKernel("VectorAddGM").setArg(3, elements);
-            CLCommandQueue queue = device.createCommandQueue();
+            final CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
+            final CLKernel vectorAddKernel = program.createCLKernel("VectorAddGM").setArg(3, elements);
+            final CLCommandQueue queue = device.createCommandQueue();
 
             queue.putWriteBuffer(clBufferA, true) // write A
                  .putWriteBuffer(clBufferB, true);// write B
@@ -329,7 +330,7 @@ public class CLCommandQueueTest extends UITestCase {
 
             // the interesting part...
 
-            CLUserEvent condition = CLUserEvent.create(context);
+            final CLUserEvent condition = CLUserEvent.create(context);
             assertEquals(CommandType.USER, condition.getType());
             assertEquals(ExecutionStatus.SUBMITTED, condition.getStatus());
             out.println(condition);
@@ -365,14 +366,14 @@ public class CLCommandQueueTest extends UITestCase {
 
         out.println(" - - - event callback test - - - ");
 
-        CLPlatform platform = CLPlatform.getDefault();
+        final CLPlatform platform = CLPlatform.getDefault();
 
         if(!platform.isAtLeast(CL_1_1)) {
             out.println("test disabled, required CLVersion: "+CL_1_1+" available: "+platform.getVersion());
             return;
         }
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
 
         try{
 
@@ -381,7 +382,7 @@ public class CLCommandQueueTest extends UITestCase {
             final CountDownLatch countdown = new CountDownLatch(1);
             customEvent.registerCallback(new CLEventListener() {
                 @Override
-                public void eventStateChanged(CLEvent event, int status) {
+                public void eventStateChanged(final CLEvent event, final int status) {
                     out.println("event received: "+event);
                     assertEquals(event, customEvent);
                     countdown.countDown();
@@ -407,11 +408,11 @@ public class CLCommandQueueTest extends UITestCase {
 
         final int elements = ONE_MB / SIZEOF_INT * 10; // 20MB per buffer
 
-        CLContext context = CLContext.create();
+        final CLContext context = CLContext.create();
 
         try{
 
-            CLDevice[] devices = context.getDevices();
+            final CLDevice[] devices = context.getDevices();
 
             // ignore this test if we can't test in parallel
             if (devices.length < 2) {
@@ -427,7 +428,7 @@ public class CLCommandQueueTest extends UITestCase {
             final CLBuffer<ByteBuffer> clBufferA2 = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
             final CLBuffer<ByteBuffer> clBufferB2 = context.createByteBuffer(elements * SIZEOF_INT, Mem.READ_ONLY);
 
-            CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
+            final CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl")).build();
 
             //two independent kernel instances
             final CLKernel vectorAddKernel1 = program.createCLKernel("VectorAddGM").setArg(3, elements);
@@ -444,12 +445,12 @@ public class CLCommandQueueTest extends UITestCase {
 
             final MultiQueueBarrier barrier = new MultiQueueBarrier(2);
 
-            Thread thread1 = new Thread("C") {
+            final Thread thread1 = new Thread("C") {
 
                 @Override
                 public void run() {
 
-                    int groupSize = queue1.getDevice().getMaxWorkItemSizes()[0];
+                    final int groupSize = queue1.getDevice().getMaxWorkItemSizes()[0];
 
                     fillBuffer(clBufferA1.buffer, 12345);
                     fillBuffer(clBufferB1.buffer, 67890);
@@ -462,7 +463,7 @@ public class CLCommandQueueTest extends UITestCase {
                     vectorAddKernel1.setArgs(clBufferA1, clBufferB1, clBufferC); // C = A+B
 
     //                System.out.println("C kernels");
-                    CLEventList events1 = new CLEventList(2);
+                    final CLEventList events1 = new CLEventList(2);
                     queue1.put1DRangeKernel(vectorAddKernel1, 0, elements, groupSize, events1)
                           .putReadBuffer(clBufferC, false, events1);
 
@@ -471,14 +472,14 @@ public class CLCommandQueueTest extends UITestCase {
                 }
             };
 
-            Thread thread2 = new Thread("D") {
+            final Thread thread2 = new Thread("D") {
 
                 @Override
                 public void run() {
 
-                    int maxWorkItemSize = queue2.getDevice().getMaxWorkItemSizes()[0];
-                    int kernelWorkGroupSize = (int)vectorAddKernel2.getWorkGroupSize( queue2.getDevice() );
-                    int localWorkSize = Math.min( maxWorkItemSize, kernelWorkGroupSize );
+                    final int maxWorkItemSize = queue2.getDevice().getMaxWorkItemSizes()[0];
+                    final int kernelWorkGroupSize = (int)vectorAddKernel2.getWorkGroupSize( queue2.getDevice() );
+                    final int localWorkSize = Math.min( maxWorkItemSize, kernelWorkGroupSize );
 
                     fillBuffer(clBufferA2.buffer, 12345);
                     fillBuffer(clBufferB2.buffer, 67890);
@@ -491,7 +492,7 @@ public class CLCommandQueueTest extends UITestCase {
                     vectorAddKernel2.setArgs(clBufferA2, clBufferB2, clBufferD); // D = A+B
 
     //                System.out.println("D kernels");
-                    CLEventList events2 = new CLEventList(2);
+                    final CLEventList events2 = new CLEventList(2);
                     queue2.put1DRangeKernel(vectorAddKernel2, 0, elements, localWorkSize, events2);
                     queue2.putReadBuffer(clBufferD, false, events2);
 
@@ -509,15 +510,15 @@ public class CLCommandQueueTest extends UITestCase {
             checkIfEqual(clBufferC.buffer, clBufferD.buffer, elements);
             out.println("results are valid");
 
-        } catch (Throwable t ) {
+        } catch (final Throwable t ) {
             t.printStackTrace();
         } finally {
             context.release();
         }
 
     }
-    public static void main(String[] args) throws IOException {
-        String tstname = CLCommandQueueTest.class.getName();
+    public static void main(final String[] args) throws IOException {
+        final String tstname = CLCommandQueueTest.class.getName();
         org.junit.runner.JUnitCore.main(tstname);
     }
 }

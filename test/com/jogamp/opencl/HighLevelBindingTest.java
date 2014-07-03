@@ -40,6 +40,7 @@ import com.jogamp.opencl.CLDevice.LocalMemType;
 import com.jogamp.opencl.CLDevice.Type;
 import com.jogamp.opencl.CLDevice.Capabilities;
 import com.jogamp.opencl.llb.CL;
+import com.jogamp.opencl.llb.CLDeviceBinding;
 import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 
@@ -82,51 +83,51 @@ public class HighLevelBindingTest extends UITestCase {
     public void enumsTest() {
 
         // enum tests
-        final EnumSet<FPConfig> singleFPConfig = FPConfig.valuesOf(CL.CL_FP_DENORM | CL.CL_FP_ROUND_TO_INF);
+        final EnumSet<FPConfig> singleFPConfig = FPConfig.valuesOf(CLDeviceBinding.CL_FP_DENORM | CLDeviceBinding.CL_FP_ROUND_TO_INF);
         assertEquals(0, FPConfig.valuesOf(0).size());
         assertTrue(singleFPConfig.contains(FPConfig.DENORM));
         assertTrue(singleFPConfig.contains(FPConfig.ROUND_TO_INF));
 
         // CLDevice enums
-        for (FPConfig e : FPConfig.values()) {
-            EnumSet<FPConfig> set = FPConfig.valuesOf(e.CONFIG);
+        for (final FPConfig e : FPConfig.values()) {
+            final EnumSet<FPConfig> set = FPConfig.valuesOf(e.CONFIG);
             assertTrue(set.contains(e));
         }
-        for (GlobalMemCacheType e : GlobalMemCacheType.values()) {
+        for (final GlobalMemCacheType e : GlobalMemCacheType.values()) {
             assertEquals(e, GlobalMemCacheType.valueOf(e.TYPE));
         }
-        for (LocalMemType e : LocalMemType.values()) {
+        for (final LocalMemType e : LocalMemType.values()) {
             assertEquals(e, LocalMemType.valueOf(e.TYPE));
         }
-        for (Type e : Type.values()) {
+        for (final Type e : Type.values()) {
             assertEquals(e, Type.valueOf(e.TYPE));
         }
-        for (Capabilities e : Capabilities.values()) {
+        for (final Capabilities e : Capabilities.values()) {
             assertEquals(e, Capabilities.valueOf(e.CAPS));
         }
 
         // CLMemory enums
-        for (Mem e : Mem.values()) {
+        for (final Mem e : Mem.values()) {
             assertEquals(e, Mem.valueOf(e.CONFIG));
         }
 
-        for (GLObjectType e : GLObjectType.values()) {
+        for (final GLObjectType e : GLObjectType.values()) {
             assertEquals(e, GLObjectType.valueOf(e.TYPE));
         }
 
         // CLSampler enums
-        for (AddressingMode e : AddressingMode.values()) {
+        for (final AddressingMode e : AddressingMode.values()) {
             assertEquals(e, AddressingMode.valueOf(e.MODE));
         }
-        for (FilteringMode e : FilteringMode.values()) {
+        for (final FilteringMode e : FilteringMode.values()) {
             assertEquals(e, FilteringMode.valueOf(e.MODE));
         }
 
         // CLImage enums
-        for (ChannelOrder e : ChannelOrder.values()) {
+        for (final ChannelOrder e : ChannelOrder.values()) {
             assertEquals(e, ChannelOrder.valueOf(e.ORDER));
         }
-        for (ChannelType e : ChannelType.values()) {
+        for (final ChannelType e : ChannelType.values()) {
             assertEquals(e, ChannelType.valueOf(e.TYPE));
         }
 
@@ -140,9 +141,9 @@ public class HighLevelBindingTest extends UITestCase {
         out.println(" - - - highLevelTest; contextless - - - ");
 
         // platform/device info tests
-        CLPlatform[] clPlatforms = CLPlatform.listCLPlatforms();
+        final CLPlatform[] clPlatforms = CLPlatform.listCLPlatforms();
 
-        for (CLPlatform platform : clPlatforms) {
+        for (final CLPlatform platform : clPlatforms) {
 
             out.println("platform info:");
             out.println("    name: "+platform.getName());
@@ -154,8 +155,8 @@ public class HighLevelBindingTest extends UITestCase {
             out.println("    max FLOPS device: "+platform.getMaxFlopsDevice());
             out.println("    extensions: "+platform.getExtensions());
 
-            CLDevice[] clDevices = platform.listCLDevices();
-            for (CLDevice device : clDevices) {
+            final CLDevice[] clDevices = platform.listCLDevices();
+            for (final CLDevice device : clDevices) {
                 out.println("device info:");
                 out.println("    name: "+device.getName());
                 out.println("    profile: "+device.getProfile());
@@ -207,8 +208,10 @@ public class HighLevelBindingTest extends UITestCase {
     @Test
     public void platformTest() {
         @SuppressWarnings("unchecked")
+        final
         CLPlatform platformGPU = CLPlatform.getDefault(version(CL_1_0), type(GPU));
         @SuppressWarnings("unchecked")
+        final
         CLPlatform platformCPU = CLPlatform.getDefault(version(CL_1_0), type(CPU));
 
         if(platformGPU != null) {
@@ -225,9 +228,9 @@ public class HighLevelBindingTest extends UITestCase {
 
         out.println(" - - - highLevelTest; create context - - - ");
 
-        CLPlatform platform = CLPlatform.getDefault();
-        CLDevice[] devices = platform.listCLDevices();
-        int deviceCount = devices.length;
+        final CLPlatform platform = CLPlatform.getDefault();
+        final CLDevice[] devices = platform.listCLDevices();
+        final int deviceCount = devices.length;
 
         CLContext c = CLContext.create();
         assertNotNull(c);
@@ -239,7 +242,7 @@ public class HighLevelBindingTest extends UITestCase {
         assertEquals(deviceCount, c.getDevices().length);
         c.release();
 
-        for (CLDevice device : devices) {
+        for (final CLDevice device : devices) {
             c = CLContext.create(device);
             assertNotNull(c);
             assertEquals(1, c.getDevices().length);
@@ -261,19 +264,19 @@ public class HighLevelBindingTest extends UITestCase {
         try{
             CLContext.create((CLDevice)null);
             fail("create with null device");
-        }catch(IllegalArgumentException ex) {
+        }catch(final IllegalArgumentException ex) {
             // expected
         }
         try{
             CLContext.create((CLDevice.Type)null);
             fail("create with null CLDevice.Type");
-        }catch(IllegalArgumentException ex) {
+        }catch(final IllegalArgumentException ex) {
             // expected
         }
         try{
             CLContext.create((CLPlatform)null, (CLDevice.Type)null);
             fail("create with null CLDevice.Type");
-        }catch(IllegalArgumentException ex) {
+        }catch(final IllegalArgumentException ex) {
             // expected
         }
 
@@ -284,38 +287,38 @@ public class HighLevelBindingTest extends UITestCase {
 
         out.println(" - - - highLevelTest; global memory kernel - - - ");
 
-        CLPlatform[] clPlatforms = CLPlatform.listCLPlatforms();
-        CLContext context = CLContext.create(clPlatforms[0]);
+        final CLPlatform[] clPlatforms = CLPlatform.listCLPlatforms();
+        final CLContext context = CLContext.create(clPlatforms[0]);
 
-        CLDevice[] contextDevices = context.getDevices();
+        final CLDevice[] contextDevices = context.getDevices();
 
         out.println("context devices:");
-        for (CLDevice device : contextDevices) {
+        for (final CLDevice device : contextDevices) {
             out.println("   "+device.toString());
         }
 
         out.println("max FLOPS device: " + context.getMaxFlopsDevice());
 
-        InputStream stream = getClass().getResourceAsStream("testkernels.cl");
-        CLProgram program = context.createProgram(stream).build();
+        final InputStream stream = getClass().getResourceAsStream("testkernels.cl");
+        final CLProgram program = context.createProgram(stream).build();
 
-        CLDevice[] programDevices = program.getCLDevices();
-        CLDevice device = programDevices[0];
+        final CLDevice[] programDevices = program.getCLDevices();
+        final CLDevice device = programDevices[0];
 
         assertEquals(contextDevices.length, programDevices.length);
 
         out.println("build log:\n"+program.getBuildLog());
         out.println("build status:\n"+program.getBuildStatus());
 
-        String source = program.getSource();
+        final String source = program.getSource();
         assertFalse(source.trim().isEmpty());
 //        out.println("source:\n"+source);
 
-        Map<CLDevice, byte[]> binaries = program.getBinaries();
+        final Map<CLDevice, byte[]> binaries = program.getBinaries();
         assertFalse(binaries.isEmpty());
 
         int elementCount = 11444777;	// Length of float arrays to process (odd # for illustration)
-        int localWorkSize = device.getMaxWorkItemSizes()[0];      // set and log Global and Local work size dimensions
+        final int localWorkSize = device.getMaxWorkItemSizes()[0];      // set and log Global and Local work size dimensions
         int globalWorkSize = 0;
 
         ByteBuffer srcA = null;
@@ -333,7 +336,7 @@ public class HighLevelBindingTest extends UITestCase {
                 dest = newDirectByteBuffer(globalWorkSize*SIZEOF_INT);
                 allocated = true;
             }
-            catch( OutOfMemoryError oome ) {
+            catch( final OutOfMemoryError oome ) {
                 ++divisor;
                 elementCount /= divisor;
                 out.println("not enough direct buffer memory; retrying with smaller buffers");
@@ -343,18 +346,18 @@ public class HighLevelBindingTest extends UITestCase {
         fillBuffer(srcA, 23456);
         fillBuffer(srcB, 46987);
 
-        CLBuffer<ByteBuffer> clBufferA = context.createBuffer(srcA, Mem.READ_ONLY);
-        CLBuffer<ByteBuffer> clBufferB = context.createBuffer(srcB, Mem.READ_ONLY);
-        CLBuffer<ByteBuffer> clBufferC = context.createBuffer(dest, Mem.WRITE_ONLY);
+        final CLBuffer<ByteBuffer> clBufferA = context.createBuffer(srcA, Mem.READ_ONLY);
+        final CLBuffer<ByteBuffer> clBufferB = context.createBuffer(srcB, Mem.READ_ONLY);
+        final CLBuffer<ByteBuffer> clBufferC = context.createBuffer(dest, Mem.WRITE_ONLY);
 
-        CLKernel vectorAddKernel = program.createCLKernel("VectorAddGM");
+        final CLKernel vectorAddKernel = program.createCLKernel("VectorAddGM");
 
         vectorAddKernel.setArg(0, clBufferA)
                        .setArg(1, clBufferB)
                        .setArg(2, clBufferC)
                        .setArg(3, elementCount);
 
-        CLCommandQueue queue = device.createCommandQueue();
+        final CLCommandQueue queue = device.createCommandQueue();
 
         // Asynchronous write of data to GPU device, blocking read later
         queue.putWriteBuffer(clBufferA, false)
@@ -387,8 +390,8 @@ public class HighLevelBindingTest extends UITestCase {
 
         context.release();
     }
-    public static void main(String[] args) throws IOException {
-        String tstname = HighLevelBindingTest.class.getName();
+    public static void main(final String[] args) throws IOException {
+        final String tstname = HighLevelBindingTest.class.getName();
         org.junit.runner.JUnitCore.main(tstname);
     }
 

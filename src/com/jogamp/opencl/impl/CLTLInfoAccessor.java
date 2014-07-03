@@ -66,7 +66,7 @@ public abstract class CLTLInfoAccessor implements CLInfoAccessor {
     };
 
     @Override
-    public final long getUInt32Long(int key) {
+    public final long getUInt32Long(final int key) {
         final ByteBuffer buffer = getBB(4).putInt(0, 0);
         final int ret = getInfo(key, 4, buffer, null);
         CLException.checkForError(ret, "error while asking for info value");
@@ -74,29 +74,29 @@ public abstract class CLTLInfoAccessor implements CLInfoAccessor {
     }
 
     @Override
-    public final long getLong(int key) {
+    public final long getLong(final int key) {
 
-        ByteBuffer buffer = getBB(8).putLong(0, 0);
-        int ret = getInfo(key, 8, buffer, null);
+        final ByteBuffer buffer = getBB(8).putLong(0, 0);
+        final int ret = getInfo(key, 8, buffer, null);
         CLException.checkForError(ret, "error while asking for info value");
 
         return buffer.getLong(0);
     }
 
     @Override
-    public final String getString(int key) {
+    public final String getString(final int key) {
 
-        PointerBuffer sizeBuffer = getNSB();
+        final PointerBuffer sizeBuffer = getNSB();
         int ret = getInfo(key, 0, null, sizeBuffer);
         CLException.checkForError(ret, "error while asking for info string");
 
-        int clSize = (int)sizeBuffer.get(0);
-        ByteBuffer buffer = getBB(clSize);
+        final int clSize = (int)sizeBuffer.get(0);
+        final ByteBuffer buffer = getBB(clSize);
 
         ret = getInfo(key, buffer.capacity(), buffer, null);
         CLException.checkForError(ret, "error while asking for info string");
 
-        byte[] array = new byte[clSize];
+        final byte[] array = new byte[clSize];
         buffer.get(array).rewind();
 
         return CLUtil.clString2JavaString(array, clSize);
@@ -104,13 +104,13 @@ public abstract class CLTLInfoAccessor implements CLInfoAccessor {
     }
 
     @Override
-    public final int[] getInts(int key, int n) {
+    public final int[] getInts(final int key, final int n) {
         // FIXME: Really 8 bytes per int on 64bit platforms ?
-        ByteBuffer buffer = getBB(n * (Platform.is32Bit()?4:8));
-        int ret = getInfo(key, buffer.capacity(), buffer, null);
+        final ByteBuffer buffer = getBB(n * (Platform.is32Bit()?4:8));
+        final int ret = getInfo(key, buffer.capacity(), buffer, null);
         CLException.checkForError(ret, "error while asking for info value");
 
-        int[] array = new int[n];
+        final int[] array = new int[n];
         for(int i = 0; i < array.length; i++) {
             if(Platform.is32Bit()) {
                 array[i] = buffer.getInt();
@@ -123,7 +123,7 @@ public abstract class CLTLInfoAccessor implements CLInfoAccessor {
         return array;
     }
 
-    protected ByteBuffer getBB(int minCapacity) {
+    protected ByteBuffer getBB(final int minCapacity) {
         if(minCapacity > BB_SIZE) {
             return Buffers.newDirectByteBuffer(minCapacity);
         }else{

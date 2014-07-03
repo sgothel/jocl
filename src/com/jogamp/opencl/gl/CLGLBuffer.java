@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -50,25 +50,25 @@ public final class CLGLBuffer<B extends Buffer> extends CLBuffer<B> implements C
      */
     public final int GLID;
 
-    private CLGLBuffer(CLContext context, B directBuffer, long id, int glObject, long size, int flags) {
+    private CLGLBuffer(final CLContext context, final B directBuffer, final long id, final int glObject, final long size, final int flags) {
         super(context, directBuffer, size, id, flags);
         this.GLID = glObject;
     }
 
 
-    static <B extends Buffer> CLGLBuffer<B> create(CLContext context, B directBuffer, long size, int flags, int glBuffer) {
+    static <B extends Buffer> CLGLBuffer<B> create(final CLContext context, final B directBuffer, final long size, final int flags, final int glBuffer) {
         checkBuffer(directBuffer, flags);
-        
-        CLGL clgli = (CLGL)getCL(context);
-        
-        int[] result = new int[1];
-        long id = clgli.clCreateFromGLBuffer(context.ID, flags, glBuffer, result, 0);
+
+        final CLGL clgli = (CLGL)getCL(context);
+
+        final int[] result = new int[1];
+        final long id = clgli.clCreateFromGLBuffer(context.ID, flags, glBuffer, result, 0);
         CLException.checkForError(result[0], "can not create CLGLObject from glBuffer #"+glBuffer);
 
         return new CLGLBuffer<B>(context, directBuffer, id, glBuffer, size, flags);
     }
 
-    static <B extends Buffer> void checkBuffer(B directBuffer, int flags) throws IllegalArgumentException {
+    static <B extends Buffer> void checkBuffer(final B directBuffer, final int flags) throws IllegalArgumentException {
         if (directBuffer != null && !directBuffer.isDirect()) {
             throw new IllegalArgumentException("buffer is not a direct buffer");
         }
@@ -108,7 +108,7 @@ public final class CLGLBuffer<B extends Buffer> extends CLBuffer<B> implements C
     }
 
     @Override
-    public <T extends Buffer> CLGLBuffer<T> cloneWith(T directBuffer) {
+    public <T extends Buffer> CLGLBuffer<T> cloneWith(final T directBuffer) {
         return new CLGLBuffer<T>(context, directBuffer, ID, GLID, size, FLAGS);
     }
 

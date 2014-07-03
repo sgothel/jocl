@@ -3,14 +3,14 @@
  *
  * Redistribution and use in source and binary forms, with or without modification, are
  * permitted provided that the following conditions are met:
- * 
+ *
  *    1. Redistributions of source code must retain the above copyright notice, this list of
  *       conditions and the following disclaimer.
- * 
+ *
  *    2. Redistributions in binary form must reproduce the above copyright notice, this list
  *       of conditions and the following disclaimer in the documentation and/or other materials
  *       provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
@@ -20,7 +20,7 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * The views and conclusions contained in the software and documentation are those of the
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of JogAmp Community.
@@ -64,7 +64,7 @@ public class CLProgram extends CLObjectResource {
 
     private final static ReentrantLock buildLock = new ReentrantLock();
     private final CLProgramBinding binding;
-    
+
     private final Set<CLKernel> kernels;
     private Map<CLDevice, Status> buildStatusMap;
 
@@ -73,54 +73,54 @@ public class CLProgram extends CLObjectResource {
     /** Set if program created from binary, or else getting source can crash the driver on Macs. */
     private boolean noSource;
 
-    private CLProgram(CLContext context, long id) {
+    private CLProgram(final CLContext context, final long id) {
         super(context, id);
         this.kernels = new HashSet<CLKernel>();
         this.binding = context.getPlatform().getProgramBinding();
     }
-    
-    static CLProgram create(CLContext context, String src) {
 
-        IntBuffer status = newDirectIntBuffer(1);
-        
-        PointerBuffer length = PointerBuffer.allocateDirect(1).put(0, src.length());
-        String[] srcArray = new String[] {src};
-        
+    static CLProgram create(final CLContext context, final String src) {
+
+        final IntBuffer status = newDirectIntBuffer(1);
+
+        final PointerBuffer length = PointerBuffer.allocateDirect(1).put(0, src.length());
+        final String[] srcArray = new String[] {src};
+
         // Create the program
-        CLProgramBinding binding = context.getPlatform().getProgramBinding();
-        long id = binding.clCreateProgramWithSource(context.ID, 1, srcArray, length, status);
+        final CLProgramBinding binding = context.getPlatform().getProgramBinding();
+        final long id = binding.clCreateProgramWithSource(context.ID, 1, srcArray, length, status);
 
-        int err = status.get();
+        final int err = status.get();
         if(err != CL_SUCCESS) {
             throw newException(err, "can not create program with source on "+context);
         }
-        
+
         return new CLProgram(context, id);
     }
 
-    static CLProgram create(CLContext context, Map<CLDevice, byte[]> binaries) {
+    static CLProgram create(final CLContext context, final Map<CLDevice, byte[]> binaries) {
 
-        Set<Entry<CLDevice, byte[]>> entries = binaries.entrySet();
-        
+        final Set<Entry<CLDevice, byte[]>> entries = binaries.entrySet();
+
         // calculate buffer size
         int binarySize = 0;
-        for (Map.Entry<CLDevice, byte[]> entry : entries) {
+        for (final Map.Entry<CLDevice, byte[]> entry : entries) {
             binarySize += entry.getValue().length;
         }
 
-        int pbSize = PointerBuffer.ELEMENT_SIZE;
-        int deviceCount = binaries.size();
-        
-        CachedBufferFactory bf = CachedBufferFactory.create(binarySize + pbSize*deviceCount*3 + 4, true);
-        PointerBuffer devices  = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
-        PointerBuffer codeBuffers = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
-        PointerBuffer lengths  = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
-        
-        int i = 0;
-        for (Map.Entry<CLDevice, byte[]> entry : entries) {
+        final int pbSize = PointerBuffer.ELEMENT_SIZE;
+        final int deviceCount = binaries.size();
 
-            byte[] bytes = entry.getValue();
-            CLDevice device = entry.getKey();
+        final CachedBufferFactory bf = CachedBufferFactory.create(binarySize + pbSize*deviceCount*3 + 4, true);
+        final PointerBuffer devices  = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
+        final PointerBuffer codeBuffers = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
+        final PointerBuffer lengths  = PointerBuffer.wrap(bf.newDirectByteBuffer(deviceCount*pbSize));
+
+        int i = 0;
+        for (final Map.Entry<CLDevice, byte[]> entry : entries) {
+
+            final byte[] bytes = entry.getValue();
+            final CLDevice device = entry.getKey();
 
             devices.put(device.ID);
             lengths.put(bytes.length);
@@ -131,16 +131,16 @@ public class CLProgram extends CLObjectResource {
         devices.rewind();
         lengths.rewind();
 
-        IntBuffer errBuffer = bf.newDirectIntBuffer(1);
+        final IntBuffer errBuffer = bf.newDirectIntBuffer(1);
 //        IntBuffer status = newDirectByteBuffer(binaries.size()*4).asIntBuffer();
-        CLProgramBinding binding = context.getPlatform().getProgramBinding();
-        long id = binding.clCreateProgramWithBinary(context.ID, devices.capacity(), devices, lengths, codeBuffers, /*status*/null, errBuffer);
+        final CLProgramBinding binding = context.getPlatform().getProgramBinding();
+        final long id = binding.clCreateProgramWithBinary(context.ID, devices.capacity(), devices, lengths, codeBuffers, /*status*/null, errBuffer);
 
 //        while(status.remaining() != 0) {
 //            checkForError(status.get(), "unable to load binaries on all devices");
 //        }
 
-        int err = errBuffer.get();
+        final int err = errBuffer.get();
         if(err != CL_SUCCESS) {
             throw newException(err, "can not create program on "+context +" with binaries "+binaries);
         }
@@ -152,10 +152,10 @@ public class CLProgram extends CLObjectResource {
 
         if(buildStatusMap == null) {
 //            synchronized(buildLock) {
-                Map<CLDevice, Status> map = new HashMap<CLDevice, Status>();
-                CLDevice[] devices = getCLDevices();
-                for (CLDevice device : devices) {
-                    Status status = getBuildStatus(device);
+                final Map<CLDevice, Status> map = new HashMap<CLDevice, Status>();
+                final CLDevice[] devices = getCLDevices();
+                for (final CLDevice device : devices) {
+                    final Status status = getBuildStatus(device);
                     if(status == Status.BUILD_SUCCESS) {
                         executable = true;
                     }
@@ -166,20 +166,20 @@ public class CLProgram extends CLObjectResource {
         }
     }
 
-    private String getBuildInfoString(CLDevice device, int flag) {
+    private String getBuildInfoString(final CLDevice device, final int flag) {
 
         if(released) {
             return "";
         }
 
-        PointerBuffer size = PointerBuffer.allocateDirect(1);
+        final PointerBuffer size = PointerBuffer.allocateDirect(1);
 
         int ret = binding.clGetProgramBuildInfo(ID, device.ID, flag, 0, null, size);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "on clGetProgramBuildInfo with "+device);
         }
 
-        ByteBuffer buffer = newDirectByteBuffer((int)size.get(0));
+        final ByteBuffer buffer = newDirectByteBuffer((int)size.get(0));
 
         ret = binding.clGetProgramBuildInfo(ID, device.ID, flag, buffer.capacity(), buffer, null);
         if(ret != CL_SUCCESS) {
@@ -189,18 +189,18 @@ public class CLProgram extends CLObjectResource {
         return CLUtil.clString2JavaString(buffer, (int)size.get(0));
     }
 
-    private String getProgramInfoString(int flag) {
+    private String getProgramInfoString(final int flag) {
 
         if(released) {
             return "";
         }
 
-        PointerBuffer size = PointerBuffer.allocateDirect(1);
+        final PointerBuffer size = PointerBuffer.allocateDirect(1);
 
         int ret = binding.clGetProgramInfo(ID, flag, 0, null, size);
         checkForError(ret, "on clGetProgramInfo");
 
-        ByteBuffer buffer = newDirectByteBuffer((int)size.get(0));
+        final ByteBuffer buffer = newDirectByteBuffer((int)size.get(0));
 
         ret = binding.clGetProgramInfo(ID, flag, buffer.capacity(), buffer, null);
         checkForError(ret, "on clGetProgramInfo");
@@ -208,11 +208,11 @@ public class CLProgram extends CLObjectResource {
         return CLUtil.clString2JavaString(buffer, (int)size.get(0));
     }
 
-    private int getBuildInfoInt(CLDevice device, int flag) {
+    private int getBuildInfoInt(final CLDevice device, final int flag) {
 
-        ByteBuffer buffer = newDirectByteBuffer(4);
+        final ByteBuffer buffer = newDirectByteBuffer(4);
 
-        int ret = binding.clGetProgramBuildInfo(ID, device.ID, flag, buffer.capacity(), buffer, null);
+        final int ret = binding.clGetProgramBuildInfo(ID, device.ID, flag, buffer.capacity(), buffer, null);
         checkForError(ret, "error on clGetProgramBuildInfo");
 
         return buffer.getInt();
@@ -237,17 +237,17 @@ public class CLProgram extends CLObjectResource {
      * @param listener A listener who is notified when the program was built.
      * @return this
      */
-    public CLProgram build(CLBuildListener listener) {
+    public CLProgram build(final CLBuildListener listener) {
         build(listener, null, (CLDevice[])null);
         return this;
     }
-    
+
     /**
      * Builds this program for the given devices.
      * @param devices A list of devices this program should be build on or null for all devices of its context.
      * @return this
      */
-    public CLProgram build(CLDevice... devices) {
+    public CLProgram build(final CLDevice... devices) {
         build(null, (String) null, devices);
         return this;
     }
@@ -259,7 +259,7 @@ public class CLProgram extends CLObjectResource {
      * @param devices A list of devices this program should be build on or null for all devices of its context.
      * @return this
      */
-    public CLProgram build(CLBuildListener listener, CLDevice... devices) {
+    public CLProgram build(final CLBuildListener listener, final CLDevice... devices) {
         build(listener,null, devices);
         return this;
     }
@@ -269,7 +269,7 @@ public class CLProgram extends CLObjectResource {
      * @see CompilerOptions
      * @return this
      */
-    public CLProgram build(String options) {
+    public CLProgram build(final String options) {
         build(null, options, (CLDevice[])null);
         return this;
     }
@@ -281,7 +281,7 @@ public class CLProgram extends CLObjectResource {
      * @param listener A listener who is notified when the program was built.
      * @return this
      */
-    public CLProgram build(CLBuildListener listener, String options) {
+    public CLProgram build(final CLBuildListener listener, final String options) {
         build(listener, options, (CLDevice[])null);
         return this;
     }
@@ -290,7 +290,7 @@ public class CLProgram extends CLObjectResource {
      * Builds this program for all devices associated with the context using the specified build options.
      * @see CompilerOptions
      */
-    public CLProgram build(String... options) {
+    public CLProgram build(final String... options) {
         build(null, optionsOf(options), (CLDevice[])null);
         return this;
     }
@@ -301,7 +301,7 @@ public class CLProgram extends CLObjectResource {
      * @see CLBuildListener
      * @param listener A listener who is notified when the program was built.
      */
-    public CLProgram build(CLBuildListener listener, String... options) {
+    public CLProgram build(final CLBuildListener listener, final String... options) {
         build(listener, optionsOf(options), (CLDevice[])null);
         return this;
     }
@@ -313,7 +313,7 @@ public class CLProgram extends CLObjectResource {
      * @param devices A list of devices this program should be build on or null for all devices of its context.
      * @return this
      */
-    public CLProgram build(String options, CLDevice... devices) {
+    public CLProgram build(final String options, final CLDevice... devices) {
         build(null, options, devices);
         return this;
     }
@@ -327,7 +327,7 @@ public class CLProgram extends CLObjectResource {
      * @param devices A list of devices this program should be build on or null for all devices of its context.
      * @param listener A listener who is notified when the program was built.
      */
-    public CLProgram build(final CLBuildListener listener, String options, CLDevice... devices) {
+    public CLProgram build(final CLBuildListener listener, String options, final CLDevice... devices) {
 
         if(released) {
             throw new CLException("can not build a released program");
@@ -363,7 +363,7 @@ public class CLProgram extends CLObjectResource {
         if(listener != null) {
             callback = new BuildProgramCallback() {
                 @Override
-                public void buildFinished(long cl_program) {
+                public void buildFinished(final long cl_program) {
                     buildLock.unlock();
                     listener.buildFinished(CLProgram.this);
                 }
@@ -405,19 +405,19 @@ public class CLProgram extends CLObjectResource {
     /**
      * Creates a kernel with the specified kernel name.
      */
-    public CLKernel createCLKernel(String kernelName) {
+    public CLKernel createCLKernel(final String kernelName) {
 
         if(released) {
             return null;
         }
 
-        int[] err = new int[1];
-        long id = getKernelBinding().clCreateKernel(ID, kernelName, err, 0);
+        final int[] err = new int[1];
+        final long id = getKernelBinding().clCreateKernel(ID, kernelName, err, 0);
         if(err[0] != CL_SUCCESS) {
             throw newException(err[0], "unable to create Kernel with name: "+kernelName);
         }
 
-        CLKernel kernel = new CLKernel(this, kernelName, id);
+        final CLKernel kernel = new CLKernel(this, kernelName, id);
         kernels.add(kernel);
         return kernel;
     }
@@ -431,10 +431,10 @@ public class CLProgram extends CLObjectResource {
             return Collections.emptyMap();
         }
 
-        HashMap<String, CLKernel> newKernels = new HashMap<String, CLKernel>();
+        final HashMap<String, CLKernel> newKernels = new HashMap<String, CLKernel>();
 
-        IntBuffer numKernels = newDirectByteBuffer(4).asIntBuffer();
-        CLKernelBinding kernelBinding = getKernelBinding();
+        final IntBuffer numKernels = newDirectByteBuffer(4).asIntBuffer();
+        final CLKernelBinding kernelBinding = getKernelBinding();
         int ret = kernelBinding.clCreateKernelsInProgram(ID, 0, null, numKernels);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not create kernels for "+this);
@@ -442,14 +442,14 @@ public class CLProgram extends CLObjectResource {
 
         if(numKernels.get(0) > 0) {
 
-            PointerBuffer kernelIDs = PointerBuffer.allocateDirect(numKernels.get(0));
+            final PointerBuffer kernelIDs = PointerBuffer.allocateDirect(numKernels.get(0));
             ret = kernelBinding.clCreateKernelsInProgram(ID, kernelIDs.capacity(), kernelIDs, null);
             if(ret != CL_SUCCESS) {
                 throw newException(ret, "can not create "+kernelIDs.capacity()+" kernels for "+this);
             }
 
             for (int i = 0; i < kernelIDs.capacity(); i++) {
-                CLKernel kernel = new CLKernel(this, kernelIDs.get(i));
+                final CLKernel kernel = new CLKernel(this, kernelIDs.get(i));
                 kernels.add(kernel);
                 newKernels.put(kernel.name, kernel);
             }
@@ -466,7 +466,7 @@ public class CLProgram extends CLObjectResource {
         return newKernels;
     }
 
-    void onKernelReleased(CLKernel kernel) {
+    void onKernelReleased(final CLKernel kernel) {
         this.kernels.remove(kernel);
     }
 
@@ -482,8 +482,8 @@ public class CLProgram extends CLObjectResource {
         executable = false;
         released = true;
         buildStatusMap = null;
-        
-        int ret = binding.clReleaseProgram(ID);
+
+        final int ret = binding.clReleaseProgram(ID);
         context.onProgramReleased(this);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not release "+this);
@@ -493,8 +493,8 @@ public class CLProgram extends CLObjectResource {
     private void releaseKernels() {
         if(!kernels.isEmpty()) {
             // copy to array to prevent concurrent modification exception
-            CLKernel[] array = kernels.toArray(new CLKernel[kernels.size()]);
-            for (CLKernel kernel : array) {
+            final CLKernel[] array = kernels.toArray(new CLKernel[kernels.size()]);
+            for (final CLKernel kernel : array) {
                 kernel.release();
             }
         }
@@ -508,20 +508,20 @@ public class CLProgram extends CLObjectResource {
             return new CLDevice[0];
         }
 
-        PointerBuffer size = PointerBuffer.allocateDirect(1);
+        final PointerBuffer size = PointerBuffer.allocateDirect(1);
         int ret = binding.clGetProgramInfo(ID, CL_PROGRAM_DEVICES, 0, null, size);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "on clGetProgramInfo of "+this);
         }
 
-        ByteBuffer bb = newDirectByteBuffer((int) size.get(0));
+        final ByteBuffer bb = newDirectByteBuffer((int) size.get(0));
         ret = binding.clGetProgramInfo(ID, CL_PROGRAM_DEVICES, bb.capacity(), bb, null);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "on clGetProgramInfo of "+this);
         }
 
-        int count = bb.capacity() / (Platform.is32Bit()?4:8);
-        CLDevice[] devices = new CLDevice[count];
+        final int count = bb.capacity() / (Platform.is32Bit()?4:8);
+        final CLDevice[] devices = new CLDevice[count];
         for (int i = 0; i < count; i++) {
             devices[i] = context.getDevice(Platform.is32Bit()?bb.getInt():bb.getLong());
         }
@@ -538,12 +538,12 @@ public class CLProgram extends CLObjectResource {
         if(released) {
             return "";
         }
-        StringBuilder sb = new StringBuilder(200);
-        CLDevice[] devices = getCLDevices();
+        final StringBuilder sb = new StringBuilder(200);
+        final CLDevice[] devices = getCLDevices();
         for (int i = 0; i < devices.length; i++) {
-            CLDevice device = devices[i];
+            final CLDevice device = devices[i];
             sb.append(device).append(" build log:\n");
-            String log = getBuildLog(device).trim();
+            final String log = getBuildLog(device).trim();
             sb.append(log.isEmpty()?"    <empty>":log);
             if(i != devices.length-1)
                 sb.append("\n");
@@ -578,18 +578,18 @@ public class CLProgram extends CLObjectResource {
      * Returns the build log for this program on the specified device. The contents
      * of the log are implementation dependent log can be an empty String.
      */
-    public String getBuildLog(CLDevice device) {
+    public String getBuildLog(final CLDevice device) {
         return getBuildInfoString(device, CL_PROGRAM_BUILD_LOG);
     }
 
     /**
      * Returns the build status enum for this program on the specified device.
      */
-    public Status getBuildStatus(CLDevice device) {
+    public Status getBuildStatus(final CLDevice device) {
         if(released) {
             return Status.BUILD_NONE;
         }
-        int clStatus = getBuildInfoInt(device, CL_PROGRAM_BUILD_STATUS);
+        final int clStatus = getBuildInfoInt(device, CL_PROGRAM_BUILD_STATUS);
         return Status.valueOf(clStatus);
     }
 
@@ -611,7 +611,7 @@ public class CLProgram extends CLObjectResource {
         // some drivers return IVE codes if the program haven't been built from source.
         try{
             return getProgramInfoString(CL_PROGRAM_SOURCE);
-        }catch(CLException.CLInvalidValueException ingore) {
+        }catch(final CLException.CLInvalidValueException ingore) {
             return "";
         }
     }
@@ -625,10 +625,10 @@ public class CLProgram extends CLObjectResource {
         if(!isExecutable()) {
             return Collections.emptyMap();
         }
-        
-        CLDevice[] devices = getCLDevices();
 
-        PointerBuffer sizes = PointerBuffer.allocateDirect(devices.length);
+        final CLDevice[] devices = getCLDevices();
+
+        final PointerBuffer sizes = PointerBuffer.allocateDirect(devices.length);
         int ret = binding.clGetProgramInfo(ID, CL_PROGRAM_BINARY_SIZES, sizes.capacity()*sizes.elementSize(), sizes.getBuffer(), null);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "on clGetProgramInfo(CL_PROGRAM_BINARY_SIZES) of "+this);
@@ -636,30 +636,30 @@ public class CLProgram extends CLObjectResource {
 
         int binariesSize = 0;
         while(sizes.remaining() != 0) {
-            int size = (int) sizes.get();
+            final int size = (int) sizes.get();
             binariesSize += size;
         }
-        ByteBuffer binaries = newDirectByteBuffer(binariesSize);
+        final ByteBuffer binaries = newDirectByteBuffer(binariesSize);
 
-        
+
         long address = InternalBufferUtil.getDirectBufferAddress(binaries);
-        PointerBuffer addresses = PointerBuffer.allocateDirect(sizes.capacity());
+        final PointerBuffer addresses = PointerBuffer.allocateDirect(sizes.capacity());
         sizes.rewind();
         while(sizes.remaining() != 0) {
             addresses.put(address);
             address += sizes.get();
         }
         addresses.rewind();
-        
+
         ret = binding.clGetProgramInfo(ID, CL_PROGRAM_BINARIES, addresses.capacity()*addresses.elementSize(), addresses.getBuffer(), null);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "on clGetProgramInfo(CL_PROGRAM_BINARIES) of "+this);
         }
 
-        Map<CLDevice, byte[]> map = new LinkedHashMap<CLDevice, byte[]>();
+        final Map<CLDevice, byte[]> map = new LinkedHashMap<CLDevice, byte[]>();
         sizes.rewind();
         for (int i = 0; i < devices.length; i++) {
-            byte[] bytes = new byte[(int)sizes.get()];
+            final byte[] bytes = new byte[(int)sizes.get()];
             binaries.get(bytes);
             map.put(devices[i], bytes);
         }
@@ -670,8 +670,8 @@ public class CLProgram extends CLObjectResource {
     /**
      * Utility method which builds a properly seperated option string.
      */
-    public static String optionsOf(String... options) {
-        StringBuilder sb = new StringBuilder(options.length * 24);
+    public static String optionsOf(final String... options) {
+        final StringBuilder sb = new StringBuilder(options.length * 24);
         for (int i = 0; i < options.length; i++) {
             sb.append(options[i]);
             if(i!= options.length-1)
@@ -683,14 +683,14 @@ public class CLProgram extends CLObjectResource {
     /**
      * Utility method for defining macros as build options (Returns "-D name").
      */
-    public static String define(String name) {
+    public static String define(final String name) {
         return "-D "+name;
     }
 
     /**
      * Utility method for defining macros as build options (Returns "-D name=value").
      */
-    public static String define(String name, Object value) {
+    public static String define(final String name, final Object value) {
         return "-D "+name+"="+value;
     }
 
@@ -701,7 +701,7 @@ public class CLProgram extends CLObjectResource {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -725,7 +725,7 @@ public class CLProgram extends CLObjectResource {
         hash = 37 * hash + (int) (this.ID ^ (this.ID >>> 32));
         return hash;
     }
-    
+
     public enum Status {
 
         BUILD_SUCCESS(CL_BUILD_SUCCESS),
@@ -738,11 +738,11 @@ public class CLProgram extends CLObjectResource {
          */
         public final int STATUS;
 
-        private Status(int status) {
+        private Status(final int status) {
             this.STATUS = status;
         }
 
-        public static Status valueOf(int clBuildStatus) {
+        public static Status valueOf(final int clBuildStatus) {
             switch(clBuildStatus) {
                 case(CL_BUILD_SUCCESS):
                     return BUILD_SUCCESS;
