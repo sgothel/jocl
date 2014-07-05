@@ -52,7 +52,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
 
                 if( TempJarCache.isInitialized() ) {
                    // only: jocl.jar -> jocl-natives-<os.and.arch>.jar
-                   JNILibLoaderBase.addNativeJarLibs(new Class<?>[] { CLDynamicLibraryBundleInfo.class }, null, null );
+                   JNILibLoaderBase.addNativeJarLibs(new Class<?>[] { CLDynamicLibraryBundleInfo.class }, null );
                 }
                 return null;
             }
