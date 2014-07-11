@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Application-Name: Java Bindings for OpenCL
+Specification-Title: Java Bindings for OpenCL API Specification
+Specification-Version: @BASEVERSION@
+Specification-Vendor: JogAmp Community
+Implementation-Title: Java Bindings for OpenCL Runtime Environment
+Implementation-Version: @VERSION@
+Implementation-Build: @BUILD_VERSION@
+Implementation-Branch: @SCM_BRANCH@
+Implementation-Commit: @SCM_COMMIT@
+Implementation-Vendor: JogAmp Community
+Implementation-URL: http://jogamp.org/
+Extension-Name: jogamp.nativetag.opencl
+Implementation-Vendor-Id: com.jogamp
+Trusted-Library: true
+Permissions: all-permissions
+@JAR_CODEBASE_TAG@
+

@@ -676,14 +676,24 @@
         </antcall>
 
         <!-- Create Java Web Start jar file from built file -->
-        <jar destfile="${build}/jar/jocl-natives-${os.and.arch}.jar">
-            <fileset dir="../${rootrel.build}/obj">
-                <include name="*jocl.${native.library.suffix}" />
-                <include name="*soft_oal.${native.library.suffix}" />
-                <include name="*openal.${native.library.suffix}" />
-                <exclude name="*openal*.1*.${native.library.suffix}" />
-            </fileset>
-        </jar>
+        <copy file="joclversion-natives"
+          tofile="${build}/tempversion-natives"
+          overwrite="true">
+            <filterset>
+                <filter token="VERSION" value="${jogamp.version}"/>
+                <filter token="BUILD_VERSION" value="${jocl.version}"/>
+                <filter token="SCM_BRANCH" value="${jocl.build.branch}"/>
+                <filter token="SCM_COMMIT" value="${jocl.build.commit}"/>
+                <filter token="BASEVERSION" value="${jogamp.version.base}" />
+                <filter token="JAR_CODEBASE_TAG" value="${jogamp.jar.codebase}"/>
+            </filterset>
+        </copy>
+        <native.tag.jar objdir="${build}/obj"
+                        nativejarfile="${build}/jar/jocl-natives-${os.and.arch}.jar"
+                        manifestfile="${build}/tempversion-natives" 
+                        module="opencl"
+                        includelibs="*jocl.${native.library.suffix}" />
+
         <!-- Produce duplicates for different configurations, since non-native-jar aliasing (Bug 1023/Bug 1024) -->
         <copy file="${build}/jar/jocl-natives-${os.and.arch}.jar" tofile="${build}/jar/jocl-android-natives-${os.and.arch}.jar"/>
     </target>
@@ -695,7 +705,7 @@
     <target name="jar" depends="init">
         <!-- Prepare the manifest -->
         <copy file="joclversion"
-          tofile="tempversion"
+          tofile="${build}/tempversion"
           overwrite="true">
             <filterset>
                 <filter token="VERSION" value="${jogamp.version}"/>
@@ -708,7 +718,7 @@
         </copy>
 
         <!-- Build the jar excluding any build specific classes. -->
-        <jar manifest="tempversion" destfile="${jocl.jar}">
+        <jar manifest="${build}/tempversion" destfile="${jocl.jar}" filesonly="true">
             <fileset dir="${classes}">
                 <include name="com/jogamp/opencl/**" />
                 <include name="jogamp/opencl/**" />
@@ -719,7 +729,7 @@
             </fileset>
         </jar>
 
-        <jar manifest="tempversion" destfile="${jocl-android.jar}">
+        <jar manifest="${build}/tempversion" destfile="${jocl-android.jar}" filesonly="true">
             <fileset dir="${classes}">
                 <include name="com/jogamp/opencl/**" />
                 <include name="jogamp/opencl/**" />
@@ -730,8 +740,6 @@
         </jar>
 
         <antcall target="android.package" inheritRefs="true" />
-
-        <delete file="tempversion"/>
     </target>
 
     <target name="jocl.build.check.aapt" depends="init">
@@ -754,7 +762,7 @@
             android.abi="${android.abi}"
             androidmanifest.path="resources/android/AndroidManifest-jocl.xml"
             androidresources.path="resources/android/res-jocl"
-            jarmanifest.path="tempversion"
+            jarmanifest.path="${build}/tempversion"
             version.code="${jogamp.version.int}"
             version.name="${jogamp.version}" />
     </target>
