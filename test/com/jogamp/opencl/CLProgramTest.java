@@ -28,7 +28,6 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.opencl.util.CLBuildConfiguration;
 import com.jogamp.opencl.util.CLProgramConfiguration;
@@ -67,7 +66,7 @@ public class CLProgramTest extends UITestCase {
 
 
     @Test
-    public void enumsTest() {
+    public void test01Enums() {
 
         // CLProgram enums
         for (final Status e : Status.values()) {
@@ -76,10 +75,7 @@ public class CLProgramTest extends UITestCase {
     }
 
     @Test
-    public void rebuildProgramTest() throws IOException {
-
-        out.println(" - - - CLProgramTest; rebuild program test - - - ");
-
+    public void test02RebuildProgram() throws IOException {
         final CLContext context = CLContext.create();
         final CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"));
 
@@ -119,10 +115,7 @@ public class CLProgramTest extends UITestCase {
     }
 
     @Test
-    public void programBinariesTest() throws IOException {
-
-        out.println(" - - - CLProgramTest; down-/upload binaries test - - - ");
-
+    public void test03ProgramBinaries() throws IOException {
         final CLContext context = CLContext.create();
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"))
                                    .build(ENABLE_MAD, WARNINGS_ARE_ERRORS);
@@ -200,10 +193,7 @@ public class CLProgramTest extends UITestCase {
 
     }
 
-    @Test
-    public void builderTest() throws IOException, ClassNotFoundException, InterruptedException {
-        out.println(" - - - CLProgramTest; program builder test - - - ");
-
+    private void builderImpl(final boolean sync) throws IOException, ClassNotFoundException, InterruptedException {
         final CLContext context = CLContext.create();
         CLProgram program = context.createProgram(getClass().getResourceAsStream("testkernels.cl"));
 
@@ -231,8 +221,14 @@ public class CLProgramTest extends UITestCase {
 
         out.println(builder);
 
-        // async build test
-        {
+        if( sync ) {
+            // sync build test
+            final CLProgram outerProgram = program;
+
+            builder.setProgram(program).build();
+            assertEquals(outerProgram, program);
+        } else {
+            // async build test
             final CountDownLatch countdown = new CountDownLatch(1);
             final CLProgram outerProgram = program;
 
@@ -243,7 +239,6 @@ public class CLProgramTest extends UITestCase {
                     countdown.countDown();
                 }
             };
-
             builder.setProgram(program).build(buildCallback);
             countdown.await();
         }
@@ -274,7 +269,6 @@ public class CLProgramTest extends UITestCase {
         program = programConfig.build();
         assertTrue(program.isExecutable());
 
-
         // cloneing
         assertEquals(builder, builder.clone());
 
@@ -283,13 +277,23 @@ public class CLProgramTest extends UITestCase {
 
 
     @Test
-    public void kernelTest() {
-        final String source = "__attribute__((reqd_work_group_size(1, 1, 1))) kernel void foo(float a, int b, short c) { }\n";
+    public void test10BuilderSync() throws IOException, ClassNotFoundException, InterruptedException {
+        builderImpl(true);
+    }
 
+    @Test
+    public void test11BuilderAsync() throws IOException, ClassNotFoundException, InterruptedException {
+        builderImpl(false);
+    }
+
+    private static final String test20KernelSource = "__attribute__((reqd_work_group_size(1, 1, 1))) kernel void foo(float a, int b, short c) { }\n";
+
+    @Test
+    public void test20Kernel() {
         final CLContext context = CLContext.create();
 
         try{
-            final CLProgram program = context.createProgram(source).build();
+            final CLProgram program = context.createProgram(test20KernelSource).build();
             assertTrue(program.isExecutable());
 
             final CLKernel kernel = program.createCLKernel("foo");
@@ -330,8 +334,7 @@ public class CLProgramTest extends UITestCase {
     }
 
     @Test
-    public void createAllKernelsTest() {
-
+    public void test21AllKernels() {
         final String source = "kernel void foo(int a) { }\n"+
                         "kernel void bar(float b) { }\n";
 
@@ -359,11 +362,11 @@ public class CLProgramTest extends UITestCase {
     }
 
 //    @Test
-    public void loadTest() throws IOException, ClassNotFoundException, InterruptedException {
+    public void test60Load() throws IOException, ClassNotFoundException, InterruptedException {
         for(int i = 0; i < 100; i++) {
-            rebuildProgramTest();
-            builderTest();
-            programBinariesTest();
+            test02RebuildProgram();
+            test11BuilderAsync();
+            test03ProgramBinaries();
         }
     }
 
