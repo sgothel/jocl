@@ -5,12 +5,8 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="jocl/build/obj"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="build/gensrc/java">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="jocl/build/obj"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="src" output="build/test/build/classes" path="test"/>
+	<classpathentry kind="src" path="build/gensrc/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/gluegen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jogl"/>
