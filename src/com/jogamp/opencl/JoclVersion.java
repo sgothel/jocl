@@ -247,8 +247,12 @@ public class JoclVersion extends JogampVersion {
         // System.err.println(NativeWindowVersion.getInstance());
         final JoclVersion v = JoclVersion.getInstance();
         System.err.println(v.toString());
-        System.err.println(v.getOpenCLTextInfo(null).toString());
-        // System.err.println(v.getOpenCLHtmlInfo(null).toString());
+        if( CLPlatform.isAvailable() ) {
+            System.err.println(v.getOpenCLTextInfo(null).toString());
+            // System.err.println(v.getOpenCLHtmlInfo(null).toString());
+        } else {
+            System.err.println("JOCL/OpenCL not available");
+        }
     }
 }
 

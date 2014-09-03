@@ -68,6 +68,9 @@ import static com.jogamp.opencl.llb.CL.*;
  *
  * optional eager initialization:
  * <p><pre>
+ *     if( !CLPlatform.isAvailable() ) {
+ *        return; // abort
+ *     }
  *     try{
  *          CLPlatform.initialize();
  *     }catch(JogampRuntimeException ex) {
@@ -77,6 +80,9 @@ import static com.jogamp.opencl.llb.CL.*;
  *
  * Example initialization:
  * <p><pre>
+ *     if( !CLPlatform.isAvailable() ) {
+ *        return; // abort
+ *     }
  *     CLPlatform platform = CLPlatform.getDefault(type(GPU));
  *
  *     if(platform == null) {
@@ -94,6 +100,7 @@ import static com.jogamp.opencl.llb.CL.*;
  * CLPlatform is threadsafe.
  *
  * @author Michael Bien, et al.
+ * @see #isAvailable()
  * @see #initialize()
  * @see #getDefault()
  * @see #listCLPlatforms()
@@ -135,8 +142,15 @@ public class CLPlatform {
     }
 
     /**
+     * @returns true if OpenCL is available on this machine,
+     * i.e. all native libraries could be loaded (CL and CL/JNI).
+     */
+    public static boolean isAvailable() { return CLAbstractImpl.isAvailable(); }
+
+    /**
      * Eagerly initializes JOCL. Subsequent calls do nothing.
      * @throws JogampRuntimeException if something went wrong in the initialization (e.g. OpenCL lib not found).
+     * @see #isAvailable()
      */
     public static void initialize() throws JogampRuntimeException {
         initialize(null);
@@ -147,9 +161,9 @@ public class CLPlatform {
      * Eagerly initializes JOCL. Subsequent calls do nothing.
      * @param factory CLAccessorFactory used for creating the bindings.
      * @throws JogampRuntimeException if something went wrong in the initialization (e.g. OpenCL lib not found).
+     * @see #isAvailable()
      */
     synchronized static void initialize(final CLAccessorFactory factory) throws JogampRuntimeException {
-
         if(cl != null) {
             return;
         }
@@ -162,19 +176,10 @@ public class CLPlatform {
             }
         }
 
-        try {
-            if( null == CLAbstractImpl.getCLProcAddressTable() ) {
-                throw new JogampRuntimeException("JOCL ProcAddressTable is NULL");
-            }
-            cl = new CLImpl();
-        }catch(final UnsatisfiedLinkError ex) {
-            System.err.println(JoclVersion.getInstance().getAllVersions(null).toString());
-            throw ex;
-        }catch(final Exception ex) {
-            System.err.println(JoclVersion.getInstance().getAllVersions(null).toString());
-            throw new JogampRuntimeException("JOCL initialization error.", ex);
+        if( !CLAbstractImpl.isAvailable() ) {
+            throw new JogampRuntimeException("JOCL is not available");
         }
-
+        cl = new CLImpl();
     }
 
     /**
@@ -188,7 +193,6 @@ public class CLPlatform {
     /**
      * Returns the default OpenCL platform or null when no platform found.
      */
-    @SuppressWarnings("unchecked")
     public static CLPlatform getDefault(final Filter<CLPlatform>... filter) {
         final CLPlatform[] platforms = listCLPlatforms(filter);
         if(platforms.length > 0) {
@@ -221,7 +225,6 @@ public class CLPlatform {
      * @param filter Acceptance filter for the returned platforms.
      * @throws CLException if something went wrong initializing OpenCL
      */
-    @SuppressWarnings("unchecked")
     public static CLPlatform[] listCLPlatforms(final Filter<CLPlatform>... filter) {
         initialize();
 
@@ -297,7 +300,6 @@ public class CLPlatform {
     /**
      * Lists all physical devices available on this platform matching the given {@link Filter}.
      */
-    @SuppressWarnings("unchecked")
     public CLDevice[] listCLDevices(final Filter<CLDevice>... filters) {
         initialize();
 
@@ -393,7 +395,6 @@ public class CLPlatform {
      * The device speed is estimated by calculating the product of
      * MAX_COMPUTE_UNITS and MAX_CLOCK_FREQUENCY.
      */
-    @SuppressWarnings("unchecked")
     public CLDevice getMaxFlopsDevice(final Filter<CLDevice>... filter) {
         return findMaxFlopsDevice(listCLDevices(filter));
     }

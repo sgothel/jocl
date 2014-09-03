@@ -93,8 +93,12 @@ public class MiscUtils {
      * @return true if OpenCL is not available for this operating system, CPU architecture, et cetera.
      * This is meant to be a check that there can't possibly be a driver installed because
      * nobody makes one, not just a check that we didn't see one.
+     * <p>
+     * To check whether an OpenCL implementation/library has actually been loaded,
+     * use {@link CLAbstractImpl#isAvailable()}.
+     * </p>
      */
-    public static final boolean isOpenCLUnavailable() {
-        return !CLAbstractImpl.isAvailable() && knownOSWithoutCLImpl.contains(Platform.getOSType());
+    public static final boolean isKnownOSWithoutCLImpl() {
+        return knownOSWithoutCLImpl.contains(Platform.getOSType());
     }
 }

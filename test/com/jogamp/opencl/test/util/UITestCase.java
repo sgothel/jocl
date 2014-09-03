@@ -36,6 +36,7 @@ import java.util.List;
 
 import com.jogamp.common.os.Platform;
 import com.jogamp.common.util.locks.SingletonInstance;
+import com.jogamp.opencl.CLPlatform;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -126,7 +127,7 @@ public abstract class UITestCase {
     @Before
     public void setUp() {
         System.err.print("++++ UITestCase.setUp: "+getFullTestName(" - "));
-        final boolean isOpenCLUnavailable = MiscUtils.isOpenCLUnavailable();
+        final boolean isOpenCLUnavailable = !CLPlatform.isAvailable();
         final boolean abortTest = isOpenCLUnavailable || !testSupported;
         if( abortTest ) {
             if( isOpenCLUnavailable ) {

@@ -234,10 +234,7 @@ public class CLGLTest extends UITestCase {
 
     @Test(timeout=15000)
     public void textureSharing() {
-
         out.println(" - - - glcl; textureSharing - - - ");
-        if(MiscUtils.isOpenCLUnavailable())
-            return;
 
         initGL();
         makeGLCurrent();
