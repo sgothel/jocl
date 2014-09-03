@@ -131,7 +131,7 @@ public abstract class UITestCase {
         final boolean abortTest = isOpenCLUnavailable || !testSupported;
         if( abortTest ) {
             if( isOpenCLUnavailable ) {
-                System.err.print(" - CL not supported on "+Platform.getOSType());
+                System.err.print(" - CL not supported on this machine");
             }
             if( !testSupported ) {
                 System.err.print(" - "+unsupportedTestMsg);
