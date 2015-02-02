@@ -35,7 +35,7 @@ import com.jogamp.opencl.CLException;
 import com.jogamp.opencl.llb.gl.CLGL;
 
 import java.nio.Buffer;
-import javax.media.opengl.GLContext;
+import com.jogamp.opengl.GLContext;
 
 
 /**

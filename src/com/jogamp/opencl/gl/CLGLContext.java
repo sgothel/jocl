@@ -30,7 +30,7 @@ package com.jogamp.opencl.gl;
 
 import java.nio.Buffer;
 
-import javax.media.opengl.GLContext;
+import com.jogamp.opengl.GLContext;
 
 import jogamp.opengl.GLContextImpl;
 import jogamp.opengl.egl.EGLContext;

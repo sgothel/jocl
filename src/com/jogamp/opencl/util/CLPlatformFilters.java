@@ -33,8 +33,8 @@ import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLPlatform;
 import com.jogamp.opencl.CLVersion;
 import java.util.Arrays;
-import javax.media.opengl.GL;
-import javax.media.opengl.GLContext;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GLContext;
 
 /**
  * Pre-defined filters.

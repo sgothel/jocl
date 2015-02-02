@@ -39,7 +39,7 @@ import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
 
 import java.nio.Buffer;
 
-import javax.media.opengl.GLContext;
+import com.jogamp.opengl.GLContext;
 
 /**
  * 3D OpenCL image representing an 3D OpenGL texture.

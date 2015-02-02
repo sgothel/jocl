@@ -38,8 +38,8 @@ import com.jogamp.opencl.CLCommandQueue;
 import com.jogamp.opencl.CLKernel;
 import com.jogamp.opencl.CLProgram;
 
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLException;
+import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.GLException;
 
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.newt.NewtFactory;
@@ -57,11 +57,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import javax.media.opengl.GL;
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLProfile;
-import javax.media.opengl.GLContext;
-import javax.media.opengl.fixedfunc.GLPointerFunc;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.GLContext;
+import com.jogamp.opengl.fixedfunc.GLPointerFunc;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;

@@ -32,7 +32,7 @@
 package com.jogamp.opencl.gl;
 
 import com.jogamp.opencl.CLMemory.GLObjectType;
-import javax.media.opengl.GLContext;
+import com.jogamp.opengl.GLContext;
 
 /**
  *

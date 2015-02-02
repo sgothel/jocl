@@ -119,12 +119,12 @@ function testawt() {
 #testnoawt com.jogamp.opencl.CLCommandQueueTest $*
 #testnoawt com.jogamp.opencl.CLExceptionTest $*
 #testnoawt com.jogamp.opencl.CLImageTest $*
-testnoawt com.jogamp.opencl.CLProgramTest $*
+#testnoawt com.jogamp.opencl.CLProgramTest $*
 #testnoawt com.jogamp.opencl.HighLevelBindingTest $*
 #testnoawt com.jogamp.opencl.LowLevelBindingTest $*
 #testnoawt com.jogamp.opencl.TestJoclVersion $*
 #testnoawt com.jogamp.opencl.TestUtils $*
-#testnoawt com.jogamp.opencl.gl.CLGLTest $*
+testnoawt com.jogamp.opencl.gl.CLGLTest $*
 #testnoawt com.jogamp.opencl.util.concurrent.CLMultiContextTest $*
 
 
