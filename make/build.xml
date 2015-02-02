@@ -201,7 +201,7 @@
         <!-- The resulting jocl.jar. -->
         <property name="jocl.jar" value="${build}/jar/jocl.jar" />
         <property name="jocl-android.jar" value="${build}/jar/jocl-android.jar" />
-        <property name="jocl-android.apk" value="${build}/jar/jocl-android-${android.abi}.apk" />
+        <property name="jocl-android.apk" value="${build}/jar/jocl-${os.and.arch}.apk" />
 
         <path id="jocl_all.classpath">
             <pathelement location="${gluegen-rt.jar}" />
@@ -747,7 +747,7 @@
           <srcfiles dir= "."                includes="*.xml"/>
           <srcfiles dir= "${src.java}"      includes="**"/>
           <srcfiles dir= "${src.generated}" includes="**"/>
-          <mapper type="merge" to="${build}/jar/jocl-android-${android.abi}.apk"/>
+          <mapper type="merge" to="${build}/jar/jocl-${os.and.arch}.apk"/>
         </uptodate>
     </target>
 
