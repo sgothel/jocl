@@ -850,6 +850,7 @@
             <classpath refid="jocl_all.classpath"/>
             <link offline="true" href="${javadoc.link}" packagelistLoc="${gluegen.root}/make/142-packages" />
             <link offline="false" href="${gluegen.link}" />
+            <arg value="${javadoc.xarg1}"/>
         </javadoc>
         <copy todir="${javadoc.jocl.public.path}/resources" overwrite="true">
             <fileset dir="${gluegen.make.dir}/doc/javadoc/resources" includes="*" />
@@ -868,6 +869,7 @@
             <classpath refid="jocl_all.classpath"/>
             <link offline="true" href="${javadoc.link}" packagelistLoc="${gluegen.root}/make/142-packages" />
             <link offline="false" href="${gluegen.link}" />
+            <arg value="${javadoc.xarg1}"/>
         </javadoc>
         <copy todir="${javadoc.jocl.dev.path}/resources" overwrite="true">
             <fileset dir="${gluegen.make.dir}/doc/javadoc/resources" includes="*" />
