@@ -390,7 +390,7 @@
 
         <!-- Use the GlueGen task to generate the Java files -->
 
-        <echo message="context..."/>
+        <echo message="Generating CLContextBinding.java"/>
     	<echo message="local stub include path ${toString:stub.includes.fileset.all}"/>
     	<echo message="relative stub include path ${stub.includes.gluegen.all}"/>
         <gluegen src="${stub.includes}/opencl.h"
@@ -404,7 +404,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="program..."/>
+        <echo message="Generating CLProgramBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-program-if.cfg"
@@ -416,7 +416,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="kernel..."/>
+        <echo message="Generating CLKernelBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-kernel-if.cfg"
@@ -428,7 +428,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="queue..."/>
+        <echo message="Generating CLCommandQueueBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-queue-if.cfg"
@@ -440,7 +440,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="device..."/>
+        <echo message="Generating CLDeviceBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-device-if.cfg"
@@ -452,7 +452,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="memobj..."/>
+        <echo message="Generating CLMemObjBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-mem-if.cfg"
@@ -464,7 +464,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="image..."/>
+        <echo message="Generating CLImageBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-image-if.cfg"
@@ -476,7 +476,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="buffer..."/>
+        <echo message="Generating CLBufferBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-buffer-if.cfg"
@@ -488,7 +488,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="sampler..."/>
+        <echo message="Generating CLSamplerBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-sampler-if.cfg"
@@ -500,7 +500,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="event..."/>
+        <echo message="Generating CLEventBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-event-if.cfg"
@@ -512,7 +512,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="platform..."/>
+        <echo message="Generating CLPlatformBinding.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-platform-if.cfg"
@@ -524,7 +524,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="CL..."/>
+        <echo message="Generating CL.java"/>
         <antcall target="java.generate.copy2temp" inheritRefs="true" />
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
@@ -537,7 +537,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="CLGL..."/>
+        <echo message="Generating CLGL.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/clgl-if.cfg"
@@ -548,7 +548,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="GLImpl..."/>
+        <echo message="Generating CLAbstractImpl.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl.cfg"
