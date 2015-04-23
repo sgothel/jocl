@@ -178,7 +178,7 @@
 
         <!-- Directories used for OpenCL header file preprocessing. -->
         <property name="etc.build.dir" value="${build}/etc" />
-        <property name="headers.orig" value="${stub.includes}/CL_orig" />
+        <property name="headers.orig" value="${stub.includes}/CL11" />
         <property name="headers.dest" value="${gen.includes}/CL" />
 
     	<!-- The headers from which Java files are generated -->
@@ -186,7 +186,7 @@
             <include name="${gen.includes.dir}"/>
         </dirset>
     	<fileset id="stub.includes.dependencies.fileset.1" dir="${stub.includes.dir}">
-            <include name="CL_orig/**" />
+            <include name="CL11/**" />
             <include name="GL3/**" />
         </fileset>
     	<fileset id="stub.includes.dependencies.fileset.2" dir="${gen.includes.dir}">
