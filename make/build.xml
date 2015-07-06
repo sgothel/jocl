@@ -80,6 +80,13 @@
         <echo message="Loaded ${user.home}/gluegen.properties." />
     </target>
 
+    <target name="set.debug">
+        <property name="c.compiler.debug" value="true" /> 
+        <property name="c.compiler.optimise"  value="none" /> 
+        <property name="javacdebug"       value="true" /> 
+        <property name="javacdebuglevel"  value="source,lines,vars" /> 
+    </target>
+
     <!-- ================================================================== -->
     <!--
        - Declare all paths and user defined variables.
@@ -938,7 +945,9 @@
     <!--
        - Build everything.
       -->
-    <target name="all" depends="jocl.build, test.compile, tag.build, developer-zip-archive"/>
+    <target name="all" description="Release build" depends="jocl.build, test.compile, tag.build, developer-zip-archive"/>
+    <target name="all.debug" description="Debug build" depends="set.debug, jocl.build, test.compile, tag.build, developer-zip-archive"/>
+    <target name="all.ide" description="Debug IDE build, no tagging or archives" depends="set.debug, jocl.build, test.compile"/>
 
     <target name="jocl.build" depends="init">
         <!-- Generate and compile the Java sources. -->
