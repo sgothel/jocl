@@ -4,9 +4,7 @@
 #include    <CL/cl_platform.h>
 #include    <CL/cl.h>
 #include    <CL/cl_ext.h>
-//#include    <CL/cl_vendor_ext.h>
 
-//#include    <GL/gl.h>
-#include    <gltypes.h>
+#include    <gl-types.h>
 #include    <CL/cl_gl.h>
 #include    <CL/cl_gl_ext.h>

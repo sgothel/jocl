@@ -183,11 +183,7 @@
 
     	<!-- The headers from which Java files are generated -->
         <dirset id="stub.includes.fileset.all" dir=".">
-            <include name="${stub.includes.dir}"/>
             <include name="${gen.includes.dir}"/>
-            <include name="${stub.includes.dir}/jvm"/>
-            <include name="${stub.includes.dir}/gl"/>
-            <include name="${stub.includes.dir}/common"/>
         </dirset>
     	<fileset id="stub.includes.dependencies.fileset.1" dir="${stub.includes.dir}">
             <include name="CL_orig/**" />
@@ -202,7 +198,9 @@
             <include name="*.java" />
             <include name="*.c" />
         </fileset>
-        <!--property name="stub.includes.gluegen.gg"  value="${gluegen.root}/make/stub_includes/gluegen" /-->
+    	<!-- relative paths to stub includes in gluegen project; have to pass separately into gluegen
+    	     task because dirsets won't work with paths outside their root path -->
+        <property name="stub.includes.gluegen.all"  value="${gluegen.root}/make/stub_includes/gluegen, ${gluegen.root}/make/stub_includes/jni, ${jogl.root}/make/stub_includes/khr, ${jogl.root}/make/stub_includes/opengl"/>
         <property name="stub.includes.gluegen.cc"  value="${gluegen.root}/make/stub_includes/platform" />
 
         <!-- The resulting jocl.jar. -->
@@ -393,11 +391,13 @@
         <!-- Use the GlueGen task to generate the Java files -->
 
         <echo message="context..."/>
-    	<echo message="incl path ${toString:stub.includes.fileset.all}"/>
+    	<echo message="local stub include path ${toString:stub.includes.fileset.all}"/>
+    	<echo message="relative stub include path ${stub.includes.gluegen.all}"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-context-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -409,6 +409,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-program-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -420,6 +421,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-kernel-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -431,6 +433,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-queue-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -442,6 +445,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-device-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -453,6 +457,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-mem-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -464,6 +469,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-image-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -475,6 +481,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-buffer-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -486,6 +493,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-sampler-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -497,6 +505,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-event-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -508,6 +517,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-platform-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -520,6 +530,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  dumpCPP="false"
                  debug="false">
@@ -531,6 +542,7 @@
                  outputRootDir="${build}"
                  config="${config}/clgl-if.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.JavaEmitter"
                  debug="false">
             <classpath refid="gluegen.classpath" />
@@ -541,6 +553,7 @@
                  outputRootDir="${build}"
                  config="${config}/cl-impl.cfg"
                  includeRefid="stub.includes.fileset.all"
+                 literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.procaddress.ProcAddressEmitter"
                  debug="false">
             <classpath refid="gluegen.classpath" />
@@ -646,7 +659,7 @@
                     <sysincludepath path="${java.includes.dir}"/>
                     <sysincludepath path="${java.includes.dir.platform}"/>
                     <sysincludepath path="${stub.includes.gluegen.cc}"/>
-                    <includepath path="${stub.includes.dir}"/>
+                    <includepath path="${jogl.root}/make/stub_includes/opengl"/>
                     <includepath path="${gen.includes.dir}"/>
                     <!-- This is for the generated headers for handwritten C code -->
                     <includepath path="${src.generated.c}" />
