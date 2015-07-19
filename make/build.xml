@@ -144,8 +144,6 @@
         <property name="src.c" value="${project.root}/${rootrel.src.c}" />
         <property name="src.java" value="${project.root}/${rootrel.src.java}" />
         <property name="build" value="${project.root}/${rootrel.build}" />
-        <property name="tempdir" value="${project.root}/build-temp" />
-        <mkdir dir="${tempdir}" />
 
         <!-- The generated source directories. -->
         <property name="src.generated" value="${build}/gensrc" />
@@ -299,13 +297,6 @@
             <srcfiles refid="stub.includes.dependencies.fileset.3" />
             <srcfiles refid="stub.includes.dependencies.fileset.4" />
         </uptodate>
-    </target>
-
-    <target name="java.generate.copy2temp">
-        <copy todir="${tempdir}">
-            <fileset dir="${build}"
-                     includes="gensrc/java/**" />
-        </copy>
     </target>
 
     <target name="generate.jdk7.autocloseable" if="${enable.jdk7.features}">
@@ -524,7 +515,6 @@
         </gluegen>
 
         <echo message="Generating CL.java"/>
-        <antcall target="java.generate.copy2temp" inheritRefs="true" />
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-if.cfg"
@@ -547,7 +537,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="Generating CLAbstractImpl.java"/>
+        <echo message="Generating CLAbstractImpl.java and CLProcAddressTable.java"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl.cfg"
@@ -945,7 +935,6 @@
     <target name="clean" depends="init">
         <delete includeEmptyDirs="true" quiet="true">
             <fileset dir="${build}" />
-        	<fileset dir="${tempdir}" />
             <fileset dir="${javadoc}" />
             <fileset dir="${javadoc.dev}" />
             <fileset dir="${gen.includes}" />
