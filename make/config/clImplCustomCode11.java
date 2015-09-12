@@ -1,10 +1,10 @@
 
     /** If null, OpenCL is not available on this machine. */
     static final DynamicLibraryBundle dynamicLookupHelper;
-    protected static final CLProcAddressTable addressTable;
+    protected static final CLProcAddressTable11 addressTable;
 
     static {
-        addressTable = new CLProcAddressTable();
+        addressTable = new CLProcAddressTable11();
         dynamicLookupHelper = AccessController.doPrivileged(new PrivilegedAction<DynamicLibraryBundle>() {
                                   public DynamicLibraryBundle run() {
                                       final DynamicLibraryBundle bundle = new DynamicLibraryBundle(new CLDynamicLibraryBundleInfo());
@@ -32,7 +32,7 @@
      * @returns true if OpenCL is available on this machine.
      */
     public static boolean isAvailable() { return dynamicLookupHelper != null; }
-    public static CLProcAddressTable getCLProcAddressTable() { return addressTable; }
+    public static CLProcAddressTable11 getCLProcAddressTable() { return addressTable; }
 
     static long clGetExtensionFunctionAddress(long clGetExtensionFunctionAddressHandle, java.lang.String procname)
     {
@@ -42,7 +42,7 @@
         return dispatch_clGetExtensionFunctionAddressStatic(procname, clGetExtensionFunctionAddressHandle);
     }
 
-    public CLAbstractImpl() {
+    public CLAbstractImpl11() {
     }
 
     /** Entry point (through function pointer) to C language function: <br> <code> void* clGetExtensionFunctionAddress(const char *  fname); </code>    */

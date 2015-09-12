@@ -34,7 +34,7 @@ package com.jogamp.opencl.util;
 import com.jogamp.common.os.Platform;
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLPlatform;
-import com.jogamp.opencl.llb.impl.CLImpl;
+import com.jogamp.opencl.llb.impl.CLImpl11;
 import java.util.Map;
 
 
@@ -58,7 +58,7 @@ public class CLInfo {
 
         // binding
         sb.append("CL_BINDING_UNAVAILABLE_FUNCTIONS: ");
-        sb.append(((CLImpl) CLPlatform.getLowLevelCLInterface()).getAddressTable().getNullPointerFunctions());
+        sb.append(((CLImpl11) CLPlatform.getLowLevelCLInterface()).getAddressTable().getNullPointerFunctions());
         sb.append("\n");
 
         // OpenCL

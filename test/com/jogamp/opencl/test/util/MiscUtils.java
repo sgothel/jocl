@@ -34,7 +34,6 @@ import java.util.Random;
 import java.util.Set;
 
 import com.jogamp.common.os.Platform;
-import com.jogamp.opencl.llb.impl.CLAbstractImpl;
 
 import static java.lang.System.*;
 import static org.junit.Assert.*;

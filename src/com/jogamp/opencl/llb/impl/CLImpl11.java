@@ -44,12 +44,12 @@ import static com.jogamp.common.nio.Buffers.*;
  * Java bindings to OpenCL, the Open Computing Language.
  * @author Michael Bien, et al.
  */
-public class CLImpl extends CLAbstractImpl {
+public class CLImpl11 extends CLAbstractImpl11 {
 
     //maps the context id to its error handler's global object pointer
     private final LongLongHashMap contextCallbackMap;
 
-    public CLImpl() {
+    public CLImpl11() {
         super();
         this.contextCallbackMap = new LongLongHashMap();
         this.contextCallbackMap.setKeyNotFoundValue(0);
@@ -253,7 +253,7 @@ public class CLImpl extends CLAbstractImpl {
             int event_byte_offset, Object errcode_ret, int errcode_ret_byte_offset,
             long getImageInfoAddress, long mapImageAddress);
 
-    public CLProcAddressTable getAddressTable() {
+    public CLProcAddressTable11 getAddressTable() {
         return addressTable;
     }
 

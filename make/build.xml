@@ -556,7 +556,7 @@
         <echo message="Generating CLAbstractImpl.java, CLAbstractImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 1.1"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
-                 config="${config}/cl-impl.cfg"
+                 config="${config}/cl-impl-11.cfg"
                  includeRefid="stub.includes.fileset.all.11"
                  literalInclude="${stub.includes.gluegen.all}"
                  emitter="com.jogamp.gluegen.procaddress.ProcAddressEmitter"

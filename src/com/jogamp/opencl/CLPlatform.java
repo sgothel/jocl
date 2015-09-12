@@ -46,8 +46,8 @@ import com.jogamp.opencl.llb.CLEventBinding;
 import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.opencl.spi.CLPlatformInfoAccessor;
 import com.jogamp.opencl.util.CLUtil;
-import com.jogamp.opencl.llb.impl.CLAbstractImpl;
-import com.jogamp.opencl.llb.impl.CLImpl;
+import com.jogamp.opencl.llb.impl.CLAbstractImpl11;
+import com.jogamp.opencl.llb.impl.CLImpl11;
 import com.jogamp.opencl.spi.CLAccessorFactory;
 import com.jogamp.opencl.util.Filter;
 
@@ -145,7 +145,7 @@ public class CLPlatform {
      * @returns true if OpenCL is available on this machine,
      * i.e. all native libraries could be loaded (CL and CL/JNI).
      */
-    public static boolean isAvailable() { return CLAbstractImpl.isAvailable(); }
+    public static boolean isAvailable() { return CLAbstractImpl11.isAvailable(); }
 
     /**
      * Eagerly initializes JOCL. Subsequent calls do nothing.
@@ -176,10 +176,10 @@ public class CLPlatform {
             }
         }
 
-        if( !CLAbstractImpl.isAvailable() ) {
+        if( !CLAbstractImpl11.isAvailable() ) {
             throw new JogampRuntimeException("JOCL is not available");
         }
-        cl = new CLImpl();
+        cl = new CLImpl11();
     }
 
     /**
