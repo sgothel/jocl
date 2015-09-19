@@ -94,7 +94,7 @@ public class MiscUtils {
      * nobody makes one, not just a check that we didn't see one.
      * <p>
      * To check whether an OpenCL implementation/library has actually been loaded,
-     * use {@link CLAbstractImpl#isAvailable()}.
+     * use {@link CLImpl#isAvailable()}.
      * </p>
      */
     public static final boolean isKnownOSWithoutCLImpl() {

@@ -288,7 +288,7 @@
 
         <!-- Now check for the presence of one well-known file -->
         <uptodate property="java.generate.skip"
-                  targetfile="${src.generated.c}/CLAbstractImpl_JNI.c">
+                  targetfile="${src.generated.c}/CLImpl11_JNI.c">
             <srcfiles refid="stub.includes.dependencies.fileset.1" />
             <srcfiles refid="stub.includes.dependencies.fileset.2" />
             <srcfiles refid="stub.includes.dependencies.fileset.3" />
@@ -553,7 +553,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="Generating CLAbstractImpl.java, CLAbstractImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 1.1"/>
+        <echo message="Generating CLImpl.java, CLImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 1.1"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl-11.cfg"
@@ -568,7 +568,7 @@
             <include name="${gen.includes.dir}/CL12"/>
         </dirset>
         <echo message="OpenCL stub include path for OpenCL version 1.2: ${toString:stub.includes.fileset.all.12}"/>
-        <echo message="Generating CLAbstractImpl.java, CLAbstractImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 1.2"/>
+        <echo message="Generating CLImpl.java, CLImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 1.2"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl-12.cfg"
@@ -583,7 +583,7 @@
             <include name="${gen.includes.dir}/CL20"/>
         </dirset>
         <echo message="OpenCL stub include path for OpenCL version 2.0: ${toString:stub.includes.fileset.all.20}"/>
-        <echo message="Generating CLAbstractImpl.java, CLAbstractImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 2.0"/>
+        <echo message="Generating CLImpl.java, CLImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 2.0"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl-20.cfg"

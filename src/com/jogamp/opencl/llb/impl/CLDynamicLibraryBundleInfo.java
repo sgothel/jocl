@@ -143,7 +143,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
             funcName = funcName.substring(0, funcName.length() - Impl_len);
         }
         if( funcName.endsWith("KHR") || funcName.endsWith("EXT") ) {
-            return CLAbstractImpl11.clGetExtensionFunctionAddress(toolGetProcAddressHandle, funcName);
+            return CLImpl11.clGetExtensionFunctionAddress(toolGetProcAddressHandle, funcName);
         }
         return 0; // on libs ..
     }

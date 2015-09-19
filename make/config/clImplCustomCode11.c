@@ -115,7 +115,7 @@ CL_CALLBACK void memObjDestructorCallback(cl_mem mem, void * object) {
 // extern CL_API_ENTRY void * CL_API_CALL clGetExtensionFunctionAddress(const char * /* func_name */) CL_API_SUFFIX__VERSION_1_0;
 
 JNIEXPORT jlong JNICALL
-Java_com_jogamp_opencl_llb_impl_CLAbstractImpl11_dispatch_1clGetExtensionFunctionAddressStatic(JNIEnv *env, jclass _unused, jstring fname, jlong procAddress) {
+Java_com_jogamp_opencl_llb_impl_CLImpl11_dispatch_1clGetExtensionFunctionAddressStatic(JNIEnv *env, jclass _unused, jstring fname, jlong procAddress) {
   typedef void* (CL_API_CALL * _local_LPCLGETPROCADDRESS)(const char *  fname);
   _local_LPCLGETPROCADDRESS ptr_clGetExtensionFunctionAddress;
   const char* _strchars_fname = NULL;

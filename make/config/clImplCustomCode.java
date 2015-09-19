@@ -1,59 +1,63 @@
-/*
- * Copyright (c) 2009 JogAmp Community. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are
- * permitted provided that the following conditions are met:
- *
- *    1. Redistributions of source code must retain the above copyright notice, this list of
- *       conditions and the following disclaimer.
- *
- *    2. Redistributions in binary form must reproduce the above copyright notice, this list
- *       of conditions and the following disclaimer in the documentation and/or other materials
- *       provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY JogAmp Community ``AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JogAmp Community OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * The views and conclusions contained in the software and documentation are those of the
- * authors and should not be interpreted as representing official policies, either expressed
- * or implied, of JogAmp Community.
- */
+/** If null, OpenCL is not available on this machine. */
+    static final DynamicLibraryBundle dynamicLookupHelper;
 
-/*
- * Created on Monday, June 07 2010 at 04:25
- */
-package com.jogamp.opencl.llb.impl;
+    static {
+        dynamicLookupHelper = AccessController.doPrivileged(new PrivilegedAction<DynamicLibraryBundle>() {
+                                  public DynamicLibraryBundle run() {
+                                      final DynamicLibraryBundle bundle = new DynamicLibraryBundle(new CLDynamicLibraryBundleInfo());
+                                      if(!bundle.isToolLibLoaded()) {
+                                          // couldn't load native CL library
+                                          // TODO: log this?
+                                          return null;
+                                      }
+                                      if(!bundle.isLibComplete()) {
+                                          System.err.println("Couln't load native CL/JNI glue library");
+                                          return null;
+                                      }
+                                      addressTable.reset(bundle);
+                                      /** Not required nor forced
+                                      if( !initializeImpl() ) {
+                                          System.err.println("Native initialization failure of CL/JNI glue library");
+                                          return null;
+                                      } */
+                                      return bundle;
+                                  } } );
+    }
 
-import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.common.util.LongLongHashMap;
-import com.jogamp.opencl.CLErrorHandler;
-import com.jogamp.opencl.CLException;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
+    // maps the context id to its error handler's global object pointer
+    private final LongLongHashMap contextCallbackMap = new LongLongHashMap();
 
-import static com.jogamp.common.nio.Buffers.*;
-
-/**
- * Java bindings to OpenCL, the Open Computing Language.
- * @author Michael Bien, et al.
- */
-public class CLImpl11 extends CLAbstractImpl11 {
-
-    //maps the context id to its error handler's global object pointer
-    private final LongLongHashMap contextCallbackMap;
-
-    public CLImpl11() {
-        super();
-        this.contextCallbackMap = new LongLongHashMap();
+    // to use in subclass constructors
+    protected void init() {
         this.contextCallbackMap.setKeyNotFoundValue(0);
     }
+
+    /**
+     * Accessor.
+     * @returns true if OpenCL is available on this machine.
+     */
+    public static boolean isAvailable() { return dynamicLookupHelper != null; }
+
+    static long clGetExtensionFunctionAddress(long clGetExtensionFunctionAddressHandle, java.lang.String procname)
+    {
+        if (clGetExtensionFunctionAddressHandle == 0) {
+            throw new RuntimeException("Passed null pointer for method \"clGetExtensionFunctionAddress\"");
+        }
+        return dispatch_clGetExtensionFunctionAddressStatic(procname, clGetExtensionFunctionAddressHandle);
+    }
+
+    /** Entry point (through function pointer) to C language function: <br> <code> void* clGetExtensionFunctionAddress(const char *  fname); </code>    */
+    long clGetExtensionFunctionAddress(String fname)  {
+
+        final long __addr_ = addressTable._addressof_clGetExtensionFunctionAddress;
+        if (__addr_ == 0) {
+            throw new UnsupportedOperationException("Method \"clGetExtensionFunctionAddress\" not available");
+        }
+        return dispatch_clGetExtensionFunctionAddressStatic(fname, __addr_);
+    }
+
+    /** Entry point (through function pointer) to C language function: <br> <code> void* clGetExtensionFunctionAddress(const char *  fname); </code>    */
+    private static native long dispatch_clGetExtensionFunctionAddressStatic(String fname, long procAddress);
 
     @Override
     public long clCreateContext(final PointerBuffer properties, final PointerBuffer devices, final CLErrorHandler pfn_notify, final IntBuffer errcode_ret) {
@@ -73,9 +77,9 @@ public class CLImpl11 extends CLAbstractImpl11 {
 
         final long[] global = new long[1];
         final long ctx = this.clCreateContext0(
-                properties != null ? properties.getBuffer() : null, getDirectBufferByteOffset(properties),
-                devices != null ? devices.remaining() : 0, devices != null ? devices.getBuffer() : null, getDirectBufferByteOffset(devices),
-                pfn_notify, global, errcode_ret, getDirectBufferByteOffset(errcode_ret), address);
+                properties != null ? properties.getBuffer() : null, Buffers.getDirectBufferByteOffset(properties),
+                devices != null ? devices.remaining() : 0, devices != null ? devices.getBuffer() : null, Buffers.getDirectBufferByteOffset(devices),
+                pfn_notify, global, errcode_ret, Buffers.getDirectBufferByteOffset(errcode_ret), address);
 
         if (pfn_notify != null && global[0] != 0) {
             synchronized (contextCallbackMap) {
@@ -104,8 +108,8 @@ public class CLImpl11 extends CLAbstractImpl11 {
 
         final long[] global = new long[1];
         final long ctx = this.clCreateContextFromType0(
-                properties != null ? properties.getBuffer() : null, getDirectBufferByteOffset(properties),
-                device_type, pfn_notify, global, errcode_ret, getDirectBufferByteOffset(errcode_ret), address);
+                properties != null ? properties.getBuffer() : null, Buffers.getDirectBufferByteOffset(properties),
+                device_type, pfn_notify, global, errcode_ret, Buffers.getDirectBufferByteOffset(errcode_ret), address);
 
         if (pfn_notify != null && global[0] != 0) {
             synchronized (contextCallbackMap) {
@@ -146,7 +150,7 @@ public class CLImpl11 extends CLAbstractImpl11 {
             throw new UnsupportedOperationException("Method not available");
         }
         return clBuildProgram0(program, deviceCount, deviceList != null ? deviceList.getBuffer() : null,
-                getDirectBufferByteOffset(deviceList), options, cb, address);
+        		Buffers.getDirectBufferByteOffset(deviceList), options, cb, address);
     }
 
     /** Entry point to C language function: <code> int32_t clBuildProgram(cl_program, uint32_t, cl_device_id * , const char * , void * ); </code>    */
@@ -224,17 +228,17 @@ public class CLImpl11 extends CLAbstractImpl11 {
         }
         ByteBuffer _res;
         _res = clEnqueueMapImage0(command_queue, image, blocking_map, map_flags, origin != null ? origin.getBuffer() : null,
-                getDirectBufferByteOffset(origin), range != null ? range.getBuffer() : null,
-                getDirectBufferByteOffset(range), image_row_pitch != null ? image_row_pitch.getBuffer() : null,
-                getDirectBufferByteOffset(image_row_pitch), image_slice_pitch != null ? image_slice_pitch.getBuffer() : null,
-                getDirectBufferByteOffset(image_slice_pitch), num_events_in_wait_list,
-                event_wait_list != null ? event_wait_list.getBuffer() : null, getDirectBufferByteOffset(event_wait_list),
-                event != null ? event.getBuffer() : null, getDirectBufferByteOffset(event), errcode_ret,
-                getDirectBufferByteOffset(errcode_ret), getImageInfoAddress, mapImageAddress);
+        		Buffers.getDirectBufferByteOffset(origin), range != null ? range.getBuffer() : null,
+        		Buffers.getDirectBufferByteOffset(range), image_row_pitch != null ? image_row_pitch.getBuffer() : null,
+        		Buffers.getDirectBufferByteOffset(image_row_pitch), image_slice_pitch != null ? image_slice_pitch.getBuffer() : null,
+        		Buffers.getDirectBufferByteOffset(image_slice_pitch), num_events_in_wait_list,
+                event_wait_list != null ? event_wait_list.getBuffer() : null, Buffers.getDirectBufferByteOffset(event_wait_list),
+                event != null ? event.getBuffer() : null, Buffers.getDirectBufferByteOffset(event), errcode_ret,
+                Buffers.getDirectBufferByteOffset(errcode_ret), getImageInfoAddress, mapImageAddress);
         if (_res == null) {
             return null;
         }
-        nativeOrder(_res);
+        Buffers.nativeOrder(_res);
         return _res;
     }
 
@@ -252,24 +256,3 @@ public class CLImpl11 extends CLAbstractImpl11 {
             int num_events_in_wait_list, Object event_wait_list, int event_wait_list_byte_offset, Object event,
             int event_byte_offset, Object errcode_ret, int errcode_ret_byte_offset,
             long getImageInfoAddress, long mapImageAddress);
-
-    public CLProcAddressTable11 getAddressTable() {
-        return addressTable;
-    }
-
-    /*
-    private static void convert32To64(long[] values) {
-    if (values.length % 2 == 1) {
-    values[values.length - 1] = values[values.length / 2] >>> 32;
-    }
-    for (int i = values.length - 1 - values.length % 2; i >= 0; i -= 2) {
-    long temp = values[i / 2];
-    values[i - 1] = temp >>> 32;
-    values[i] = temp & 0x00000000FFFFFFFFL;
-    }
-    }
-     */
-
-
-
-}
