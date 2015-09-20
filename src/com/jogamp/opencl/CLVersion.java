@@ -45,6 +45,9 @@ public class CLVersion implements Comparable<CLVersion> {
 
     public final static CLVersion CL_1_0 = new CLVersion("OpenCL 1.0");
     public final static CLVersion CL_1_1 = new CLVersion("OpenCL 1.1");
+    public final static CLVersion CL_1_2 = new CLVersion("OpenCL 1.2");
+    public final static CLVersion CL_2_0 = new CLVersion("OpenCL 2.0");
+    public final static CLVersion CL_2_1 = new CLVersion("OpenCL 2.1");
 
     /**
      * The full version String is defined as:

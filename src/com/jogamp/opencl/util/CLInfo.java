@@ -58,7 +58,7 @@ public class CLInfo {
 
         // binding
         sb.append("CL_BINDING_UNAVAILABLE_FUNCTIONS: ");
-        sb.append(((CLImpl11) CLPlatform.getLowLevelCLInterface()).getAddressTable().getNullPointerFunctions());
+        sb.append(CLImpl11.getAddressTable().getNullPointerFunctions());
         sb.append("\n");
 
         // OpenCL

@@ -32,6 +32,8 @@ import java.util.Random;
 
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.impl.BuildProgramCallback;
+import com.jogamp.opencl.llb.impl.CLImpl12;
+import com.jogamp.opencl.llb.impl.CLImpl20;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.llb.CLContextBinding;
 import com.jogamp.opencl.llb.CLDeviceBinding;
@@ -166,7 +168,16 @@ public class LowLevelBindingTest extends UITestCase {
                 checkForError(ret);
                 out.println("    device: " + clString2JavaString(bb, (int)longBuffer.get(0)));
 
-                ret = cl.clGetDeviceInfo(device, CLDeviceBinding.CL_DEVICE_TYPE, bb.capacity(), bb, longBuffer);
+                // get the CL interface with version specific to this device
+                CL deviceInterface = CLPlatform.getLowLevelCLInterfaceForDevice(device);
+                if(deviceInterface instanceof CLImpl12)
+                    out.println("    CL impl: 1.2");
+                else if(deviceInterface instanceof CLImpl20)
+                    out.println("    CL impl: 2.0");
+                else
+                    out.println("    CL impl: 1.1");
+                
+                ret = deviceInterface.clGetDeviceInfo(device, CLDeviceBinding.CL_DEVICE_TYPE, bb.capacity(), bb, longBuffer);
                 checkForError(ret);
                 out.println("    type: " + CLDevice.Type.valueOf(bb.get()));
                 bb.rewind();

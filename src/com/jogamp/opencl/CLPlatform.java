@@ -47,7 +47,10 @@ import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.opencl.spi.CLPlatformInfoAccessor;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.opencl.llb.impl.CLImpl11;
+import com.jogamp.opencl.llb.impl.CLImpl12;
+import com.jogamp.opencl.llb.impl.CLImpl20;
 import com.jogamp.opencl.spi.CLAccessorFactory;
+import com.jogamp.opencl.spi.CLInfoAccessor;
 import com.jogamp.opencl.util.Filter;
 
 import java.nio.IntBuffer;
@@ -248,10 +251,29 @@ public class CLPlatform {
     }
 
     /**
-     * Returns the low level binding interface to the OpenCL APIs.
+     * Returns the low level binding interface to the OpenCL APIs. This interface is always for OpenCL 1.1.
      */
     public static CL getLowLevelCLInterface() {
         initialize();
+        return cl;
+    }
+
+    /**
+     * Returns the low level binding interface to the OpenCL APIs for the specified device. This interface
+     * is the newest one the device supports.
+     */
+    public static CL getLowLevelCLInterfaceForDevice(final long device) {
+        initialize();
+        
+        CLInfoAccessor deviceInfo = defaultFactory.createDeviceInfoAccessor(cl, device);
+        CLVersion version = new CLVersion(deviceInfo.getString(CL_DEVICE_VERSION));
+
+        if(version.isEqual(CLVersion.CL_1_2))
+        	return new CLImpl12();
+
+        if(version.isEqual(CLVersion.CL_2_0))
+        	return new CLImpl20();
+
         return cl;
     }
 
