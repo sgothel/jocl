@@ -3,6 +3,7 @@
  */
 package com.jogamp.opencl.util.concurrent;
 
+import com.jogamp.common.util.InterruptSource;
 import com.jogamp.opencl.CLCommandQueue;
 import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLResource;
@@ -235,7 +236,7 @@ public class CLCommandQueuePool<C extends CLQueueContext> implements CLResource 
 
     }
 
-    private static class QueueThread extends Thread {
+    private static class QueueThread extends InterruptSource.Thread {
         private final CLQueueContext context;
         public QueueThread(final ThreadGroup group, final Runnable runnable, final CLQueueContext context, final int index) {
             super(group, runnable, "queue-worker-thread-"+index+"["+context+"]");
