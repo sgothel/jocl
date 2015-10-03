@@ -45,7 +45,6 @@ import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLPlatform;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLContextBinding;
 import com.jogamp.opencl.llb.gl.CLGL;
 
 /**
@@ -167,7 +166,7 @@ public final class CLGLContext extends CLContext {
             final long displayHandle = ctxImpl.getDrawableImpl().getNativeSurface().getDisplayHandle();
             properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
                       .put(CL.CL_GLX_DISPLAY_KHR).put(displayHandle)
-                      .put(CLContextBinding.CL_CONTEXT_PLATFORM).put(platform.ID);
+                      .put(CL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof WindowsWGLContext) {
 //          spec: "When the WGL binding API is supported, the attribute
 //          CL_GL_CONTEXT_KHR should be set to an HGLRC handle to an OpenGL
@@ -177,7 +176,7 @@ public final class CLGLContext extends CLContext {
             final long surfaceHandle = ctxImpl.getDrawableImpl().getNativeSurface().getSurfaceHandle();
             properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
                       .put(CL.CL_WGL_HDC_KHR).put(surfaceHandle)
-                      .put(CLContextBinding.CL_CONTEXT_PLATFORM).put(platform.ID);
+                      .put(CL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof MacOSXCGLContext) {
 //          spec: "When the CGL binding API is supported, the attribute
 //          CL_CGL_SHAREGROUP_KHR should be set to a CGLShareGroup handle to
@@ -193,7 +192,7 @@ public final class CLGLContext extends CLContext {
             final long group = CGL.CGLGetShareGroup(cgl);
             properties = PointerBuffer.allocateDirect(5);
             properties.put(CLGL.CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE).put(group)
-                      .put(CLContextBinding.CL_CONTEXT_PLATFORM).put(platform.ID);
+                      .put(CL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof EGLContext) {
 //            TODO test EGL
 //          spec: "When the EGL binding API is supported, the attribute
@@ -205,7 +204,7 @@ public final class CLGLContext extends CLContext {
             final long displayHandle = ctxImpl.getDrawableImpl().getNativeSurface().getDisplayHandle();
             properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
                       .put(CL.CL_EGL_DISPLAY_KHR).put(displayHandle)
-                      .put(CLContextBinding.CL_CONTEXT_PLATFORM).put(platform.ID);
+                      .put(CL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else{
             throw new RuntimeException("unsupported GLContext: "+glContext);
         }

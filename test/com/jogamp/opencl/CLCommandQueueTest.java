@@ -43,7 +43,6 @@ import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.util.CLDeviceFilters;
 import com.jogamp.opencl.util.CLPlatformFilters;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLCommandQueueBinding;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -74,7 +73,7 @@ public class CLCommandQueueTest extends UITestCase {
     public void enumsTest() {
 
         //CLCommandQueueEnums
-        final EnumSet<Mode> queueMode = Mode.valuesOf(CLCommandQueueBinding.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE | CLCommandQueueBinding.CL_QUEUE_PROFILING_ENABLE);
+        final EnumSet<Mode> queueMode = Mode.valuesOf(CL.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE | CL.CL_QUEUE_PROFILING_ENABLE);
         assertTrue(queueMode.contains(OUT_OF_ORDER_MODE));
         assertTrue(queueMode.contains(PROFILING_MODE));
 

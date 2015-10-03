@@ -4,7 +4,6 @@
 package com.jogamp.opencl.spi;
 
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLDeviceBinding;
 
 /**
  * Implementations of this interface are factories responsible for creating CLAccessors.
@@ -12,7 +11,7 @@ import com.jogamp.opencl.llb.CLDeviceBinding;
  */
 public interface CLAccessorFactory {
 
-    CLInfoAccessor createDeviceInfoAccessor(CLDeviceBinding cl, long id);
+    CLInfoAccessor createDeviceInfoAccessor(CL cl, long id);
 
     CLPlatformInfoAccessor createPlatformInfoAccessor(CL cl, long id);
 

@@ -35,11 +35,6 @@ import com.jogamp.opencl.llb.impl.BuildProgramCallback;
 import com.jogamp.opencl.llb.impl.CLImpl12;
 import com.jogamp.opencl.llb.impl.CLImpl20;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLContextBinding;
-import com.jogamp.opencl.llb.CLDeviceBinding;
-import com.jogamp.opencl.llb.CLMemObjBinding;
-import com.jogamp.opencl.llb.CLPlatformBinding;
-import com.jogamp.opencl.llb.CLProgramBinding;
 import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 
@@ -137,34 +132,34 @@ public class LowLevelBindingTest extends UITestCase {
             final long platform = platformId.get(i);
             out.println("platform id: "+platform);
 
-            ret = cl.clGetPlatformInfo(platform, CLPlatformBinding.CL_PLATFORM_PROFILE, bb.capacity(), bb, longBuffer);
+            ret = cl.clGetPlatformInfo(platform, CL.CL_PLATFORM_PROFILE, bb.capacity(), bb, longBuffer);
             checkForError(ret);
             out.println("    profile: " + clString2JavaString(bb, (int)longBuffer.get(0)));
 
-            ret = cl.clGetPlatformInfo(platform, CLPlatformBinding.CL_PLATFORM_VERSION, bb.capacity(), bb, longBuffer);
+            ret = cl.clGetPlatformInfo(platform, CL.CL_PLATFORM_VERSION, bb.capacity(), bb, longBuffer);
             checkForError(ret);
             out.println("    version: " + clString2JavaString(bb, (int)longBuffer.get(0)));
 
-            ret = cl.clGetPlatformInfo(platform, CLPlatformBinding.CL_PLATFORM_NAME, bb.capacity(), bb, longBuffer);
+            ret = cl.clGetPlatformInfo(platform, CL.CL_PLATFORM_NAME, bb.capacity(), bb, longBuffer);
             checkForError(ret);
             out.println("    name: " + clString2JavaString(bb, (int)longBuffer.get(0)));
 
-            ret = cl.clGetPlatformInfo(platform, CLPlatformBinding.CL_PLATFORM_VENDOR, bb.capacity(), bb, longBuffer);
+            ret = cl.clGetPlatformInfo(platform, CL.CL_PLATFORM_VENDOR, bb.capacity(), bb, longBuffer);
             checkForError(ret);
             out.println("    vendor: " + clString2JavaString(bb, (int)longBuffer.get(0)));
 
             //find all devices
-            ret = cl.clGetDeviceIDs(platform, CLDeviceBinding.CL_DEVICE_TYPE_ALL, 0, null, intBuffer);
+            ret = cl.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 0, null, intBuffer);
             checkForError(ret);
             out.println("#devices: "+intBuffer.get(0));
 
             final PointerBuffer devices = PointerBuffer.allocateDirect(intBuffer.get(0));
-            ret = cl.clGetDeviceIDs(platform, CLDeviceBinding.CL_DEVICE_TYPE_ALL, devices.capacity(), devices, null);
+            ret = cl.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, devices.capacity(), devices, null);
 
             //print device info
             for (int j = 0; j < devices.capacity(); j++) {
                 final long device = devices.get(j);
-                ret = cl.clGetDeviceInfo(device, CLDeviceBinding.CL_DEVICE_NAME, bb.capacity(), bb, longBuffer);
+                ret = cl.clGetDeviceInfo(device, CL.CL_DEVICE_NAME, bb.capacity(), bb, longBuffer);
                 checkForError(ret);
                 out.println("    device: " + clString2JavaString(bb, (int)longBuffer.get(0)));
 
@@ -177,7 +172,7 @@ public class LowLevelBindingTest extends UITestCase {
                 else
                     out.println("    CL impl: 1.1");
                 
-                ret = deviceInterface.clGetDeviceInfo(device, CLDeviceBinding.CL_DEVICE_TYPE, bb.capacity(), bb, longBuffer);
+                ret = deviceInterface.clGetDeviceInfo(device, CL.CL_DEVICE_TYPE, bb.capacity(), bb, longBuffer);
                 checkForError(ret);
                 out.println("    type: " + CLDevice.Type.valueOf(bb.get()));
                 bb.rewind();
@@ -207,19 +202,19 @@ public class LowLevelBindingTest extends UITestCase {
         final long platform = pb.get(0);
 
         //find all devices
-        ret = cl.clGetDeviceIDs(platform, CLDeviceBinding.CL_DEVICE_TYPE_ALL, 0, null, intBuffer);
+        ret = cl.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, 0, null, intBuffer);
         checkForError(ret);
         out.println("#devices: "+intBuffer.get(0));
 
         final PointerBuffer devices = PointerBuffer.allocateDirect(intBuffer.get(0));
-        ret = cl.clGetDeviceIDs(platform, CLDeviceBinding.CL_DEVICE_TYPE_ALL, devices.capacity(), devices, null);
+        ret = cl.clGetDeviceIDs(platform, CL.CL_DEVICE_TYPE_ALL, devices.capacity(), devices, null);
 
         final long context = cl.clCreateContext(null, devices, null, intBuffer);
         checkError("on clCreateContext", intBuffer.get());
 
         //get number of devices
         final PointerBuffer longBuffer = PointerBuffer.allocateDirect(1);
-        ret = cl.clGetContextInfo(context, CLContextBinding.CL_CONTEXT_DEVICES, 0, null, longBuffer);
+        ret = cl.clGetContextInfo(context, CL.CL_CONTEXT_DEVICES, 0, null, longBuffer);
         checkError("on clGetContextInfo", ret);
 
         final long contextDevices = longBuffer.get(0)/(is32Bit()?4:8);
@@ -252,15 +247,15 @@ public class LowLevelBindingTest extends UITestCase {
         checkForError(ret);
 
         final long platform = pb.get(0);
-        final PointerBuffer properties = PointerBuffer.allocateDirect(3).put(CLContextBinding.CL_CONTEXT_PLATFORM)
+        final PointerBuffer properties = PointerBuffer.allocateDirect(3).put(CL.CL_CONTEXT_PLATFORM)
                                               .put(platform).put(0) // 0 terminated array
                                               .rewind();
-        final long context = cl.clCreateContextFromType(properties, CLDeviceBinding.CL_DEVICE_TYPE_ALL, null, null);
+        final long context = cl.clCreateContextFromType(properties, CL.CL_DEVICE_TYPE_ALL, null, null);
         out.println("context handle: "+context);
         checkError("on clCreateContextFromType", ret);
 
         final PointerBuffer longBuffer = PointerBuffer.allocateDirect(1);
-        ret = cl.clGetContextInfo(context, CLContextBinding.CL_CONTEXT_DEVICES, 0, null, longBuffer);
+        ret = cl.clGetContextInfo(context, CL.CL_CONTEXT_DEVICES, 0, null, longBuffer);
         checkError("on clGetContextInfo", ret);
 
         final int deviceCount = (int) (longBuffer.get(0) / (is32Bit() ? 4 : 8));
@@ -270,7 +265,7 @@ public class LowLevelBindingTest extends UITestCase {
         // without even dumping a stack when using AMD drivers. Presumably the drivers would write past the end
         // of the block and mess up GC info somehow.
         final ByteBuffer bb = newDirectByteBuffer(32768);
-        ret = cl.clGetContextInfo(context, CLContextBinding.CL_CONTEXT_DEVICES, bb.capacity(), bb, null);
+        ret = cl.clGetContextInfo(context, CL.CL_CONTEXT_DEVICES, bb.capacity(), bb, null);
         checkError("on clGetContextInfo", ret);
 
         for (int i = 0; i < deviceCount; i++) {
@@ -284,7 +279,7 @@ public class LowLevelBindingTest extends UITestCase {
         final long device = is32Bit()?bb.getInt(offset):bb.getLong(offset);
 
         bb.rewind();
-        ret = cl.clGetDeviceInfo(device, CLDeviceBinding.CL_DEVICE_MAX_WORK_GROUP_SIZE, bb.capacity(), bb, null);
+        ret = cl.clGetDeviceInfo(device, CL.CL_DEVICE_MAX_WORK_GROUP_SIZE, bb.capacity(), bb, null);
         checkError("on clGetDeviceInfo", ret);
         final int maxWGS = bb.getInt();
         out.println("max WGS: " + maxWGS);
@@ -320,11 +315,11 @@ public class LowLevelBindingTest extends UITestCase {
         }
 
         // Allocate the OpenCL buffer memory objects for source and result on the device GMEM
-        final long devSrcA = cl.clCreateBuffer(context, CLMemObjBinding.CL_MEM_READ_ONLY, srcA.capacity(), null, intBuffer);
+        final long devSrcA = cl.clCreateBuffer(context, CL.CL_MEM_READ_ONLY, srcA.capacity(), null, intBuffer);
         checkError("on clCreateBuffer", intBuffer.get(0));
-        final long devSrcB = cl.clCreateBuffer(context, CLMemObjBinding.CL_MEM_READ_ONLY, srcB.capacity(), null, intBuffer);
+        final long devSrcB = cl.clCreateBuffer(context, CL.CL_MEM_READ_ONLY, srcB.capacity(), null, intBuffer);
         checkError("on clCreateBuffer", intBuffer.get(0));
-        final long devDst  = cl.clCreateBuffer(context, CLMemObjBinding.CL_MEM_WRITE_ONLY, dest.capacity(), null, intBuffer);
+        final long devDst  = cl.clCreateBuffer(context, CL.CL_MEM_WRITE_ONLY, dest.capacity(), null, intBuffer);
         checkError("on clCreateBuffer", intBuffer.get(0));
 
 
@@ -360,35 +355,35 @@ public class LowLevelBindingTest extends UITestCase {
 
         // Read program infos
         bb.rewind();
-        ret = cl.clGetProgramInfo(program, CLProgramBinding.CL_PROGRAM_NUM_DEVICES, bb.capacity(), bb, null);
+        ret = cl.clGetProgramInfo(program, CL.CL_PROGRAM_NUM_DEVICES, bb.capacity(), bb, null);
         checkError("on clGetProgramInfo1", ret);
         out.println("program associated with "+bb.getInt(0)+" device(s)");
 
-        ret = cl.clGetProgramInfo(program, CLProgramBinding.CL_PROGRAM_SOURCE, 0, null, longBuffer);
+        ret = cl.clGetProgramInfo(program, CL.CL_PROGRAM_SOURCE, 0, null, longBuffer);
         checkError("on clGetProgramInfo CL_PROGRAM_SOURCE", ret);
         out.println("program source length (cl): "+longBuffer.get(0));
         out.println("program source length (java): "+programSource.length());
 
         bb.rewind();
-        ret = cl.clGetProgramInfo(program, CLProgramBinding.CL_PROGRAM_SOURCE, bb.capacity(), bb, null);
+        ret = cl.clGetProgramInfo(program, CL.CL_PROGRAM_SOURCE, bb.capacity(), bb, null);
         checkError("on clGetProgramInfo CL_PROGRAM_SOURCE", ret);
         out.println("program source:\n" + clString2JavaString(bb, (int)longBuffer.get(0)));
 
         // Check program status
         bb.rewind();
-        ret = cl.clGetProgramBuildInfo(program, device, CLProgramBinding.CL_PROGRAM_BUILD_STATUS, bb.capacity(), bb, null);
+        ret = cl.clGetProgramBuildInfo(program, device, CL.CL_PROGRAM_BUILD_STATUS, bb.capacity(), bb, null);
         checkError("on clGetProgramBuildInfo1", ret);
 
         out.println("program build status: " + CLProgram.Status.valueOf(bb.getInt(0)));
-        assertEquals("build status", CLProgramBinding.CL_BUILD_SUCCESS, bb.getInt(0));
+        assertEquals("build status", CL.CL_BUILD_SUCCESS, bb.getInt(0));
 
         // Read build log
-        ret = cl.clGetProgramBuildInfo(program, device, CLProgramBinding.CL_PROGRAM_BUILD_LOG, 0, null, longBuffer);
+        ret = cl.clGetProgramBuildInfo(program, device, CL.CL_PROGRAM_BUILD_LOG, 0, null, longBuffer);
         checkError("on clGetProgramBuildInfo2", ret);
         out.println("program log length: " + longBuffer.get(0));
 
         bb.rewind();
-        ret = cl.clGetProgramBuildInfo(program, device, CLProgramBinding.CL_PROGRAM_BUILD_LOG, bb.capacity(), bb, null);
+        ret = cl.clGetProgramBuildInfo(program, device, CL.CL_PROGRAM_BUILD_LOG, bb.capacity(), bb, null);
         checkError("on clGetProgramBuildInfo3", ret);
         out.println("log:\n" + clString2JavaString(bb, (int)longBuffer.get(0)));
 

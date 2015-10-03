@@ -30,7 +30,6 @@ package com.jogamp.opencl.gl;
 
 import com.jogamp.opencl.llb.gl.CLGL;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLImageBinding;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLException;
 import com.jogamp.opencl.CLImage3d;
@@ -77,11 +76,11 @@ public class CLGLTexture3d<B extends Buffer> extends CLImage3d<B> implements CLG
         final CLImageInfoAccessor accessor = new CLImageInfoAccessor(cl, id);
 
         final CLImageFormat format = createUninitializedImageFormat();
-        accessor.getInfo(CLImageBinding.CL_IMAGE_FORMAT, CLImageFormatImpl.size(), format.getFormatImpl().getBuffer(), null);
+        accessor.getInfo(CL.CL_IMAGE_FORMAT, CLImageFormatImpl.size(), format.getFormatImpl().getBuffer(), null);
 
-        final int width = (int)accessor.getLong(CLImageBinding.CL_IMAGE_WIDTH);
-        final int height = (int)accessor.getLong(CLImageBinding.CL_IMAGE_HEIGHT);
-        final int depth = (int)accessor.getLong(CLImageBinding.CL_IMAGE_DEPTH);
+        final int width = (int)accessor.getLong(CL.CL_IMAGE_WIDTH);
+        final int height = (int)accessor.getLong(CL.CL_IMAGE_HEIGHT);
+        final int depth = (int)accessor.getLong(CL.CL_IMAGE_DEPTH);
 
         return new CLGLTexture3d<B>(context, directBuffer, format, accessor, target, mipLevel, width, height, depth, id, texture, flags);
     }

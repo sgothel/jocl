@@ -29,7 +29,6 @@
 package com.jogamp.opencl.gl;
 
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLImageBinding;
 import com.jogamp.opencl.llb.gl.CLGL;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLException;
@@ -75,10 +74,10 @@ public class CLGLImage2d<B extends Buffer> extends CLImage2d<B> implements CLGLO
         final CLImageInfoAccessor accessor = new CLImageInfoAccessor(getCL(context), id);
 
         final CLImageFormat format = createUninitializedImageFormat();
-        accessor.getInfo(CLImageBinding.CL_IMAGE_FORMAT, CLImageFormatImpl.size(), format.getFormatImpl().getBuffer(), null);
+        accessor.getInfo(CL.CL_IMAGE_FORMAT, CLImageFormatImpl.size(), format.getFormatImpl().getBuffer(), null);
 
-        final int width = (int)accessor.getLong(CLImageBinding.CL_IMAGE_WIDTH);
-        final int height = (int)accessor.getLong(CLImageBinding.CL_IMAGE_HEIGHT);
+        final int width = (int)accessor.getLong(CL.CL_IMAGE_WIDTH);
+        final int height = (int)accessor.getLong(CL.CL_IMAGE_HEIGHT);
 
         return new CLGLImage2d<B>(context, directBuffer, format, accessor, width, height, id, glObject, flags);
     }

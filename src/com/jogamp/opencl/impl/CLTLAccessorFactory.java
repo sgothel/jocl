@@ -35,7 +35,6 @@ package com.jogamp.opencl.impl;
 import java.nio.IntBuffer;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLDeviceBinding;
 import com.jogamp.opencl.spi.CLAccessorFactory;
 import com.jogamp.opencl.spi.CLInfoAccessor;
 import com.jogamp.opencl.spi.CLPlatformInfoAccessor;
@@ -50,7 +49,7 @@ import static com.jogamp.opencl.CLException.*;
 public class CLTLAccessorFactory implements CLAccessorFactory {
 
     @Override
-    public CLInfoAccessor createDeviceInfoAccessor(final CLDeviceBinding cl, final long id) {
+    public CLInfoAccessor createDeviceInfoAccessor(final CL cl, final long id) {
         return new CLDeviceInfoAccessor(cl, id);
     }
 
@@ -61,10 +60,10 @@ public class CLTLAccessorFactory implements CLAccessorFactory {
 
     private final static class CLDeviceInfoAccessor extends CLTLInfoAccessor {
 
-        private final CLDeviceBinding cl;
+        private final CL cl;
         private final long ID;
 
-        private CLDeviceInfoAccessor(final CLDeviceBinding cl, final long id) {
+        private CLDeviceInfoAccessor(final CL cl, final long id) {
             this.cl = cl;
             this.ID = id;
         }
@@ -99,7 +98,7 @@ public class CLTLAccessorFactory implements CLAccessorFactory {
             final int count = buffer.get(0);
 
             // return an empty buffer rather than throwing an exception
-            if(ret == CLDeviceBinding.CL_DEVICE_NOT_FOUND || count == 0) {
+            if(ret == CL.CL_DEVICE_NOT_FOUND || count == 0) {
                 return new long[0];
             }else{
                 checkForError(ret, "error while enumerating devices");

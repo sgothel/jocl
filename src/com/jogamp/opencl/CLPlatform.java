@@ -28,22 +28,11 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.opencl.llb.CLPlatformBinding;
-import com.jogamp.opencl.llb.CLProgramBinding;
-import com.jogamp.opencl.llb.CLSamplerBinding;
-import com.jogamp.opencl.llb.CLKernelBinding;
-import com.jogamp.opencl.llb.CLImageBinding;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.impl.CLTLAccessorFactory;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.JogampRuntimeException;
 import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.opencl.llb.CLBufferBinding;
-import com.jogamp.opencl.llb.CLCommandQueueBinding;
-import com.jogamp.opencl.llb.CLContextBinding;
-import com.jogamp.opencl.llb.CLDeviceBinding;
-import com.jogamp.opencl.llb.CLEventBinding;
-import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.opencl.spi.CLPlatformInfoAccessor;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.opencl.llb.impl.CLImpl11;

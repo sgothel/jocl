@@ -40,7 +40,6 @@ import com.jogamp.opencl.CLDevice.LocalMemType;
 import com.jogamp.opencl.CLDevice.Type;
 import com.jogamp.opencl.CLDevice.Capabilities;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLDeviceBinding;
 import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 
@@ -83,7 +82,7 @@ public class HighLevelBindingTest extends UITestCase {
     public void enumsTest() {
 
         // enum tests
-        final EnumSet<FPConfig> singleFPConfig = FPConfig.valuesOf(CLDeviceBinding.CL_FP_DENORM | CLDeviceBinding.CL_FP_ROUND_TO_INF);
+        final EnumSet<FPConfig> singleFPConfig = FPConfig.valuesOf(CL.CL_FP_DENORM | CL.CL_FP_ROUND_TO_INF);
         assertEquals(0, FPConfig.valuesOf(0).size());
         assertTrue(singleFPConfig.contains(FPConfig.DENORM));
         assertTrue(singleFPConfig.contains(FPConfig.ROUND_TO_INF));

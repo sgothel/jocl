@@ -30,11 +30,6 @@ package com.jogamp.opencl;
 
 import com.jogamp.opencl.llb.gl.CLGL;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLDeviceBinding;
-import com.jogamp.opencl.llb.CLImageBinding;
-import com.jogamp.opencl.llb.CLMemObjBinding;
-import com.jogamp.opencl.llb.CLPlatformBinding;
-import com.jogamp.opencl.llb.CLProgramBinding;
 
 /**
  * Main Exception type for runtime OpenCL errors and failed function calls (e.g. returning not CL_SUCCESS).
@@ -102,18 +97,18 @@ public class CLException extends RuntimeException {
      */
     public static String resolveErrorCode(final int error) {
         switch(error) {
-            case CLDeviceBinding.CL_DEVICE_NOT_FOUND:                       return "CL_DEVICE_NOT_FOUND";
-            case CLDeviceBinding.CL_DEVICE_NOT_AVAILABLE:                   return "CL_DEVICE_NOT_AVAILABLE";
+            case CL.CL_DEVICE_NOT_FOUND:                       return "CL_DEVICE_NOT_FOUND";
+            case CL.CL_DEVICE_NOT_AVAILABLE:                   return "CL_DEVICE_NOT_AVAILABLE";
             case CL.CL_COMPILER_NOT_AVAILABLE:                 return "CL_COMPILER_NOT_AVAILABLE";
-            case CLMemObjBinding.CL_MEM_OBJECT_ALLOCATION_FAILURE:          return "CL_MEM_OBJECT_ALLOCATION_FAILURE";
+            case CL.CL_MEM_OBJECT_ALLOCATION_FAILURE:          return "CL_MEM_OBJECT_ALLOCATION_FAILURE";
             case CL.CL_OUT_OF_RESOURCES:                       return "CL_OUT_OF_RESOURCES";
             case CL.CL_OUT_OF_HOST_MEMORY:                     return "CL_OUT_OF_HOST_MEMORY";
             case CL.CL_PROFILING_INFO_NOT_AVAILABLE:           return "CL_PROFILING_INFO_NOT_AVAILABLE";
-            case CLMemObjBinding.CL_MEM_COPY_OVERLAP:                       return "CL_MEM_COPY_OVERLAP";
-            case CLImageBinding.CL_IMAGE_FORMAT_MISMATCH:                  return "CL_IMAGE_FORMAT_MISMATCH";
-            case CLImageBinding.CL_IMAGE_FORMAT_NOT_SUPPORTED:             return "CL_IMAGE_FORMAT_NOT_SUPPORTED";
-            case CLProgramBinding.CL_BUILD_PROGRAM_FAILURE:                  return "CL_BUILD_PROGRAM_FAILURE";
-            case CLMemObjBinding.CL_MAP_FAILURE:                            return "CL_MAP_FAILURE";
+            case CL.CL_MEM_COPY_OVERLAP:                       return "CL_MEM_COPY_OVERLAP";
+            case CL.CL_IMAGE_FORMAT_MISMATCH:                  return "CL_IMAGE_FORMAT_MISMATCH";
+            case CL.CL_IMAGE_FORMAT_NOT_SUPPORTED:             return "CL_IMAGE_FORMAT_NOT_SUPPORTED";
+            case CL.CL_BUILD_PROGRAM_FAILURE:                  return "CL_BUILD_PROGRAM_FAILURE";
+            case CL.CL_MAP_FAILURE:                            return "CL_MAP_FAILURE";
             case CL.CL_INVALID_VALUE:                          return "CL_INVALID_VALUE";
             case CL.CL_INVALID_DEVICE_TYPE:                    return "CL_INVALID_DEVICE_TYPE";
             case CL.CL_INVALID_PLATFORM:                       return "CL_INVALID_PLATFORM";
@@ -148,7 +143,7 @@ public class CLException extends RuntimeException {
             case CL.CL_INVALID_MIP_LEVEL:                      return "CL_INVALID_MIP_LEVEL";
             case CL.CL_INVALID_GLOBAL_WORK_SIZE:               return "CL_INVALID_GLOBAL_WORK_SIZE";
             case CL.CL_INVALID_PROPERTY:                       return "CL_INVALID_PROPERTY";
-            case CLPlatformBinding.CL_PLATFORM_NOT_FOUND_KHR:                 return "CL_PLATFORM_NOT_FOUND_KHR";
+            case CL.CL_PLATFORM_NOT_FOUND_KHR:                 return "CL_PLATFORM_NOT_FOUND_KHR";
             case CL.CL_MISALIGNED_SUB_BUFFER_OFFSET:             return "CL_MISALIGNED_SUB_BUFFER_OFFSET";
             case CL.CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST:  return "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
             case CLGL.CL_INVALID_GL_OBJECT:                    return "CL_INVALID_GL_OBJECT";
@@ -159,18 +154,18 @@ public class CLException extends RuntimeException {
 
     private static CLException createSpecificException(final int error, final String message) {
         switch(error) {
-            case CLDeviceBinding.CL_DEVICE_NOT_FOUND:                       return new CLDeviceNotFoundException(message);
-            case CLDeviceBinding.CL_DEVICE_NOT_AVAILABLE:                   return new CLDeviceNotAvailableException(message);
+            case CL.CL_DEVICE_NOT_FOUND:                       return new CLDeviceNotFoundException(message);
+            case CL.CL_DEVICE_NOT_AVAILABLE:                   return new CLDeviceNotAvailableException(message);
             case CL.CL_COMPILER_NOT_AVAILABLE:                 return new CLCompilerNotAvailableException(message);
-            case CLMemObjBinding.CL_MEM_OBJECT_ALLOCATION_FAILURE:          return new CLMemObjectAllocationFailureException(message);
+            case CL.CL_MEM_OBJECT_ALLOCATION_FAILURE:          return new CLMemObjectAllocationFailureException(message);
             case CL.CL_OUT_OF_RESOURCES:                       return new CLOutOfResourcesException(message);
             case CL.CL_OUT_OF_HOST_MEMORY:                     return new CLOutOfHostMemoryException(message);
             case CL.CL_PROFILING_INFO_NOT_AVAILABLE:           return new CLProfilingInfoNotAvailableException(message);
-            case CLMemObjBinding.CL_MEM_COPY_OVERLAP:                       return new CLMemCopyOverlapException(message);
-            case CLImageBinding.CL_IMAGE_FORMAT_MISMATCH:                  return new CLImageFormatMismatchException(message);
-            case CLImageBinding.CL_IMAGE_FORMAT_NOT_SUPPORTED:             return new CLImageFormatNotSupportedException(message);
-            case CLProgramBinding.CL_BUILD_PROGRAM_FAILURE:                  return new CLBuildProgramFailureException(message);
-            case CLMemObjBinding.CL_MAP_FAILURE:                            return new CLMapFailureException(message);
+            case CL.CL_MEM_COPY_OVERLAP:                       return new CLMemCopyOverlapException(message);
+            case CL.CL_IMAGE_FORMAT_MISMATCH:                  return new CLImageFormatMismatchException(message);
+            case CL.CL_IMAGE_FORMAT_NOT_SUPPORTED:             return new CLImageFormatNotSupportedException(message);
+            case CL.CL_BUILD_PROGRAM_FAILURE:                  return new CLBuildProgramFailureException(message);
+            case CL.CL_MAP_FAILURE:                            return new CLMapFailureException(message);
             case CL.CL_INVALID_VALUE:                          return new CLInvalidValueException(message);
             case CL.CL_INVALID_DEVICE_TYPE:                    return new CLInvalidDeviceTypeException(message);
             case CL.CL_INVALID_PLATFORM:                       return new CLInvalidPlatformException(message);
@@ -205,7 +200,7 @@ public class CLException extends RuntimeException {
             case CL.CL_INVALID_MIP_LEVEL:                      return new CLInvalidMipLevelException(message);
             case CL.CL_INVALID_GLOBAL_WORK_SIZE:               return new CLInvalidGlobalWorkSizeException(message);
             case CL.CL_INVALID_PROPERTY:                       return new CLInvalidPropertyException(message);
-            case CLPlatformBinding.CL_PLATFORM_NOT_FOUND_KHR:                 return new CLPlatformNotFoundKhrException(message);
+            case CL.CL_PLATFORM_NOT_FOUND_KHR:                 return new CLPlatformNotFoundKhrException(message);
             case CL.CL_MISALIGNED_SUB_BUFFER_OFFSET:             return new CLMisalignedSubBufferOffsetException(message);
             case CL.CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST:  return new CLExecStatusErrorForEventsInWaitListException(message);
             case CLGL.CL_INVALID_GL_OBJECT:                    return new CLInvalidGLObjectException(message);
@@ -220,7 +215,7 @@ public class CLException extends RuntimeException {
     public final static class CLDeviceNotFoundException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_DEVICE_NOT_FOUND;
         public CLDeviceNotFoundException(final String message) {
-            super(CLDeviceBinding.CL_DEVICE_NOT_FOUND, "CL_DEVICE_NOT_FOUND", message);
+            super(CL.CL_DEVICE_NOT_FOUND, "CL_DEVICE_NOT_FOUND", message);
         }
     }
 
@@ -230,7 +225,7 @@ public class CLException extends RuntimeException {
     public final static class CLDeviceNotAvailableException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_DEVICE_NOT_AVAILABLE;
         public CLDeviceNotAvailableException(final String message) {
-            super(CLDeviceBinding.CL_DEVICE_NOT_AVAILABLE, "CL_DEVICE_NOT_AVAILABLE", message);
+            super(CL.CL_DEVICE_NOT_AVAILABLE, "CL_DEVICE_NOT_AVAILABLE", message);
         }
     }
 
@@ -250,7 +245,7 @@ public class CLException extends RuntimeException {
     public final static class CLMemObjectAllocationFailureException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_MEM_OBJECT_ALLOCATION_FAILURE;
         public CLMemObjectAllocationFailureException(final String message) {
-            super(CLMemObjBinding.CL_MEM_OBJECT_ALLOCATION_FAILURE, "CL_MEM_OBJECT_ALLOCATION_FAILURE", message);
+            super(CL.CL_MEM_OBJECT_ALLOCATION_FAILURE, "CL_MEM_OBJECT_ALLOCATION_FAILURE", message);
         }
     }
 
@@ -290,7 +285,7 @@ public class CLException extends RuntimeException {
     public final static class CLMemCopyOverlapException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_MEM_COPY_OVERLAP;
         public CLMemCopyOverlapException(final String message) {
-            super(CLMemObjBinding.CL_MEM_COPY_OVERLAP, "CL_MEM_COPY_OVERLAP", message);
+            super(CL.CL_MEM_COPY_OVERLAP, "CL_MEM_COPY_OVERLAP", message);
         }
     }
 
@@ -300,7 +295,7 @@ public class CLException extends RuntimeException {
     public final static class CLImageFormatMismatchException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_IMAGE_FORMAT_MISMATCH;
         public CLImageFormatMismatchException(final String message) {
-            super(CLImageBinding.CL_IMAGE_FORMAT_MISMATCH, "CL_IMAGE_FORMAT_MISMATCH", message);
+            super(CL.CL_IMAGE_FORMAT_MISMATCH, "CL_IMAGE_FORMAT_MISMATCH", message);
         }
     }
 
@@ -310,7 +305,7 @@ public class CLException extends RuntimeException {
     public final static class CLImageFormatNotSupportedException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_IMAGE_FORMAT_NOT_SUPPORTED;
         public CLImageFormatNotSupportedException(final String message) {
-            super(CLImageBinding.CL_IMAGE_FORMAT_NOT_SUPPORTED, "CL_IMAGE_FORMAT_NOT_SUPPORTED", message);
+            super(CL.CL_IMAGE_FORMAT_NOT_SUPPORTED, "CL_IMAGE_FORMAT_NOT_SUPPORTED", message);
         }
     }
 
@@ -320,7 +315,7 @@ public class CLException extends RuntimeException {
     public final static class CLBuildProgramFailureException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_BUILD_PROGRAM_FAILURE;
         public CLBuildProgramFailureException(final String message) {
-            super(CLProgramBinding.CL_BUILD_PROGRAM_FAILURE, "CL_BUILD_PROGRAM_FAILURE", message);
+            super(CL.CL_BUILD_PROGRAM_FAILURE, "CL_BUILD_PROGRAM_FAILURE", message);
         }
     }
 
@@ -330,7 +325,7 @@ public class CLException extends RuntimeException {
     public final static class CLMapFailureException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_MAP_FAILURE;
         public CLMapFailureException(final String message) {
-            super(CLMemObjBinding.CL_MAP_FAILURE, "CL_MAP_FAILURE", message);
+            super(CL.CL_MAP_FAILURE, "CL_MAP_FAILURE", message);
         }
     }
 
@@ -737,7 +732,7 @@ public class CLException extends RuntimeException {
     public final static class CLPlatformNotFoundKhrException extends CLException {
         private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_PLATFORM_NOT_FOUND_KHR;
         public CLPlatformNotFoundKhrException(final String message) {
-            super(CLPlatformBinding.CL_PLATFORM_NOT_FOUND_KHR, "CL_PLATFORM_NOT_FOUND_KHR", message);
+            super(CL.CL_PLATFORM_NOT_FOUND_KHR, "CL_PLATFORM_NOT_FOUND_KHR", message);
         }
     }
 
