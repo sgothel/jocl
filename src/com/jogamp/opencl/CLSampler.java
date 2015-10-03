@@ -30,7 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.impl.CLTLInfoAccessor;
-import com.jogamp.opencl.llb.CLSamplerBinding;
+import com.jogamp.opencl.llb.CL;
 
 import java.nio.Buffer;
 
@@ -46,18 +46,18 @@ import static com.jogamp.opencl.util.CLUtil.*;
 public class CLSampler extends CLObjectResource {
 
     private final CLSamplerInfoAccessor samplerInfo;
-    private final CLSamplerBinding binding;
+    private final CL binding;
 
     private CLSampler(final CLContext context, final long id,  final AddressingMode addrMode, final FilteringMode filtMode, final boolean normalizedCoords) {
         super(context, id);
-        this.binding = context.getPlatform().getSamplerBinding();
+        this.binding = context.getPlatform().getCLBinding();
         this.samplerInfo = new CLSamplerInfoAccessor();
     }
 
     static CLSampler create(final CLContext context, final AddressingMode addrMode, final FilteringMode filtMode, final boolean normalizedCoords) {
         final int[] error = new int[1];
 
-        final CLSamplerBinding binding = context.getPlatform().getSamplerBinding();
+        final CL binding = context.getPlatform().getCLBinding();
         final long id = binding.clCreateSampler(context.ID, clBoolean(normalizedCoords), addrMode.MODE, filtMode.MODE, error, 0);
 
         checkForError(error[0], "can not create sampler");

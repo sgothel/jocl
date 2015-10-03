@@ -28,7 +28,6 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.CL;
@@ -57,7 +56,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
     protected int elementSize;
     protected int clCapacity;
 
-    private final CLMemObjBinding binding;
+    private final CL binding;
 
     protected <Buffer> CLMemory(final CLContext context, final long size, final long id, final int flags) {
         this(context, null, size, id, flags);
@@ -68,7 +67,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
         this.buffer = directBuffer;
         this.FLAGS = flags;
         this.size = size;
-        this.binding = context.getPlatform().getMemObjectBinding();
+        this.binding = context.getPlatform().getCLBinding();
         initElementSize();
         initCLCapacity();
     }
@@ -91,7 +90,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
 
     protected static long getSizeImpl(final CLContext context, final long id) {
         final PointerBuffer pb = PointerBuffer.allocateDirect(1);
-        final CLMemObjBinding binding = context.getPlatform().getMemObjectBinding(); // FIXME: CL separation makes this pretty complicated !
+        final CL binding = context.getPlatform().getCLBinding(); // FIXME: CL separation makes this pretty complicated !
         final int ret = binding.clGetMemObjectInfo(id, CL_MEM_SIZE, pb.elementSize(), pb.getBuffer(), null);
         checkForError(ret, "can not obtain buffer info");
         return pb.get();

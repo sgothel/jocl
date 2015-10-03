@@ -29,12 +29,11 @@
 package com.jogamp.opencl;
 
 import com.jogamp.common.nio.CachedBufferFactory;
-import com.jogamp.opencl.llb.CLProgramBinding;
 import com.jogamp.opencl.util.CLProgramConfiguration;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.common.os.Platform;
 import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.opencl.llb.CLKernelBinding;
+import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.llb.impl.BuildProgramCallback;
 import com.jogamp.opencl.util.CLBuildListener;
 import java.nio.ByteBuffer;
@@ -63,7 +62,7 @@ import static com.jogamp.common.nio.Buffers.*;
 public class CLProgram extends CLObjectResource {
 
     private final static ReentrantLock buildLock = new ReentrantLock();
-    private final CLProgramBinding binding;
+    private final CL binding;
 
     private final Set<CLKernel> kernels;
     private Map<CLDevice, Status> buildStatusMap;
@@ -76,7 +75,7 @@ public class CLProgram extends CLObjectResource {
     private CLProgram(final CLContext context, final long id) {
         super(context, id);
         this.kernels = new HashSet<CLKernel>();
-        this.binding = context.getPlatform().getProgramBinding();
+        this.binding = context.getPlatform().getCLBinding();
     }
 
     static CLProgram create(final CLContext context, final String src) {
@@ -87,7 +86,7 @@ public class CLProgram extends CLObjectResource {
         final String[] srcArray = new String[] {src};
 
         // Create the program
-        final CLProgramBinding binding = context.getPlatform().getProgramBinding();
+        final CL binding = context.getPlatform().getCLBinding();
         final long id = binding.clCreateProgramWithSource(context.ID, 1, srcArray, length, status);
 
         final int err = status.get();
@@ -133,7 +132,7 @@ public class CLProgram extends CLObjectResource {
 
         final IntBuffer errBuffer = bf.newDirectIntBuffer(1);
 //        IntBuffer status = newDirectByteBuffer(binaries.size()*4).asIntBuffer();
-        final CLProgramBinding binding = context.getPlatform().getProgramBinding();
+        final CL binding = context.getPlatform().getCLBinding();
         final long id = binding.clCreateProgramWithBinary(context.ID, devices.capacity(), devices, lengths, codeBuffers, /*status*/null, errBuffer);
 
 //        while(status.remaining() != 0) {
@@ -216,10 +215,6 @@ public class CLProgram extends CLObjectResource {
         checkForError(ret, "error on clGetProgramBuildInfo");
 
         return buffer.getInt();
-    }
-
-    private CLKernelBinding getKernelBinding() {
-        return getPlatform().getKernelBinding();
     }
 
     /**
@@ -412,7 +407,7 @@ public class CLProgram extends CLObjectResource {
         }
 
         final int[] err = new int[1];
-        final long id = getKernelBinding().clCreateKernel(ID, kernelName, err, 0);
+        final long id = binding.clCreateKernel(ID, kernelName, err, 0);
         if(err[0] != CL_SUCCESS) {
             throw newException(err[0], "unable to create Kernel with name: "+kernelName);
         }
@@ -434,8 +429,7 @@ public class CLProgram extends CLObjectResource {
         final HashMap<String, CLKernel> newKernels = new HashMap<String, CLKernel>();
 
         final IntBuffer numKernels = newDirectByteBuffer(4).asIntBuffer();
-        final CLKernelBinding kernelBinding = getKernelBinding();
-        int ret = kernelBinding.clCreateKernelsInProgram(ID, 0, null, numKernels);
+        int ret = binding.clCreateKernelsInProgram(ID, 0, null, numKernels);
         if(ret != CL_SUCCESS) {
             throw newException(ret, "can not create kernels for "+this);
         }
@@ -443,7 +437,7 @@ public class CLProgram extends CLObjectResource {
         if(numKernels.get(0) > 0) {
 
             final PointerBuffer kernelIDs = PointerBuffer.allocateDirect(numKernels.get(0));
-            ret = kernelBinding.clCreateKernelsInProgram(ID, kernelIDs.capacity(), kernelIDs, null);
+            ret = binding.clCreateKernelsInProgram(ID, kernelIDs.capacity(), kernelIDs, null);
             if(ret != CL_SUCCESS) {
                 throw newException(ret, "can not create "+kernelIDs.capacity()+" kernels for "+this);
             }

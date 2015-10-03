@@ -29,7 +29,7 @@
 package com.jogamp.opencl;
 
 import com.jogamp.opencl.impl.CLTLInfoAccessor;
-import com.jogamp.opencl.llb.CLEventBinding;
+import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.llb.impl.CLEventCallback;
 import com.jogamp.common.nio.PointerBuffer;
 import java.nio.Buffer;
@@ -49,11 +49,11 @@ public class CLEvent extends CLObjectResource {
 
     private final CLEventInfoAccessor eventInfo;
     private final CLEventProfilingInfoAccessor eventProfilingInfo;
-    private final CLEventBinding binding;
+    private final CL binding;
 
     CLEvent(final CLContext context, final long id) {
         super(context, id);
-        binding = context.getPlatform().getEventBinding();
+        binding = context.getPlatform().getCLBinding();
         this.eventInfo = new CLEventInfoAccessor();
         this.eventProfilingInfo = new CLEventProfilingInfoAccessor();
     }

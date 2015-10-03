@@ -29,7 +29,7 @@
 package com.jogamp.opencl;
 
 import com.jogamp.common.nio.Buffers;
-import com.jogamp.opencl.llb.CLImageBinding;
+import com.jogamp.opencl.llb.CL;
 import java.nio.Buffer;
 import java.nio.IntBuffer;
 
@@ -52,7 +52,7 @@ public class CLImage2d<B extends Buffer> extends CLImage<B> {
     static <B extends Buffer> CLImage2d<B> createImage(final CLContext context, final B directBuffer,
             final int width, final int height, final int rowPitch, final CLImageFormat format, final int flags) {
 
-        final CLImageBinding cl = context.getPlatform().getImageBinding();
+        final CL cl = context.getPlatform().getCLBinding();
         final IntBuffer err = Buffers.newDirectIntBuffer(1);
         B host_ptr = null;
         if(isHostPointerFlag(flags)) {

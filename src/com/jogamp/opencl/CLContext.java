@@ -56,8 +56,6 @@ import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLSampler.AddressingMode;
 import com.jogamp.opencl.CLSampler.FilteringMode;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLContextBinding;
-import com.jogamp.opencl.llb.CLMemObjBinding;
 import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
 
 /**
@@ -114,17 +112,17 @@ public class CLContext extends CLObjectResource {
 
     }
 
-    private synchronized void initDevices(final CLContextBinding cl) {
+    private synchronized void initDevices(final CL cl) {
 
         if (devices == null) {
 
             final PointerBuffer deviceCount = PointerBuffer.allocateDirect(1);
 
-            int ret = cl.clGetContextInfo(ID, CLContextBinding.CL_CONTEXT_DEVICES, 0, null, deviceCount);
+            int ret = cl.clGetContextInfo(ID, CL.CL_CONTEXT_DEVICES, 0, null, deviceCount);
             CLException.checkForError(ret, "can not enumerate devices");
 
             final ByteBuffer deviceIDs = Buffers.newDirectByteBuffer((int)deviceCount.get());
-            ret = cl.clGetContextInfo(ID, CLContextBinding.CL_CONTEXT_DEVICES, deviceIDs.capacity(), deviceIDs, null);
+            ret = cl.clGetContextInfo(ID, CL.CL_CONTEXT_DEVICES, deviceIDs.capacity(), deviceIDs, null);
             CLException.checkForError(ret, "can not enumerate devices");
 
             devices = new CLDevice[deviceIDs.capacity() / (Platform.is32Bit() ? 4 : 8)];
@@ -200,7 +198,7 @@ public class CLContext extends CLObjectResource {
 
     protected static long createContextFromType(final CLPlatform platform, final CLErrorHandler handler, final PointerBuffer properties, final long deviceType) {
         final IntBuffer status = Buffers.newDirectIntBuffer(1);
-        final CLContextBinding cl = platform.getContextBinding();
+        final CL cl = platform.getCLBinding();
         final long context = cl.clCreateContextFromType(properties, deviceType, handler, status);
 
         CLException.checkForError(status.get(), "can not create CL context");
@@ -221,7 +219,7 @@ public class CLContext extends CLObjectResource {
                 pb.put(i, device.ID);
             }
         }
-        final CLContextBinding cl = platform.getContextBinding();
+        final CL cl = platform.getCLBinding();
         final long context = cl.clCreateContext(properties, pb, handler, status);
 
         CLException.checkForError(status.get(), "can not create CL context");
@@ -234,7 +232,7 @@ public class CLContext extends CLObjectResource {
             throw new RuntimeException("no OpenCL installation found");
         }
 
-        return PointerBuffer.allocateDirect(3).put(CLContextBinding.CL_CONTEXT_PLATFORM)
+        return PointerBuffer.allocateDirect(3).put(CL.CL_CONTEXT_PLATFORM)
                                               .put(platform.ID).put(0) // 0 terminated array
                                               .rewind();
     }
@@ -508,7 +506,7 @@ public class CLContext extends CLObjectResource {
             }
 
         } finally {
-            final int ret = platform.getContextBinding().clReleaseContext(ID);
+            final int ret = platform.getCLBinding().clReleaseContext(ID);
             CLException.checkForError(ret, "error releasing context");
         }
 
@@ -520,7 +518,7 @@ public class CLContext extends CLObjectResource {
 
     private CLImageFormat[] getSupportedImageFormats(final int flags, final int type) {
 
-        final CLContextBinding binding = platform.getContextBinding();
+        final CL binding = platform.getCLBinding();
 
         final int[] entries = new int[1];
         int ret = binding.clGetSupportedImageFormats(ID, flags, type, 0, null, entries, 0);
@@ -554,14 +552,14 @@ public class CLContext extends CLObjectResource {
      * Returns all supported 2d image formats with the (optional) memory allocation flags.
      */
     public CLImageFormat[] getSupportedImage2dFormats(final Mem... flags) {
-        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CLMemObjBinding.CL_MEM_OBJECT_IMAGE2D);
+        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CL.CL_MEM_OBJECT_IMAGE2D);
     }
 
     /**
      * Returns all supported 3d image formats with the (optional) memory allocation flags.
      */
     public CLImageFormat[] getSupportedImage3dFormats(final Mem... flags) {
-        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CLMemObjBinding.CL_MEM_OBJECT_IMAGE3D);
+        return getSupportedImageFormats(flags==null?0:Mem.flagsToInt(flags), CL.CL_MEM_OBJECT_IMAGE3D);
     }
 
     /**
@@ -638,7 +636,7 @@ public class CLContext extends CLObjectResource {
      * Returns all devices associated with this CLContext.
      */
     public CLDevice[] getDevices() {
-        initDevices(platform.getContextBinding());
+        initDevices(platform.getCLBinding());
         return devices;
     }
 

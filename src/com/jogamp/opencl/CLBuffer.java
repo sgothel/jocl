@@ -34,7 +34,6 @@ import java.util.List;
 
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.CLBufferBinding;
 
 import java.nio.Buffer;
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
             throw new IllegalArgumentException("no host pointer defined");
         }
 
-        final CLBufferBinding binding = context.getPlatform().getBufferBinding();
+        final CL binding = context.getPlatform().getCLBinding();
         final int[] result = new int[1];
         final long id = binding.clCreateBuffer(context.ID, flags, size, null, result, 0);
         CLException.checkForError(result[0], "can not create cl buffer");
@@ -81,7 +80,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
             host_ptr = directBuffer;
         }
 
-        final CLBufferBinding binding = context.getPlatform().getBufferBinding();
+        final CL binding = context.getPlatform().getCLBinding();
         final int[] result = new int[1];
         final int size = Buffers.sizeOfBufferElem(directBuffer) * directBuffer.capacity();
         final long id = binding.clCreateBuffer(context.ID, flags, size, host_ptr, result, 0);
@@ -116,7 +115,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
         info.put(1, size);
         final int bitset = Mem.flagsToInt(flags);
 
-        final CLBufferBinding binding = getPlatform().getBufferBinding();
+        final CL binding = getPlatform().getCLBinding();
         final int[] err = new int[1];
         final long subID = binding.clCreateSubBuffer(ID, bitset, CL.CL_BUFFER_CREATE_TYPE_REGION, info.getBuffer(), err, 0);
         CLException.checkForError(err[0], "can not create sub buffer");

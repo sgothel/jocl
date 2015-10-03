@@ -34,7 +34,7 @@ package com.jogamp.opencl;
 
 import static com.jogamp.opencl.CLException.*;
 import static com.jogamp.opencl.llb.CL.*;
-import com.jogamp.opencl.llb.CLEventBinding;
+import com.jogamp.opencl.llb.CL;
 
 /**
  * Custom, user controlled event.
@@ -51,7 +51,7 @@ public class CLUserEvent extends CLEvent {
      * Creates a new user event.
      */
     public static CLUserEvent create(final CLContext context) {
-        final CLEventBinding binding = context.getPlatform().getEventBinding();
+        final CL binding = context.getPlatform().getCLBinding();
         final int[] error = new int[1];
         final long ID = binding.clCreateUserEvent(context.ID, error, 0);
         checkForError(error[0], "can not create user event.");
@@ -63,7 +63,7 @@ public class CLUserEvent extends CLEvent {
      * Calls {@native clSetUserEventStatus}.
      */
     public CLUserEvent setStatus(final CLEvent.ExecutionStatus status) {
-        final CLEventBinding binding = getPlatform().getEventBinding();
+        final CL binding = getPlatform().getCLBinding();
         final int err = binding.clSetUserEventStatus(ID, status.STATUS);
         if(err != CL_SUCCESS) {
             newException(err, "can not set status "+status);

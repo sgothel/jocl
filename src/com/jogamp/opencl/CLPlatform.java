@@ -538,50 +538,6 @@ public class CLPlatform {
         return info;
     }
 
-    protected CLBufferBinding getBufferBinding() {
-        return cl;
-    }
-
-    protected CLCommandQueueBinding getCommandQueueBinding() {
-        return cl;
-    }
-
-    protected CLContextBinding getContextBinding() {
-        return cl;
-    }
-
-    protected CLDeviceBinding getDeviceBinding() {
-        return cl;
-    }
-
-    protected CLEventBinding getEventBinding() {
-        return cl;
-    }
-
-    protected CLImageBinding getImageBinding() {
-        return cl;
-    }
-
-    protected CLKernelBinding getKernelBinding() {
-        return cl;
-    }
-
-    protected CLMemObjBinding getMemObjectBinding() {
-        return cl;
-    }
-
-    protected CLPlatformBinding getPlatformBinding() {
-        return cl;
-    }
-
-    protected CLProgramBinding getProgramBinding() {
-        return cl;
-    }
-
-    protected CLSamplerBinding getSamplerBinding() {
-        return cl;
-    }
-
     protected CL getCLBinding() {
         return cl;
     }

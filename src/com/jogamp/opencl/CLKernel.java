@@ -31,7 +31,7 @@ package com.jogamp.opencl;
 import com.jogamp.opencl.util.CLUtil;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.nio.PointerBuffer;
-import com.jogamp.opencl.llb.CLKernelBinding;
+import com.jogamp.opencl.llb.CL;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
@@ -56,7 +56,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
     public final int numArgs;
 
     private final CLProgram program;
-    private final CLKernelBinding binding;
+    private final CL binding;
 
     private final ByteBuffer buffer;
 
@@ -73,7 +73,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
         this.program = program;
         this.buffer = Buffers.newDirectByteBuffer((is32Bit()?4:8)*3);
 
-        binding = program.getPlatform().getKernelBinding();
+        binding = program.getPlatform().getCLBinding();
 
         if(name == null) {
             // get function name

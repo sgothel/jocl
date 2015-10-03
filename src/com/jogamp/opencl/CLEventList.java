@@ -108,7 +108,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
      */
     public void waitForEvents() {
         if(size > 0) {
-            events[0].getPlatform().getEventBinding().clWaitForEvents(size, IDsView);
+            events[0].getPlatform().getCLBinding().clWaitForEvents(size, IDsView);
         }
     }
 
@@ -122,7 +122,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         }
 
         final PointerBuffer view = getEventBuffer(start);
-        getEvent(start).getPlatform().getEventBinding().clWaitForEvents(range, view);
+        getEvent(start).getPlatform().getCLBinding().clWaitForEvents(range, view);
     }
 
     /**
@@ -130,7 +130,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
      */
     public void waitForEvent(final int index) {
         final PointerBuffer view = getEventBuffer(index);
-        getEvent(index).getPlatform().getEventBinding().clWaitForEvents(1, view);
+        getEvent(index).getPlatform().getCLBinding().clWaitForEvents(1, view);
     }
 
     /**

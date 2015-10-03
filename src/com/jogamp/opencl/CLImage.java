@@ -30,7 +30,7 @@ package com.jogamp.opencl;
 
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.impl.CLTLInfoAccessor;
-import com.jogamp.opencl.llb.CLImageBinding;
+import com.jogamp.opencl.llb.CL;
 import java.nio.Buffer;
 
 import static com.jogamp.opencl.llb.CL.*;
@@ -61,7 +61,7 @@ public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
     }
 
     private static CLImageInfoAccessor createAccessor(final CLContext context, final long id) {
-        return new CLImageInfoAccessor(context.getPlatform().getImageBinding(), id);
+        return new CLImageInfoAccessor(context.getPlatform().getCLBinding(), id);
     }
 
     protected static CLImageFormat createUninitializedImageFormat() {
@@ -109,9 +109,9 @@ public abstract class CLImage<B extends Buffer> extends CLMemory<B>  {
     protected final static class CLImageInfoAccessor extends CLTLInfoAccessor {
 
         private final long id;
-        private final CLImageBinding cl;
+        private final CL cl;
 
-        public CLImageInfoAccessor(final CLImageBinding cl, final long id) {
+        public CLImageInfoAccessor(final CL cl, final long id) {
             this.cl = cl;
             this.id = id;
         }

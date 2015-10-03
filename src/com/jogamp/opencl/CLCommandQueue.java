@@ -31,8 +31,8 @@ package com.jogamp.opencl;
 import static com.jogamp.opencl.CLException.checkForError;
 import static com.jogamp.opencl.CLException.newException;
 import static com.jogamp.opencl.llb.CL.CL_SUCCESS;
-import static com.jogamp.opencl.llb.CLCommandQueueBinding.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE;
-import static com.jogamp.opencl.llb.CLCommandQueueBinding.CL_QUEUE_PROFILING_ENABLE;
+import static com.jogamp.opencl.llb.CL.CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE;
+import static com.jogamp.opencl.llb.CL.CL_QUEUE_PROFILING_ENABLE;
 import static com.jogamp.opencl.util.CLUtil.clBoolean;
 
 import java.nio.Buffer;
@@ -46,7 +46,7 @@ import java.util.List;
 import com.jogamp.common.nio.CachedBufferFactory;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.gl.CLGLObject;
-import com.jogamp.opencl.llb.CLCommandQueueBinding;
+import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.llb.gl.CLGL;
 
 /**
@@ -64,7 +64,7 @@ import com.jogamp.opencl.llb.gl.CLGL;
  */
 public class CLCommandQueue extends CLObjectResource {
 
-    private final CLCommandQueueBinding cl;
+    private final CL cl;
     private final CLDevice device;
     private final long properties;
 
@@ -81,7 +81,7 @@ public class CLCommandQueue extends CLObjectResource {
 
         this.device = device;
         this.properties = properties;
-        this.cl = context.getPlatform().getCommandQueueBinding();
+        this.cl = context.getPlatform().getCLBinding();
 
         final int pbsize = PointerBuffer.ELEMENT_SIZE;
         final CachedBufferFactory factory = CachedBufferFactory.create(9*pbsize + 4, true);
@@ -96,7 +96,7 @@ public class CLCommandQueue extends CLObjectResource {
 
     static CLCommandQueue create(final CLContext context, final CLDevice device, final long properties) {
         final int[] status = new int[1];
-        final CLCommandQueueBinding binding = context.getPlatform().getCommandQueueBinding();
+        final CL binding = context.getPlatform().getCLBinding();
         final long id = binding.clCreateCommandQueue(context.ID, device.ID, properties, status, 0);
 
         if(status[0] != CL_SUCCESS) {
