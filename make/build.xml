@@ -410,7 +410,7 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="Generating CLImpl.java, CLImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 1.1"/>
+        <echo message="Generating CL11.java, CLImpl11.java, CLImpl11_JNI.c, and CLProcAddressTable11.java for OpenCL version 1.1"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl-11.cfg"
@@ -425,7 +425,7 @@
             <include name="${gen.includes.dir}/CL12"/>
         </dirset>
         <echo message="OpenCL stub include path for OpenCL version 1.2: ${toString:stub.includes.fileset.all.12}"/>
-        <echo message="Generating CLImpl.java, CLImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 1.2"/>
+        <echo message="Generating CL12.java, CLImpl12.java, CLImpl12_JNI.c, and CLProcAddressTable12.java for OpenCL version 1.2"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl-12.cfg"
@@ -440,7 +440,7 @@
             <include name="${gen.includes.dir}/CL20"/>
         </dirset>
         <echo message="OpenCL stub include path for OpenCL version 2.0: ${toString:stub.includes.fileset.all.20}"/>
-        <echo message="Generating CLImpl.java, CLImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 2.0"/>
+        <echo message="Generating CL20.java, CLImpl20.java, CLImpl20_JNI.c, and CLProcAddressTable20.java for OpenCL version 2.0"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"
                  config="${config}/cl-impl-20.cfg"
