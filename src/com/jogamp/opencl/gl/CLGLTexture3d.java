@@ -28,7 +28,6 @@
 
 package com.jogamp.opencl.gl;
 
-import com.jogamp.opencl.llb.gl.CLGL;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLException;
@@ -68,9 +67,8 @@ public class CLGLTexture3d<B extends Buffer> extends CLImage3d<B> implements CLG
 
         final CL cl = getCL(context);
         final int[] result = new int[1];
-        final CLGL clgli = (CLGL)cl;
 
-        final long id = clgli.clCreateFromGLTexture3D(context.ID, flags, target, mipLevel, texture, result, 0);
+        final long id = cl.clCreateFromGLTexture3D(context.ID, flags, target, mipLevel, texture, result, 0);
         CLException.checkForError(result[0], "can not create CLGLTexture3d from texture #"+texture+".");
 
         final CLImageInfoAccessor accessor = new CLImageInfoAccessor(cl, id);

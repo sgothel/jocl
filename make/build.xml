@@ -410,17 +410,6 @@
             <classpath refid="gluegen.classpath" />
         </gluegen>
 
-        <echo message="Generating CLGL.java from OpenCL version 1.1"/>
-        <gluegen src="${stub.includes}/opencl.h"
-                 outputRootDir="${build}"
-                 config="${config}/clgl-if.cfg"
-                 includeRefid="stub.includes.fileset.all.11"
-                 literalInclude="${stub.includes.gluegen.all}"
-                 emitter="com.jogamp.gluegen.JavaEmitter"
-                 debug="false">
-            <classpath refid="gluegen.classpath" />
-        </gluegen>
-
         <echo message="Generating CLImpl.java, CLImpl_JNI.c, and CLProcAddressTable.java for OpenCL version 1.1"/>
         <gluegen src="${stub.includes}/opencl.h"
                  outputRootDir="${build}"

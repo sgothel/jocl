@@ -35,7 +35,6 @@ import com.jogamp.common.nio.PointerBuffer;
 import java.nio.Buffer;
 
 import static com.jogamp.opencl.llb.CL.*;
-import static com.jogamp.opencl.llb.gl.CLGL.*;
 import static com.jogamp.opencl.CLException.*;
 
 /**

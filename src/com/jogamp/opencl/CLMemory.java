@@ -39,7 +39,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static com.jogamp.opencl.CLException.*;
-import static com.jogamp.opencl.llb.gl.CLGL.*;
+import static com.jogamp.opencl.llb.CL.*;
 
 /**
  * Common superclass for all OpenCL memory types.

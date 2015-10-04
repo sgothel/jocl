@@ -47,7 +47,6 @@ import com.jogamp.common.nio.CachedBufferFactory;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.gl.CLGLObject;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.gl.CLGL;
 
 /**
  * The command queue is used to queue a set of operations for a specific {@link CLDevice}.
@@ -1701,9 +1700,7 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        final CLGL xl = (CLGL) cl;
-
-        final int ret = xl.clEnqueueAcquireGLObjects(ID, glObjectIDs.remaining(), glObjectIDs,
+        final int ret = cl.clEnqueueAcquireGLObjects(ID, glObjectIDs.remaining(), glObjectIDs,
                     conditions, conditionIDs,
                     events==null ? null : events.IDs);
 
@@ -1770,9 +1767,7 @@ public class CLCommandQueue extends CLObjectResource {
             conditions   = condition.size;
         }
 
-        final CLGL xl = (CLGL) cl;
-
-        final int ret = xl.clEnqueueReleaseGLObjects(ID, glObjectIDs.remaining(), glObjectIDs,
+        final int ret = cl.clEnqueueReleaseGLObjects(ID, glObjectIDs.remaining(), glObjectIDs,
                 conditions, conditionIDs,
                 events==null ? null : events.IDs);
 

@@ -32,7 +32,7 @@ import com.jogamp.opencl.CLBuffer;
 import com.jogamp.opencl.CLCommandQueue;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLException;
-import com.jogamp.opencl.llb.gl.CLGL;
+import com.jogamp.opencl.llb.CL;
 
 import java.nio.Buffer;
 import com.jogamp.opengl.GLContext;
@@ -59,10 +59,9 @@ public final class CLGLBuffer<B extends Buffer> extends CLBuffer<B> implements C
     static <B extends Buffer> CLGLBuffer<B> create(final CLContext context, final B directBuffer, final long size, final int flags, final int glBuffer) {
         checkBuffer(directBuffer, flags);
 
-        final CLGL clgli = (CLGL)getCL(context);
-
+        final CL cl = getCL(context);
         final int[] result = new int[1];
-        final long id = clgli.clCreateFromGLBuffer(context.ID, flags, glBuffer, result, 0);
+        final long id = cl.clCreateFromGLBuffer(context.ID, flags, glBuffer, result, 0);
         CLException.checkForError(result[0], "can not create CLGLObject from glBuffer #"+glBuffer);
 
         return new CLGLBuffer<B>(context, directBuffer, id, glBuffer, size, flags);

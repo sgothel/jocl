@@ -45,7 +45,6 @@ import com.jogamp.opencl.CLDevice;
 import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLPlatform;
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.gl.CLGL;
 
 /**
  * OpenCL Context supporting JOGL-JOCL interoperablity.
@@ -164,7 +163,7 @@ public final class CLGLContext extends CLContext {
 //          create the OpenGL context."
             properties = PointerBuffer.allocateDirect(7);
             final long displayHandle = ctxImpl.getDrawableImpl().getNativeSurface().getDisplayHandle();
-            properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
+            properties.put(CL.CL_GL_CONTEXT_KHR).put(glID[0])
                       .put(CL.CL_GLX_DISPLAY_KHR).put(displayHandle)
                       .put(CL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof WindowsWGLContext) {
@@ -174,7 +173,7 @@ public final class CLGLContext extends CLContext {
 //          HDC handle of the display used to create the OpenGL context."
             properties = PointerBuffer.allocateDirect(7);
             final long surfaceHandle = ctxImpl.getDrawableImpl().getNativeSurface().getSurfaceHandle();
-            properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
+            properties.put(CL.CL_GL_CONTEXT_KHR).put(glID[0])
                       .put(CL.CL_WGL_HDC_KHR).put(surfaceHandle)
                       .put(CL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof MacOSXCGLContext) {
@@ -191,7 +190,7 @@ public final class CLGLContext extends CLContext {
             final long cgl = CGL.getCGLContext(glID[0]);
             final long group = CGL.CGLGetShareGroup(cgl);
             properties = PointerBuffer.allocateDirect(5);
-            properties.put(CLGL.CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE).put(group)
+            properties.put(CL.CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE).put(group)
                       .put(CL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else if(glContext instanceof EGLContext) {
 //            TODO test EGL
@@ -202,7 +201,7 @@ public final class CLGLContext extends CLContext {
 //          display used to create the OpenGL ES or OpenGL context."
             properties = PointerBuffer.allocateDirect(7);
             final long displayHandle = ctxImpl.getDrawableImpl().getNativeSurface().getDisplayHandle();
-            properties.put(CLGL.CL_GL_CONTEXT_KHR).put(glID[0])
+            properties.put(CL.CL_GL_CONTEXT_KHR).put(glID[0])
                       .put(CL.CL_EGL_DISPLAY_KHR).put(displayHandle)
                       .put(CL.CL_CONTEXT_PLATFORM).put(platform.ID);
         }else{
@@ -318,8 +317,8 @@ public final class CLGLContext extends CLContext {
      * Return the low level OpenCL interface with OpenGL interoperability.
      */
     @Override
-    public CLGL getCL() {
-        return (CLGL)super.getCL();
+    public CL getCL() {
+        return super.getCL();
     }
 
     /**

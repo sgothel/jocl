@@ -29,7 +29,6 @@
 package com.jogamp.opencl.gl;
 
 import com.jogamp.opencl.llb.CL;
-import com.jogamp.opencl.llb.gl.CLGL;
 import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLException;
 import com.jogamp.opencl.CLImage2d;
@@ -62,9 +61,8 @@ public class CLGLImage2d<B extends Buffer> extends CLImage2d<B> implements CLGLO
 
         final CL cl = getCL(context);
         final int[] result = new int[1];
-        final CLGL clgli = (CLGL)cl;
 
-        final long id = clgli.clCreateFromGLRenderbuffer(context.ID, flags, renderbuffer, result, 0);
+        final long id = cl.clCreateFromGLRenderbuffer(context.ID, flags, renderbuffer, result, 0);
         CLException.checkForError(result[0], "can not create CLGLImage2d from renderbuffer #"+renderbuffer+".");
 
         return createImage(context, id, directBuffer, renderbuffer, flags);

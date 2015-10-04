@@ -33,7 +33,6 @@ import com.jogamp.opencl.CLContext;
 import com.jogamp.opencl.CLException;
 import com.jogamp.opencl.CLImageFormat;
 import com.jogamp.opencl.llb.impl.CLImageFormatImpl;
-import com.jogamp.opencl.llb.gl.CLGL;
 
 import java.nio.Buffer;
 
@@ -59,9 +58,8 @@ public class CLGLTexture2d<B extends Buffer> extends CLGLImage2d<B> implements C
 
         final CL cl = getCL(context);
         final int[] result = new int[1];
-        final CLGL clgli = (CLGL)cl;
 
-        final long id = clgli.clCreateFromGLTexture2D(context.ID, flags, target, mipLevel, texture, result, 0);
+        final long id = cl.clCreateFromGLTexture2D(context.ID, flags, target, mipLevel, texture, result, 0);
         CLException.checkForError(result[0], "can not create CLGLTexture2d from texture #"+texture+".");
 
         final CLImageInfoAccessor accessor = new CLImageInfoAccessor(cl, id);

@@ -28,7 +28,6 @@
 
 package com.jogamp.opencl;
 
-import com.jogamp.opencl.llb.gl.CLGL;
 import com.jogamp.opencl.llb.CL;
 
 /**
@@ -146,8 +145,8 @@ public class CLException extends RuntimeException {
             case CL.CL_PLATFORM_NOT_FOUND_KHR:                 return "CL_PLATFORM_NOT_FOUND_KHR";
             case CL.CL_MISALIGNED_SUB_BUFFER_OFFSET:             return "CL_MISALIGNED_SUB_BUFFER_OFFSET";
             case CL.CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST:  return "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
-            case CLGL.CL_INVALID_GL_OBJECT:                    return "CL_INVALID_GL_OBJECT";
-            case CLGL.CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR:  return "CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR";
+            case CL.CL_INVALID_GL_OBJECT:                    return "CL_INVALID_GL_OBJECT";
+            case CL.CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR:  return "CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR";
             default: return null;
         }
     }
@@ -203,8 +202,8 @@ public class CLException extends RuntimeException {
             case CL.CL_PLATFORM_NOT_FOUND_KHR:                 return new CLPlatformNotFoundKhrException(message);
             case CL.CL_MISALIGNED_SUB_BUFFER_OFFSET:             return new CLMisalignedSubBufferOffsetException(message);
             case CL.CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST:  return new CLExecStatusErrorForEventsInWaitListException(message);
-            case CLGL.CL_INVALID_GL_OBJECT:                    return new CLInvalidGLObjectException(message);
-            case CLGL.CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR:  return new CLInvalidGLSharegroupReferenceKhrException(message);
+            case CL.CL_INVALID_GL_OBJECT:                    return new CLInvalidGLObjectException(message);
+            case CL.CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR:  return new CLInvalidGLSharegroupReferenceKhrException(message);
             default: return null;
         }
     }
@@ -664,9 +663,9 @@ public class CLException extends RuntimeException {
      *
      */
     public final static class CLInvalidGLObjectException extends CLException {
-        private static final long serialVersionUID = CLException.serialVersionUID+CLGL.CL_INVALID_GL_OBJECT;
+        private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_INVALID_GL_OBJECT;
         public CLInvalidGLObjectException(final String message) {
-            super(CLGL.CL_INVALID_GL_OBJECT, "CL_INVALID_GL_OBJECT", message);
+            super(CL.CL_INVALID_GL_OBJECT, "CL_INVALID_GL_OBJECT", message);
         }
     }
 
@@ -719,9 +718,9 @@ public class CLException extends RuntimeException {
      *
      */
     public final static class CLInvalidGLSharegroupReferenceKhrException extends CLException {
-        private static final long serialVersionUID = CLException.serialVersionUID+CLGL.CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR;
+        private static final long serialVersionUID = CLException.serialVersionUID+CL.CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR;
         public CLInvalidGLSharegroupReferenceKhrException(final String message) {
-            super(CLGL.CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR, "CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR", message);
+            super(CL.CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR, "CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR", message);
         }
     }
 
