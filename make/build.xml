@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   - Ant build for JOCL.  This build has been tested with ANT 1.8.0.  The
+   - Ant build for JOCL.  This build has been tested with ANT 1.9.4.  The
    - optional.jar that contains the optional ANT tasks must be in the ANT
    - classpath (typically the ant/lib directory).
    -
@@ -38,8 +38,8 @@
             <isset property="rootrel.build"/>
         </not>
     </condition>
-    <property name="build"                value="${project.root}/${rootrel.build}" />
 
+    <property name="build"         value="${project.root}/${rootrel.build}" />
     <property name="gluegen.root"  value="${project.root}/../gluegen" />
     <property name="gluegen.build" value="${gluegen.root}/${rootrel.build}" />
 
@@ -116,7 +116,7 @@
     <target name="init.android" if="android-jars.available" >
         <property name="gluegen-rt-android.jar" value="${gluegen.build}/gluegen-rt-android.jar" />
 
-    	<path id="javac.android.classpath">
+        <path id="javac.android.classpath">
             <pathelement location="${android-min.jar}"/>
             <pathelement location="${gluegen-rt-android.jar}" />
             <pathelement location="${jogl-all.jar}" />
@@ -163,7 +163,7 @@
             <pathelement location="${antlr.jar}" />
         </path>
 
-    	<path id="javac.classpath">
+        <path id="javac.classpath">
             <pathelement location="${gluegen.jar}" />
             <pathelement location="${jogl-all.jar}" />
         </path>
@@ -179,12 +179,12 @@
         <property name="headers.orig" value="${stub.includes}/CL" />
         <property name="headers.dest" value="${gen.includes}/CL" />
 
-    	<!-- The headers from which Java files are generated -->
-    	<fileset id="stub.includes.dependencies.fileset.1" dir="${stub.includes.dir}">
+        <!-- The headers from which Java files are generated -->
+        <fileset id="stub.includes.dependencies.fileset.1" dir="${stub.includes.dir}">
             <include name="CL11/**" />
             <include name="GL3/**" />
         </fileset>
-    	<fileset id="stub.includes.dependencies.fileset.2" dir="${gen.includes.dir}">
+        <fileset id="stub.includes.dependencies.fileset.2" dir="${gen.includes.dir}">
             <include name="CL/**" />
         </fileset>
         <fileset id="stub.includes.dependencies.fileset.3" file="${gluegen.jar}" />
@@ -193,8 +193,8 @@
             <include name="*.java" />
             <include name="*.c" />
         </fileset>
-    	<!-- relative paths to stub includes in gluegen project; have to pass separately into gluegen
-    	     task because dirsets won't work with paths outside their root path -->
+        <!-- relative paths to stub includes in gluegen project; have to pass separately into gluegen
+             task because dirsets won't work with paths outside their root path -->
         <property name="stub.includes.gluegen.all"  value="${gluegen.root}/make/stub_includes/gluegen, ${gluegen.root}/make/stub_includes/jni, ${jogl.root}/make/stub_includes/khr, ${jogl.root}/make/stub_includes/opengl"/>
         <property name="stub.includes.gluegen.cc"  value="${gluegen.root}/make/stub_includes/platform" />
 
@@ -245,7 +245,7 @@
         <echo message="useLinuxARMv6SFOptions ${useLinuxARMv6SFOptions}" />
         <echo message="useLinuxARMv6HFOptions ${useLinuxARMv6HFOptions}" />
         <condition property="enable.jdk7.features">
-        	<or>
+            <or>
                 <equals arg1="${target.targetlevel}" arg2="1.7"/>
                 <equals arg1="${target.targetlevel}" arg2="1.8"/>
             </or>
@@ -335,7 +335,7 @@
         <taskdef name="uncomment-function-params" classname="com.jogamp.ant.FunctionParamUncommenter" classpath="${etc.build.dir}"/>
     </target>
 
-	<target name="update-opencl-headers" depends="make-build-utilities">
+    <target name="update-opencl-headers" depends="make-build-utilities">
         <property name="registry.url" value="http://www.khronos.org/registry/cl/api/1.1/"/>
 
         <!-- download new headers from OpenCL registry if necessary -->
@@ -346,17 +346,17 @@
         <update-headers header="${headers.orig}/cl_platform.h" url="${registry.url}cl_platform.h"/>
     </target>
 
-	<!--
-	   - Copies the OpenCl headers to a new directory while uncommenting the function parameters so gluegen will work properly.
-	  -->
+    <!--
+       - Copies the OpenCl headers to a new directory while uncommenting the function parameters so gluegen will work properly.
+      -->
     <target name="preprocess-opencl-headers" depends="make-build-utilities">
-    	<property name="preprocess.from" value="${stub.includes}/CL${opencl.version}" />
-    	<property name="preprocess.to"   value="${gen.includes}/CL${opencl.version}/CL" />
+        <property name="preprocess.from" value="${stub.includes}/CL${opencl.version}" />
+        <property name="preprocess.to"   value="${gen.includes}/CL${opencl.version}/CL" />
         <mkdir dir="${preprocess.to}"/>
 
         <!-- need to use absolute paths or it won't work inside Eclipse, where user.dir is Eclipse's bin dir-->
-    	<property name="preprocess.from.abs" value="${basedir}/${stub.includes.dir}/CL${opencl.version}" />
-    	<property name="preprocess.to.abs"   value="${basedir}/${gen.includes.dir}/CL${opencl.version}/CL" />
+        <property name="preprocess.from.abs" value="${basedir}/${stub.includes.dir}/CL${opencl.version}" />
+        <property name="preprocess.to.abs"   value="${basedir}/${gen.includes.dir}/CL${opencl.version}/CL" />
         <uncomment-function-params src="${preprocess.from.abs}/cl.h" dest="${preprocess.to.abs}/cl.h"/>
         <uncomment-function-params src="${preprocess.from.abs}/cl_gl.h" dest="${preprocess.to.abs}/cl_gl.h"/>
 
@@ -366,7 +366,7 @@
         <copy file="${preprocess.from}/cl_gl_ext.h"   toDir="${preprocess.to}" overwrite="true"/>
     </target>
 
-	<!--
+    <!--
        - Setup the generating ANT tasks and use it to generate the Java files
        - from the C OpenCL headers.  This involves setting the taskdef and creating
        - the classpath reference id then running the task on each header.
@@ -471,8 +471,8 @@
                target="${target.targetlevel}" 
                bootclasspath="${target.rt.jar}"
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
-        	<classpath refid="javac.classpath"/>
-        	<src path="${src.java}" />
+            <classpath refid="javac.classpath"/>
+            <src path="${src.java}" />
             <src path="${src.generated.java}" />
             <compilerarg value="-Xlint:all"/>
             <!-- suppress warning due to @CLProperty annotation, which is used at runtime but not during compilation -->
@@ -489,8 +489,8 @@
                target="${target.targetlevel}" 
                bootclasspath="${target.rt.jar}"
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
-        	<classpath refid="javac.android.classpath"/>
-        	<src path="${src.java}" />
+            <classpath refid="javac.android.classpath"/>
+            <src path="${src.java}" />
             <src path="${src.generated.java}" />
             <compilerarg value="-Xlint:all"/>
         </javac>
