@@ -103,10 +103,10 @@
         <!-- GlueGen properties. -->
         <!-- NOTE that these require a checked-out GlueGen workspace as a -->
         <!-- sibling of the JOCL workspace. -->
-        <property name="gluegen.make.dir" value="${gluegen.root}/make" />
+        <property name="gluegen.make.dir"  value="${gluegen.root}/make" />
         <property name="gluegen.build.xml" value="${gluegen.make.dir}/build.xml" />
-        <property name="gluegen.jar" value="${gluegen.build}/gluegen.jar" />
-        <property name="gluegen-rt.jar" value="${gluegen.build}/gluegen-rt.jar" />
+        <property name="gluegen.jar"       value="${gluegen.build}/gluegen.jar" />
+        <property name="gluegen-rt.jar"    value="${gluegen.build}/gluegen-rt.jar" />
 
         <property name="jogl.root"     value="${project.root}/../jogl" />
         <property name="jogl.build"    value="${jogl.root}/${rootrel.build}" />
@@ -129,12 +129,9 @@
              and need exact string matching, which is why they use file.separator
              instead of "/". -->
         <property name="rootrel.src" value="src" />
-        <!--property name="rootrel.src.java" value="${rootrel.src}/java" /-->
         <property name="rootrel.src.java" value="${rootrel.src}" />
-        <!---property name="rootrel.src.c" value="${rootrel.src}/native" /-->
         <property name="rootrel.src.c" value="resources" />
         <property name="rootrel.src.generated" value="${rootrel.build}/gensrc" />
-        <property name="rootrel.generated.java" value="${rootrel.src.generated}/classes" />
         <property name="rootrel.generated.c.jocl" value="${rootrel.src.generated}/native/jocl" />
         <property name="rootrel.obj" value="${rootrel.build}/obj" />
         <property name="rootrel.obj.jocl" value="${rootrel.obj}/jocl" />
@@ -182,10 +179,13 @@
         <!-- The headers from which Java files are generated -->
         <fileset id="stub.includes.dependencies.fileset.1" dir="${stub.includes.dir}">
             <include name="CL11/**" />
-            <include name="GL3/**" />
+            <include name="CL12/**" />
+            <include name="CL20/**" />
         </fileset>
         <fileset id="stub.includes.dependencies.fileset.2" dir="${gen.includes.dir}">
-            <include name="CL/**" />
+            <include name="CL11/CL/**" />
+            <include name="CL12/CL/**" />
+            <include name="CL20/CL/**" />
         </fileset>
         <fileset id="stub.includes.dependencies.fileset.3" file="${gluegen.jar}" />
         <fileset id="stub.includes.dependencies.fileset.4" dir="config">
@@ -195,7 +195,7 @@
         </fileset>
         <!-- relative paths to stub includes in gluegen project; have to pass separately into gluegen
              task because dirsets won't work with paths outside their root path -->
-        <property name="stub.includes.gluegen.all"  value="${gluegen.root}/make/stub_includes/gluegen, ${gluegen.root}/make/stub_includes/jni, ${jogl.root}/make/stub_includes/khr, ${jogl.root}/make/stub_includes/opengl"/>
+        <property name="stub.includes.gluegen.all" value="${gluegen.root}/make/stub_includes/gluegen, ${gluegen.root}/make/stub_includes/jni, ${jogl.root}/make/stub_includes/khr, ${jogl.root}/make/stub_includes/opengl"/>
         <property name="stub.includes.gluegen.cc"  value="${gluegen.root}/make/stub_includes/platform" />
 
         <!-- The resulting jocl.jar. -->
@@ -222,28 +222,6 @@
         <!-- optional android classes - if android -->
         <property name="java.part.android" value="jogamp/opencl/os/android/**"/>
 
-        <condition property="useLinuxARMv6SFOptions">
-            <and>
-                <isset property="isLinuxARMv6"/>
-                <isset property="isAbiEabiGnuArmel"/>
-                <isset property="isCrosscompilation"/>
-            </and>
-        </condition>
-        <condition property="useLinuxARMv6HFOptions">
-            <and>
-                <isset property="isLinuxARMv6"/>
-                <isset property="isAbiEabiGnuArmhf"/>
-                <isset property="isCrosscompilation"/>
-            </and>
-        </condition>
-        <condition property="isCLANG.i386">
-            <and>
-                <isset property="isCLANG"/>
-                <isset property="isI386"/>
-            </and>
-        </condition>
-        <echo message="useLinuxARMv6SFOptions ${useLinuxARMv6SFOptions}" />
-        <echo message="useLinuxARMv6HFOptions ${useLinuxARMv6HFOptions}" />
         <condition property="enable.jdk7.features">
             <or>
                 <equals arg1="${target.targetlevel}" arg2="1.7"/>
@@ -331,19 +309,7 @@
             <compilerarg value="-Xlint:all"/>
         </javac>
 
-        <taskdef name="update-headers"            classname="com.jogamp.ant.HeaderFileDownloader"     classpath="${etc.build.dir}"/>
         <taskdef name="uncomment-function-params" classname="com.jogamp.ant.FunctionParamUncommenter" classpath="${etc.build.dir}"/>
-    </target>
-
-    <target name="update-opencl-headers" depends="make-build-utilities">
-        <property name="registry.url" value="http://www.khronos.org/registry/cl/api/1.1/"/>
-
-        <!-- download new headers from OpenCL registry if necessary -->
-        <update-headers header="${headers.orig}/cl.h" url="${registry.url}cl.h"/>
-        <update-headers header="${headers.orig}/cl_gl.h" url="${registry.url}cl_gl.h"/>
-        <update-headers header="${headers.orig}/cl_gl_ext.h" url="${registry.url}cl_gl_ext.h"/>
-        <update-headers header="${headers.orig}/cl_ext.h" url="${registry.url}cl_ext.h"/>
-        <update-headers header="${headers.orig}/cl_platform.h" url="${registry.url}cl_platform.h"/>
     </target>
 
     <!--
@@ -532,12 +498,12 @@
             <echo message="Compiling @{output.lib.name}" />
 
             <cc outtype="shared" 
-            objdir="${obj}" 
-            outfile="${obj}/@{output.lib.name}"
-            optimize="${c.compiler.optimise}" 
-            debug="${c.compiler.debug}"
-            multithreaded="true" 
-            exceptions="false">
+                objdir="${obj}" 
+                outfile="${obj}/@{output.lib.name}"
+                optimize="${c.compiler.optimise}" 
+                debug="${c.compiler.debug}"
+                multithreaded="true" 
+                exceptions="false">
 
                 <compiler extends="@{compiler.cfg.id}" >
                     <fileset dir="${project.root}">
