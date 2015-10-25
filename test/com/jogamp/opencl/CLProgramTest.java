@@ -147,6 +147,7 @@ public class CLProgramTest extends UITestCase {
         assertNotNull(program.getCLDevices());
         assertEquals(program.getCLDevices().length, 0);
 
+        // make sure kernel creation does nothing after program release 
         {
             final Map<String, CLKernel> kernels = program.createCLKernels();
             assertNotNull(kernels);
@@ -156,23 +157,31 @@ public class CLProgramTest extends UITestCase {
 
         program = context.createProgram(binaries);
 
-        assertFalse(program.isExecutable());
-
+        // as of 10/25/2015, Intel shows recreated programs as executable 
+        if(!context.getPlatform().isVendorIntel())
+        	assertFalse(program.isExecutable());
+        else
+        	assertTrue(program.isExecutable());
+        	
         assertNotNull(program.getCLDevices());
         assertTrue(program.getCLDevices().length != 0);
 
         assertNotNull(program.getBinaries());
-        assertEquals(program.getBinaries().size(), 0);
+        // as of 10/25/2015, Intel shows recreated programs binaries as having size 
+        if(!context.getPlatform().isVendorIntel())
+        	assertEquals(program.getBinaries().size(), 0);
+        else
+        	assertTrue(program.getBinaries().size() > 0);
 
         assertNotNull(program.getBuildLog());
         assertTrue(program.getBuildLog().length() != 0);
 
         assertNotNull(program.getSource());
-        assertEquals(program.getSource().length(), 0);
+       	assertEquals(program.getSource().length(), 0);
 
-        // only test kernel creation error on unbuilt program if we're not on AMD -- as of
-        // 3/8/2014, AMD drivers segfault on this instead of returning CL_INVALID_PROGRAM_EXECUTABLE
-        if(!context.getPlatform().isVendorAMD()) {
+        // only test kernel creation error on unbuilt program if we're not on AMD or Intel -- as of
+        // (3/8/2014, 10/31/2015) (AMD, Intel) drivers segfault on this instead of returning CL_INVALID_PROGRAM_EXECUTABLE
+        if(!context.getPlatform().isVendorAMD() && !context.getPlatform().isVendorIntel()) {
             try{
                 final Map<String, CLKernel> kernels = program.createCLKernels();
                 fail("expected an exception from createCLKernels but got: "+kernels);

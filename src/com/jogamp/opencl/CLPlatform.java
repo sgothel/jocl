@@ -468,6 +468,14 @@ public class CLPlatform {
     public boolean isVendorAMD() {
         return getVendor().contains("Advanced Micro Devices");
     }
+
+    /**
+     * @return true if the vendor is Intel.
+     */
+    public boolean isVendorIntel() {
+        return getVendor().contains("Intel");
+    }
+
     /**
      * Returns the ICD suffix.
      */
