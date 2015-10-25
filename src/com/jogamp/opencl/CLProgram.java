@@ -45,7 +45,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Semaphore;
 
 import static com.jogamp.opencl.CLException.*;
 import static com.jogamp.opencl.llb.CL.*;
@@ -61,7 +61,9 @@ import static com.jogamp.common.nio.Buffers.*;
  */
 public class CLProgram extends CLObjectResource {
 
-    private final static ReentrantLock buildLock = new ReentrantLock();
+	// must use a semaphore instead of a reentrant lock because the CL implementation can call
+	// our notifier function from a different thread than the one that calls clBuildProgram
+    private final static Semaphore buildLock = new Semaphore(1, true);
     private final CL binding;
 
     private final Set<CLKernel> kernels;
@@ -150,18 +152,16 @@ public class CLProgram extends CLObjectResource {
     private void initBuildStatus() {
 
         if(buildStatusMap == null) {
-//            synchronized(buildLock) {
-                final Map<CLDevice, Status> map = new HashMap<CLDevice, Status>();
-                final CLDevice[] devices = getCLDevices();
-                for (final CLDevice device : devices) {
-                    final Status status = getBuildStatus(device);
-                    if(status == Status.BUILD_SUCCESS) {
-                        executable = true;
-                    }
-                    map.put(device, status);
+            final Map<CLDevice, Status> map = new HashMap<CLDevice, Status>();
+            final CLDevice[] devices = getCLDevices();
+            for (final CLDevice device : devices) {
+                final Status status = getBuildStatus(device);
+                if(status == Status.BUILD_SUCCESS) {
+                    executable = true;
                 }
-                this.buildStatusMap = Collections.unmodifiableMap(map);
-//            }
+                map.put(device, status);
+            }
+            this.buildStatusMap = Collections.unmodifiableMap(map);
         }
     }
 
@@ -359,7 +359,7 @@ public class CLProgram extends CLObjectResource {
             callback = new BuildProgramCallback() {
                 @Override
                 public void buildFinished(final long cl_program) {
-                    buildLock.unlock();
+                    buildLock.release();
                     listener.buildFinished(CLProgram.this);
                 }
             };
@@ -371,14 +371,19 @@ public class CLProgram extends CLObjectResource {
         // spec: building programs is not threadsafe, we are locking the API call to
         // make sure only one thread calls it at a time until it completes (asynchronous or synchronously).
         {
-            buildLock.lock();
+            try {
+				buildLock.acquire();
+			} catch(InterruptedException e) {
+	            throw newException(ret, "\nInterrupted while waiting to get build lock");
+			}
+
             boolean exception = true;
             try{
                 ret = binding.clBuildProgram(ID, count, deviceIDs, options, callback);
                 exception = false;
             }finally{
                 if(callback == null || exception) {
-                    buildLock.unlock();
+                    buildLock.release();
                 }
             }
         }
