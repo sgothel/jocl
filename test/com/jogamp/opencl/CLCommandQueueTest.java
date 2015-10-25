@@ -347,7 +347,12 @@ public class CLCommandQueueTest extends UITestCase {
             Thread.sleep(1000);
             final CLEvent status = events.getEvent(0);
 
-            assertEquals(ExecutionStatus.QUEUED, status.getStatus());
+            // on Intel, user events start as submitted instead of queued
+            if(context.getPlatform().isVendorIntel())
+            	assertEquals(ExecutionStatus.SUBMITTED, status.getStatus());
+            else
+            	assertEquals(ExecutionStatus.QUEUED, status.getStatus());
+
             condition.setComplete();
             assertTrue(condition.isComplete());
 
