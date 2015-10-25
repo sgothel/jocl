@@ -138,14 +138,13 @@
 
         <!-- The source directories. -->
         <property name="src"   value="${project.root}/${rootrel.src}" />
-        <property name="src.c" value="${project.root}/${rootrel.src.c}" />
         <property name="src.java" value="${project.root}/${rootrel.src.java}" />
         <property name="build" value="${project.root}/${rootrel.build}" />
 
         <!-- The generated source directories. -->
         <property name="src.generated" value="${build}/gensrc" />
         <property name="src.generated.java" value="${src.generated}/java" />
-        <property name="src.generated.c" value="${src.generated}/native/jocl" />
+        <property name="src.generated.c" value="${src.generated}/native" />
 
         <!-- The compiler output directories. -->
         <property name="classes" value="${build}/classes" />
@@ -177,18 +176,18 @@
         <property name="headers.dest" value="${gen.includes}/CL" />
 
         <!-- The headers from which Java files are generated -->
-        <fileset id="stub.includes.dependencies.fileset.1" dir="${stub.includes.dir}">
+        <fileset id="stub.includes.fileset" dir="${stub.includes.dir}">
             <include name="CL11/**" />
             <include name="CL12/**" />
             <include name="CL20/**" />
         </fileset>
-        <fileset id="stub.includes.dependencies.fileset.2" dir="${gen.includes.dir}">
+        <fileset id="gen.includes.fileset" dir="${gen.includes.dir}">
             <include name="CL11/CL/**" />
             <include name="CL12/CL/**" />
             <include name="CL20/CL/**" />
         </fileset>
-        <fileset id="stub.includes.dependencies.fileset.3" file="${gluegen.jar}" />
-        <fileset id="stub.includes.dependencies.fileset.4" dir="config">
+        <fileset id="glugen.jar.fileset" file="${gluegen.jar}" />
+        <fileset id="config.files.fileset" dir="config">
             <include name="*.cfg" />
             <include name="*.java" />
             <include name="*.c" />
@@ -251,26 +250,25 @@
       -->
 
     <target name="java.generate.check">
-        <!-- Blow away all target files if any dependencies are violated
-             (the uptodate task doesn't allow arbitrary source and target filesets but should) -->
+        <!-- delete all generated files if any parent file is newer -->
         <dependset>
-            <srcfileset refid="stub.includes.dependencies.fileset.1" />
-            <srcfileset refid="stub.includes.dependencies.fileset.2" />
-            <srcfileset refid="stub.includes.dependencies.fileset.3" />
-            <srcfileset refid="stub.includes.dependencies.fileset.4" />
+            <srcfileset refid="stub.includes.fileset" />
+            <srcfileset refid="gen.includes.fileset" />
+            <srcfileset refid="glugen.jar.fileset" />
+            <srcfileset refid="config.files.fileset" />
             <targetfileset dir=".">
                 <include name="${src.generated.java}/**/*.java" />
                 <include name="${src.generated.c}/**/*.c" />
             </targetfileset>
         </dependset>
 
-        <!-- Now check for the presence of one well-known file -->
+        <!-- if one well-known generated file survived and is older than the parent files, we can skip file generation -->
         <uptodate property="java.generate.skip"
-                  targetfile="${src.generated.c}/CLImpl11_JNI.c">
-            <srcfiles refid="stub.includes.dependencies.fileset.1" />
-            <srcfiles refid="stub.includes.dependencies.fileset.2" />
-            <srcfiles refid="stub.includes.dependencies.fileset.3" />
-            <srcfiles refid="stub.includes.dependencies.fileset.4" />
+                  targetfile="${src.generated.c}/jocl11/CLImpl11_JNI.c">
+            <srcfiles refid="stub.includes.fileset" />
+            <srcfiles refid="gen.includes.fileset" />
+            <srcfiles refid="glugen.jar.fileset" />
+            <srcfiles refid="config.files.fileset" />
         </uptodate>
     </target>
 
@@ -514,9 +512,6 @@
                     <sysincludepath path="${stub.includes.gluegen.cc}"/>
                     <includepath path="${jogl.root}/make/stub_includes/opengl"/>
                     <includepath path="${gen.includes.dir}/CL11"/>
-                    <!-- This is for the generated headers for handwritten C code -->
-                    <includepath path="${src.generated.c}" />
-                    <includepath path="${src.c}"/>
                 </compiler>
 
                 <compiler extends="@{compiler.cfg.id}" >
@@ -528,9 +523,6 @@
                     <sysincludepath path="${stub.includes.gluegen.cc}"/>
                     <includepath path="${jogl.root}/make/stub_includes/opengl"/>
                     <includepath path="${gen.includes.dir}/CL12"/>
-                    <!-- This is for the generated headers for handwritten C code -->
-                    <includepath path="${src.generated.c}" />
-                    <includepath path="${src.c}"/>
                 </compiler>
 
                 <compiler extends="@{compiler.cfg.id}" >
@@ -542,9 +534,6 @@
                     <sysincludepath path="${stub.includes.gluegen.cc}"/>
                     <includepath path="${jogl.root}/make/stub_includes/opengl"/>
                     <includepath path="${gen.includes.dir}/CL20"/>
-                    <!-- This is for the generated headers for handwritten C code -->
-                    <includepath path="${src.generated.c}" />
-                    <includepath path="${src.c}"/>
                 </compiler>
 
                 <linker extends="@{linker.cfg.id}" />
