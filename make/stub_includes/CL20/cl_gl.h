@@ -25,7 +25,7 @@
 #define __OPENCL_CL_GL_H
 
 #ifdef __APPLE__
-#include <OpenCL/cl.h>
+#include <CL/cl.h>
 #else
 #include <CL/cl.h>
 #endif	

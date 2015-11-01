@@ -27,6 +27,7 @@
 #define __OPENCL_CL_H
 
 #ifdef __APPLE__
+#pragma GCC diagnostic ignored "-Wignored-attributes"
 #include <OpenCL/cl_platform.h>
 #else
 #include <CL/cl_platform.h>
