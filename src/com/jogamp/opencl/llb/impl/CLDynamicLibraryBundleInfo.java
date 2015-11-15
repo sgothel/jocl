@@ -96,6 +96,16 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
     }
 
     @Override
+    public final boolean searchToolLibInSystemPath() {
+        return true;
+    }
+
+    @Override
+    public final boolean searchToolLibSystemPathFirst() {
+        return true;
+    }
+
+    @Override
     public final List<List<String>> getToolLibNames() {
         final List<List<String>> libNamesList = new ArrayList<List<String>>();
 
