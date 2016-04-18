@@ -31,6 +31,7 @@ package com.jogamp.opencl;
 import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.opencl.util.CLBuildConfiguration;
 import com.jogamp.opencl.util.CLProgramConfiguration;
+import com.jogamp.common.nio.Buffers;
 import com.jogamp.opencl.CLProgram.Status;
 import com.jogamp.opencl.util.CLBuildListener;
 import com.jogamp.opencl.llb.CL;
@@ -41,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -52,7 +54,11 @@ import org.junit.runners.MethodSorters;
 
 import static org.junit.Assert.*;
 import static java.lang.System.*;
+import static com.jogamp.common.os.Platform.is32Bit;
+import static com.jogamp.opencl.CLException.newException;
 import static com.jogamp.opencl.CLProgram.CompilerOptions.*;
+import static com.jogamp.opencl.llb.CL12.CL_KERNEL_GLOBAL_WORK_SIZE;
+import static com.jogamp.opencl.llb.CL.CL_SUCCESS;
 
 /**
  *
@@ -368,6 +374,46 @@ public class CLProgramTest extends UITestCase {
             context.release();
         }
 
+    }
+
+    /**
+     * Test of getting new kernel work group information, including those from OpenCL versions newer than 1.1.
+     */
+    @Test
+    public void test22KerneWorkGrouplInfo() {
+        final CLContext context = CLContext.create();
+
+        try{
+            final CLProgram program = context.createProgram(test20KernelSource).build();
+            assertTrue(program.isExecutable());
+
+            final CLKernel kernel = program.createCLKernel("foo");
+            assertNotNull(kernel);
+
+            final long pwgsm = kernel.getPreferredWorkGroupSizeMultiple(context.getDevices()[0]);
+            out.println("preferred workgroup size multiple: " + pwgsm);
+
+            final long pms = kernel.getPrivateMemSize(context.getDevices()[0]);
+            out.println("private mem size: " + pms);
+
+            if( context.getDevices()[0].getCVersion().isAtLeast(1, 2) ) {
+	            CL deviceInterface = CLPlatform.getLowLevelCLInterfaceForDevice(context.getDevices()[0].ID);
+	
+	            ByteBuffer buffer = Buffers.newDirectByteBuffer((is32Bit()?4:8)*3);
+	            final int ret = deviceInterface.clGetKernelWorkGroupInfo(kernel.ID, context.getDevices()[0].ID, CL_KERNEL_GLOBAL_WORK_SIZE, (is32Bit()?4:8)*3, buffer, null);
+	            if(ret != CL_SUCCESS) {
+	                throw newException(ret, "Error while asking for CL_KERNEL_GLOBAL_WORK_SIZE of " + kernel + " on "+ context.getDevices()[0]);
+	            }
+	
+	            if(is32Bit()) {
+	                out.println("kernel global work size: " + buffer.getInt(0) + ", " + buffer.getInt(4) + ", " + buffer.getInt(8) );
+	            }else {
+	                out.println("kernel global work size: " + buffer.getLong(0) + ", " + buffer.getLong(8) + ", " + buffer.getLong(16) );
+	            }
+            }
+        }finally{
+            context.release();
+        }
     }
 
 //    @Test

@@ -315,6 +315,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
      * qualifier and whose size is specified with clSetKernelArg.
      * If the local memory size, for any pointer argument to the kernel declared with
      * the <code>__local</code> address qualifier, is not specified, its size is assumed to be 0.
+     * @version 1.0
      */
     public long getLocalMemorySize(final CLDevice device) {
         return getWorkGroupInfo(device, CL_KERNEL_LOCAL_MEM_SIZE);
@@ -326,6 +327,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
      * that can be used to execute a kernel on a specific device given by device.
      * The OpenCL implementation uses the resource requirements of the kernel
      * (register usage etc.) to determine what this work-group size should be.
+     * @version 1.0
      */
     public long getWorkGroupSize(final CLDevice device) {
         return getWorkGroupInfo(device, CL_KERNEL_WORK_GROUP_SIZE);
@@ -335,6 +337,7 @@ public class CLKernel extends CLObjectResource implements Cloneable {
      * Returns the work-group size specified by the <code>__attribute__((reqd_work_group_size(X, Y, Z)))</code> qualifier in kernel sources.
      * If the work-group size is not specified using the above attribute qualifier <code>new long[]{(0, 0, 0)}</code> is returned.
      * The returned array has always three elements.
+     * @version 1.0
      */
     public long[] getCompileWorkGroupSize(final CLDevice device) {
         final int ret = binding.clGetKernelWorkGroupInfo(ID, device.ID, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, (is32Bit()?4:8)*3, buffer, null);
@@ -347,6 +350,25 @@ public class CLKernel extends CLObjectResource implements Cloneable {
         }else {
             return new long[] { buffer.getLong(0), buffer.getLong(8), buffer.getLong(16) };
         }
+    }
+
+    /**
+     * Returns the preferred multiple of workgroup size to use for kernel launch. This is only a performance hint; enqueueing
+     * with other sizes will still work, unless the size is more than the maximum allowed.
+     * @version 1.1
+     */
+    public long getPreferredWorkGroupSizeMultiple(final CLDevice device) {
+        return getWorkGroupInfo(device, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE);
+    }
+
+    /**
+     * Returns the number of bytes of private memory used by each work item in the kernel.
+     * This includes private memory declared with the <code>__private</code> qualifier, as
+     * well as other private memory used by the implementation.
+     * @version 1.1
+     */
+    public long getPrivateMemSize(final CLDevice device) {
+        return getWorkGroupInfo(device, CL_KERNEL_PRIVATE_MEM_SIZE);
     }
 
     private long getWorkGroupInfo(final CLDevice device, final int flag) {
