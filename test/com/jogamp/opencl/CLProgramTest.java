@@ -395,22 +395,6 @@ public class CLProgramTest extends UITestCase {
 
             final long pms = kernel.getPrivateMemSize(context.getDevices()[0]);
             out.println("private mem size: " + pms);
-
-            if( context.getDevices()[0].getCVersion().isAtLeast(1, 2) ) {
-	            CL deviceInterface = CLPlatform.getLowLevelCLInterfaceForDevice(context.getDevices()[0].ID);
-	
-	            ByteBuffer buffer = Buffers.newDirectByteBuffer((is32Bit()?4:8)*3);
-	            final int ret = deviceInterface.clGetKernelWorkGroupInfo(kernel.ID, context.getDevices()[0].ID, CL_KERNEL_GLOBAL_WORK_SIZE, (is32Bit()?4:8)*3, buffer, null);
-	            if(ret != CL_SUCCESS) {
-	                throw newException(ret, "Error while asking for CL_KERNEL_GLOBAL_WORK_SIZE of " + kernel + " on "+ context.getDevices()[0]);
-	            }
-	
-	            if(is32Bit()) {
-	                out.println("kernel global work size: " + buffer.getInt(0) + ", " + buffer.getInt(4) + ", " + buffer.getInt(8) );
-	            }else {
-	                out.println("kernel global work size: " + buffer.getLong(0) + ", " + buffer.getLong(8) + ", " + buffer.getLong(16) );
-	            }
-            }
         }finally{
             context.release();
         }
