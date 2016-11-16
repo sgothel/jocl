@@ -145,7 +145,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
         if(buffer == null) {
             return 0;
         }
-        return buffer.capacity();
+        return buffer.limit();
     }
 
     /**
@@ -155,7 +155,7 @@ public abstract class CLMemory <B extends Buffer> extends CLObjectResource {
         if(buffer == null) {
             return 0;
         }
-        return getElementSize() * buffer.capacity();
+        return getElementSize() * buffer.limit();
     }
 
     /**
