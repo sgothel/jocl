@@ -82,7 +82,7 @@ public class CLBuffer<B extends Buffer> extends CLMemory<B> {
 
         final CL binding = context.getPlatform().getCLBinding();
         final int[] result = new int[1];
-        final int size = Buffers.sizeOfBufferElem(directBuffer) * directBuffer.capacity();
+        final int size = Buffers.sizeOfBufferElem(directBuffer) * directBuffer.limit();
         final long id = binding.clCreateBuffer(context.ID, flags, size, host_ptr, result, 0);
         CLException.checkForError(result[0], "can not create cl buffer");
 

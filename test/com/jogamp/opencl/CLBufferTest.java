@@ -65,6 +65,26 @@ import static com.jogamp.opencl.CLVersion.*;
 public class CLBufferTest extends UITestCase {
 
     @Test
+    public void createBufferFromLimitedBuffer() {
+        final int elements = NUM_ELEMENTS;
+        final int padding = 19*SIZEOF_INT*2; // Totally arbitrary number > 0 divisible by 2*SIZEOF_INT
+        final CLContext context = CLContext.create();
+
+        // Make a buffer that is offset relative to the originally allocated position and has a
+        // limit that is
+        // not equal to the capacity to test whether all these attributes are correctly handled.
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(elements*SIZEOF_INT + padding);
+        byteBuffer.position(padding / 2); // Offset the original buffer
+        IntBuffer intBuffer = byteBuffer.slice().order(ByteOrder.nativeOrder()).asIntBuffer(); // Slice it to have a new buffer that starts at the offset
+        intBuffer.limit(elements);
+
+        final CLBuffer<IntBuffer> deviceBuffer = context.createBuffer(intBuffer);
+        assertEquals(elements, deviceBuffer.getCLCapacity());
+        assertEquals(elements * SIZEOF_INT, deviceBuffer.getNIOSize());
+        assertEquals(elements, deviceBuffer.getNIOCapacity());
+    }
+
+    @Test
     public void cloneWithLimitedBufferTest() {
         final int elements = NUM_ELEMENTS;
         final int padding = 312; // Arbitrary number
