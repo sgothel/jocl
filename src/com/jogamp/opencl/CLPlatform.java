@@ -281,7 +281,12 @@ public class CLPlatform {
      * @see #listCLDevices(com.jogamp.opencl.CLDevice.Type...)
      */
     public CLDevice[] listCLDevices() {
-        return this.listCLDevices(CLDevice.Type.ALL);
+        try{
+            return this.listCLDevices(CLDevice.Type.ALL);
+        }
+        catch(CLInvalidDeviceTypeException ignore){ //trying to list GPUs if CL_DEVICE_TYPE_ALL isn't valid. on some non-standard implementations (Android PowerVR), only CL_DEVICE_TYPE_GPU is supported and use of other types including ALL will lead to a CL_INVALID_DEVICE_TYPE
+            return this.listCLDevices(CLDevice.Type.GPU);
+        }
     }
 
     /**
