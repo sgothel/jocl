@@ -50,7 +50,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
             public Object run() {
                 Platform.initSingleton();
 
-                if( TempJarCache.isInitialized() ) {
+                if( TempJarCache.isInitialized(true) ) {
                    // only: jocl.jar -> jocl-natives-<os.and.arch>.jar
                    JNILibLoaderBase.addNativeJarLibs(new Class<?>[] { jogamp.opencl.Debug.class }, null );
                 }
