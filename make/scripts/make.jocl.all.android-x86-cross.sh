@@ -82,7 +82,7 @@ export TARGET_TRIPLE=i686-linux-android
 export TOOLCHAIN_NAME=x86
 
 export NDK_TOOLCHAIN_ROOT=$NDK_ROOT/toolchains/${TOOLCHAIN_NAME}-${GCC_VERSION}/prebuilt/${HOST_ARCH}
-export TARGET_PLATFORM_ROOT=${NDK_ROOT}/platforms/android-${ANDROID_VERSION}/arch-x86
+export TARGET_PLATFORM_SYSROOT=${NDK_ROOT}/platforms/android-${ANDROID_VERSION}/arch-x86
 
 # Need to add toolchain bins to the PATH. 
 export PATH="$NDK_TOOLCHAIN_ROOT/$TARGET_TRIPLE/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/17.0.0:$PATH"
