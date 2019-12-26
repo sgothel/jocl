@@ -493,6 +493,8 @@
 
             <cc outtype="shared" 
                 objdir="${obj}" 
+                usehighleveltool="true"
+                writesoname="true"
                 outfile="${obj}/@{output.lib.name}"
                 optimize="${c.compiler.optimise}" 
                 debug="${c.compiler.debug}"
