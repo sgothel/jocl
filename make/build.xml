@@ -594,6 +594,18 @@
                 <filter token="JAR_CODEBASE_TAG" value="${jogamp.jar.codebase}"/>
             </filterset>
         </copy>
+        <copy file="joclversion-android"
+          tofile="${build}/tempversion-android"
+          overwrite="true">
+            <filterset>
+                <filter token="VERSION" value="${jogamp.version}"/>
+                <filter token="BUILD_VERSION" value="${jocl.version}"/>
+                <filter token="SCM_BRANCH" value="${jocl.build.branch}"/>
+                <filter token="SCM_COMMIT" value="${jocl.build.commit}"/>
+                <filter token="BASEVERSION" value="${jogamp.version.base}" />
+                <filter token="JAR_CODEBASE_TAG" value="${jogamp.jar.codebase}"/>
+            </filterset>
+        </copy>
 
         <!-- Build the jar excluding any build specific classes. -->
         <jar manifest="${build}/tempversion" destfile="${jocl.jar}" filesonly="true">
@@ -607,7 +619,7 @@
             </fileset>
         </jar>
 
-        <jar manifest="${build}/tempversion" destfile="${jocl-android.jar}" filesonly="true">
+        <jar manifest="${build}/tempversion-android" destfile="${jocl-android.jar}" filesonly="true">
             <fileset dir="${classes}">
                 <include name="com/jogamp/opencl/**" />
                 <include name="jogamp/opencl/**" />
@@ -640,7 +652,7 @@
             android.abi="${android.abi}"
             androidmanifest.path="resources/android/AndroidManifest-jocl.xml"
             androidresources.path="resources/android/res-jocl"
-            jarmanifest.path="${build}/tempversion"
+            jarmanifest.path="${build}/tempversion-android"
             version.code="${jogamp.version.int}"
             version.name="${jogamp.version}">
           <d8-classpaths>
