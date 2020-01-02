@@ -205,6 +205,7 @@
         <path id="jocl_all.classpath">
             <pathelement location="${gluegen-rt.jar}" />
             <pathelement location="${jocl.jar}" />
+            <pathelement location="${jogl-all-noawt.jar}" />
         </path>
 
         <!-- Create the required output directories. -->
@@ -674,9 +675,9 @@
     <target name="javadoc" depends="init, javadoc.init, javadoc.public, javadoc.dev, javadoc.zip"/>
 
     <!-- copies ${gluegen-javadoc.path}/** to ${javadoc.root.path}/gluegen/ 
-         gluegen-javadoc.path is the parent folder of package-list:
+         gluegen-javadoc.path is the parent folder of element-list:
             gluegen-javadoc.path := build/javadoc/gluegen 
-            with build/javadoc/gluegen/javadoc/package-list
+            with build/javadoc/gluegen/javadoc/element-list
       -->
     <target name="javadoc.gluegen" depends="init" if="gluegen-javadoc.path">
         <delete dir="${javadoc.root.path}/gluegen" includeEmptyDirs="true" quiet="true" failonerror="false" />
@@ -723,11 +724,12 @@
 
         <!-- if gluegen-javadoc.path is not set, check in default location, 
              ${gluegen.root}/${rootrel.build}/javadoc/gluegen -->
-        <available file="${gluegen.build}/javadoc/gluegen/javadoc/package-list" 
+        <available file="${gluegen.build}/javadoc/gluegen/javadoc/element-list" 
                    type="file"
                    property="gluegen-javadoc.path"
                    value="${gluegen.build}/javadoc/gluegen" />
         <antcall target="javadoc.gluegen" inheritRefs="true" />
+        <property name="java.excludes.javadoc.packagenames" value="jogamp.opencl.os.android.*"/>
     </target>
 
     <target name="javadoc.zip" depends="javadoc.init">
@@ -738,6 +740,7 @@
 
     <target name="javadoc.public" depends="javadoc.init">
         <javadoc packagenames="${javadoc.packagenames}"
+                 excludepackagenames="${java.excludes.javadoc.packagenames}"
                  sourcepath="${src.java};${src.generated.java}"
                  destdir="${javadoc.jocl.public.path}" windowtitle="JOCL API"
                  encoding="UTF-8"
@@ -747,6 +750,7 @@
             <classpath refid="jocl_all.classpath"/>
             <link offline="true" href="${javadoc.link}" packagelistLoc="${gluegen.root}/make/142-packages" />
             <link offline="false" href="${gluegen.link}" />
+            <arg value="--frames"/>
             <arg value="${javadoc.xarg1}"/>
         </javadoc>
         <copy todir="${javadoc.jocl.public.path}/resources" overwrite="true">
@@ -757,6 +761,7 @@
     <target name="javadoc.dev" depends="javadoc.init">
         <!-- Build the internal developer Javadoc -->
         <javadoc packagenames="${javadoc.dev.packagenames},${javadoc.dev.packagenames.platform}"
+                 excludepackagenames="${java.excludes.javadoc.packagenames}"
                  sourcepath="${src.java};${src.generated.java}"
                  destdir="${javadoc.jocl.dev.path}" windowtitle="JOCL API"
                  encoding="UTF-8"
@@ -766,6 +771,7 @@
             <classpath refid="jocl_all.classpath"/>
             <link offline="true" href="${javadoc.link}" packagelistLoc="${gluegen.root}/make/142-packages" />
             <link offline="false" href="${gluegen.link}" />
+            <arg value="--frames"/>
             <arg value="${javadoc.xarg1}"/>
         </javadoc>
         <copy todir="${javadoc.jocl.dev.path}/resources" overwrite="true">
