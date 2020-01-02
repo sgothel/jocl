@@ -78,7 +78,7 @@
         <property name="jocl-test.jar"        value="${build}/jar/jocl-test.jar" />
 
         <property name="obj.all.paths"        value="${gluegen.build}/obj${path.separator}${jogl.build}/lib${path.separator}${obj}${path.separator}lib/${os.and.arch}"/>
-        <property name="classpath.test"       value="${junit.jar}${path.separator}${gluegen-rt.jar}${path.separator}${jogl-all.jar}${path.separator}${jocl.jar}${path.separator}${jocl-test.jar}"/>
+        <property name="classpath.test"       value="${junit.jar}${path.separator}${gluegen-rt.jar}${path.separator}${jogl-all-noawt.jar}${path.separator}${jocl.jar}${path.separator}${jocl-test.jar}"/>
         <property name="classpath.test.remote" value="${junit.jar}${path.separator}${env.TARGET_ANT_HOME}/lib/ant.jar${path.separator}${env.TARGET_ANT_HOME}/lib/ant-junit.jar${path.separator}${gluegen-rt.jar}${path.separator}${jocl.jar}${path.separator}${jocl-test.jar}"/>
 
         <property name="test.archive.name"    value="${archive.name}-test-results-${build.node.name}"/>
@@ -94,7 +94,7 @@
                fork="yes"
                includeantruntime="false"
                srcdir="${src.test}" 
-               classpath="${gluegen-rt.jar};${jocl.jar};${junit.jar};${jogl-all.jar}"
+               classpath="${gluegen-rt.jar};${jocl.jar};${junit.jar};${jogl-all-noawt.jar}"
                memoryMaximumSize="${javac.memorymax}"
                encoding="UTF-8"
                source="${target.sourcelevel}" 
@@ -174,7 +174,7 @@
             version.name="${jogamp.version}">
           <d8-classpaths>
               <arg line="--classpath ${gluegen-rt-android.jar}"/> 
-              <arg line="--classpath ${jogl-all.jar}"/> 
+              <arg line="--classpath ${jogl-all-noawt.jar}"/> 
               <arg line="--classpath ${jocl.jar}"/> 
               <arg line="--classpath ${junit.jar}"/> 
           </d8-classpaths>
