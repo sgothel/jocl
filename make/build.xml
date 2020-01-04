@@ -577,7 +577,7 @@
                         nativejarfile="${build}/jar/jocl-natives-${os.and.arch}.jar"
                         manifestfile="${build}/tempversion-natives" 
                         module="opencl"
-                        includelibs="*jocl.${native.library.suffix} *jocl.symbols" />
+                        includelibs="*jocl.${native.library.suffix}" />
 
         <!-- Produce duplicates for different configurations, since non-native-jar aliasing (Bug 1023/Bug 1024) -->
         <copy file="${build}/jar/jocl-natives-${os.and.arch}.jar" tofile="${build}/jar/jocl-android-natives-${os.and.arch}.jar"/>
