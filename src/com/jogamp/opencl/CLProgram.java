@@ -28,6 +28,7 @@
 
 package com.jogamp.opencl;
 
+import com.jogamp.common.nio.AbstractBuffer;
 import com.jogamp.common.nio.CachedBufferFactory;
 import com.jogamp.opencl.util.CLProgramConfiguration;
 import com.jogamp.opencl.util.CLUtil;
@@ -109,7 +110,7 @@ public class CLProgram extends CLObjectResource {
             binarySize += entry.getValue().length;
         }
 
-        final int pbSize = PointerBuffer.ELEMENT_SIZE;
+        final int pbSize = AbstractBuffer.POINTER_SIZE;
         final int deviceCount = binaries.size();
 
         final CachedBufferFactory bf = CachedBufferFactory.create(binarySize + pbSize*deviceCount*3 + 4, true);
@@ -373,7 +374,7 @@ public class CLProgram extends CLObjectResource {
         {
             try {
 				buildLock.acquire();
-			} catch(InterruptedException e) {
+			} catch(final InterruptedException e) {
 	            throw newException(ret, "\nInterrupted while waiting to get build lock");
 			}
 

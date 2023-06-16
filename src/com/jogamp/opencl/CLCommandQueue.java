@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.jogamp.common.nio.AbstractBuffer;
 import com.jogamp.common.nio.CachedBufferFactory;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.gl.CLGLObject;
@@ -82,7 +83,7 @@ public class CLCommandQueue extends CLObjectResource {
         this.properties = properties;
         this.cl = context.getPlatform().getCLBinding();
 
-        final int pbsize = PointerBuffer.ELEMENT_SIZE;
+        final int pbsize = AbstractBuffer.POINTER_SIZE;
         final CachedBufferFactory factory = CachedBufferFactory.create(9*pbsize + 4, true);
 
         this.ibA = PointerBuffer.wrap(factory.newDirectByteBuffer(3*pbsize));

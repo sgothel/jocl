@@ -33,6 +33,8 @@
 package com.jogamp.opencl.impl;
 
 import java.nio.IntBuffer;
+
+import com.jogamp.common.nio.AbstractBuffer;
 import com.jogamp.common.nio.PointerBuffer;
 import com.jogamp.opencl.llb.CL;
 import com.jogamp.opencl.spi.CLAccessorFactory;
@@ -103,7 +105,7 @@ public class CLTLAccessorFactory implements CLAccessorFactory {
             }else{
                 checkForError(ret, "error while enumerating devices");
 
-                final PointerBuffer deviceIDs = PointerBuffer.wrap(getBB(count*PointerBuffer.ELEMENT_SIZE));
+                final PointerBuffer deviceIDs = PointerBuffer.wrap(getBB(count*AbstractBuffer.POINTER_SIZE));
                 ret = cl.clGetDeviceIDs(ID, type, count, deviceIDs, null);
                 checkForError(ret, "error while enumerating devices");
 

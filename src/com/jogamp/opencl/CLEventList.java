@@ -28,6 +28,7 @@
 
 package com.jogamp.opencl;
 
+import com.jogamp.common.nio.AbstractBuffer;
 import com.jogamp.common.nio.CachedBufferFactory;
 import com.jogamp.common.nio.PointerBuffer;
 import java.util.Iterator;
@@ -85,7 +86,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         if(factory == null) {
             return PointerBuffer.allocateDirect(size);
         }else{
-            return PointerBuffer.wrap(factory.newDirectByteBuffer(size*PointerBuffer.ELEMENT_SIZE));
+            return PointerBuffer.wrap(factory.newDirectByteBuffer(size*AbstractBuffer.POINTER_SIZE));
         }
     }
 
@@ -175,6 +176,7 @@ public final class CLEventList implements CLResource, AutoCloseable, Iterable<CL
         return events.length;
     }
 
+    @Override
     public boolean isReleased() {
         return size == 0;
     }
