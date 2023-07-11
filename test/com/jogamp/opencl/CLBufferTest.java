@@ -30,7 +30,6 @@ package com.jogamp.opencl;
 
 import com.jogamp.opencl.CLMemory.Mem;
 import com.jogamp.opencl.CLMemory.Map;
-import com.jogamp.opencl.test.util.MiscUtils;
 import com.jogamp.opencl.test.util.UITestCase;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.util.Bitstream;
@@ -38,6 +37,7 @@ import com.jogamp.common.util.Bitstream;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -63,6 +63,72 @@ import static com.jogamp.opencl.CLVersion.*;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CLBufferTest extends UITestCase {
+
+    @Test
+    public void createBufferFromLimitedBuffer() {
+        final int elements = NUM_ELEMENTS;
+        final int padding = 19*SIZEOF_INT*2; // Totally arbitrary number > 0 divisible by 2*SIZEOF_INT
+        final CLContext context = CLContext.create();
+
+        // Make a buffer that is offset relative to the originally allocated position and has a
+        // limit that is
+        // not equal to the capacity to test whether all these attributes are correctly handled.
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(elements*SIZEOF_INT + padding);
+        byteBuffer.position(padding / 2); // Offset the original buffer
+        IntBuffer intBuffer = byteBuffer.slice().order(ByteOrder.nativeOrder()).asIntBuffer(); // Slice it to have a new buffer that starts at the offset
+        intBuffer.limit(elements);
+
+        final CLBuffer<IntBuffer> deviceBuffer = context.createBuffer(intBuffer);
+        assertEquals(elements, deviceBuffer.getCLCapacity());
+        assertEquals(elements * SIZEOF_INT, deviceBuffer.getNIOSize());
+        assertEquals(elements, deviceBuffer.getNIOCapacity());
+    }
+
+    @Test
+    public void cloneWithLimitedBufferTest() {
+        final int elements = NUM_ELEMENTS;
+        final int padding = 312; // Arbitrary number
+        final CLContext context = CLContext.create();
+
+        final IntBuffer hostBuffer = ByteBuffer.allocateDirect((elements + padding)*SIZEOF_INT).asIntBuffer();
+        hostBuffer.limit(elements);
+
+        final CLBuffer<?> deviceBuffer = context.createBuffer(elements*SIZEOF_INT).cloneWith(hostBuffer);
+        assertEquals(elements, deviceBuffer.getCLCapacity());
+        assertEquals(elements*SIZEOF_INT, deviceBuffer.getNIOSize());
+        assertEquals(elements, deviceBuffer.getNIOCapacity());
+
+        context.release();
+    }
+
+    @Test
+    public void copyLimitedSlicedBuffersTest() {
+        final int size = 4200*SIZEOF_INT; // Arbitrary number that is a multiple of SIZEOF_INT;
+        final int padding = 307; // Totally arbitrary number > 0
+        final CLContext context = CLContext.create();
+        final CLCommandQueue queue = context.getDevices()[0].createCommandQueue();
+
+        // Make a buffer that is offset relative to the originally allocated position and has a limit that is
+        // not equal to the capacity to test whether all these attributes are correctly handled.
+        ByteBuffer hostBuffer = ByteBuffer.allocateDirect(size + padding);
+        hostBuffer.position(padding/2); // Offset the original buffer
+        hostBuffer = hostBuffer.slice(); // Slice it to have a new buffer that starts at the offset
+        hostBuffer.limit(size);
+        hostBuffer.order(ByteOrder.nativeOrder()); // Necessary for comparisons to work later on.
+        fillBuffer(hostBuffer, 12345);
+
+        final CLBuffer<ByteBuffer> bufferA = context.createBuffer(size).cloneWith(hostBuffer);
+        final CLBuffer<ByteBuffer> bufferB = context.createByteBuffer(size);
+
+        queue.putWriteBuffer(bufferA, false)
+             .putCopyBuffer(bufferA, bufferB, bufferA.getNIOSize())
+             .putReadBuffer(bufferB, true).finish();
+
+        hostBuffer.rewind();
+        bufferB.buffer.rewind();
+        checkIfEqual(hostBuffer, bufferB.buffer, size/SIZEOF_INT);
+        context.release();
+    }
 
     @Test
     public void createBufferTest() {
