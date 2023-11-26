@@ -47,6 +47,7 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
 
     static {
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            @Override
             public Object run() {
                 Platform.initSingleton();
 
@@ -135,6 +136,8 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
 
         return libNamesList;
     }
+    @Override
+    public List<String> getSymbolForToolLibPath() { return Arrays.asList("clCreateContext"); }
 
     @Override
     public final List<String> getToolGetProcAddressFuncNameList() {
