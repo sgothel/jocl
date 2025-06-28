@@ -27,10 +27,6 @@ export PATH=${ANDROID_TOOLCHAIN_ROOT}/${ANDROID_TOOLCHAIN_NAME}/bin:${ANDROID_TO
 echo PATH ${PATH} 2>&1 | tee -a ${LOGF}
 echo clang `which clang` 2>&1 | tee -a ${LOGF}
 
-export SOURCE_LEVEL=1.8
-export TARGET_LEVEL=1.8
-export TARGET_RT_JAR=/opt-share/jre1.8.0_212/lib/rt.jar
-
 #export JUNIT_DISABLED="true"
 #export JUNIT_RUN_ARG0="-Dnewt.test.Screen.disableScreenMode"
 

@@ -14,10 +14,6 @@ set PATH=%J2RE_HOME%\bin;%JAVA_HOME%\bin;%ANT_PATH%\bin;c:\mingw32\bin;%CMAKE_PA
 REM set LIB_GEN=%THISDIR%\lib
 REM set CLASSPATH=.;%THISDIR%\build-win32\classes
 
-set SOURCE_LEVEL=1.8
-set TARGET_LEVEL=1.8
-set TARGET_RT_JAR=C:\jre1.8.0_212\lib\rt.jar
-
 REM set JOGAMP_JAR_CODEBASE=Codebase: *.jogamp.org
 set JOGAMP_JAR_CODEBASE=Codebase: *.goethel.localnet
 
