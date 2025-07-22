@@ -307,9 +307,7 @@
                fork="yes"
                includeAntRuntime="false"
                memoryMaximumSize="${javac.memorymax}"
-               source="${target.sourcelevel}" 
-               target="${target.targetlevel}" 
-               bootclasspath="${target.rt.jar}"
+               release="${target.releaselevel}" 
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <src path="${basedir}/../etc/src"/>
             <compilerarg value="-Xlint:all"/>
@@ -439,9 +437,7 @@
                includeantruntime="false"
                excludes="${java.part.android}"
                encoding="UTF-8"
-               source="${target.sourcelevel}" 
-               target="${target.targetlevel}" 
-               bootclasspath="${target.rt.jar}"
+               release="${target.releaselevel}" 
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <classpath refid="javac.classpath"/>
             <src path="${src.java}" />
@@ -457,9 +453,7 @@
         <javac destdir="${classes}" 
                includeantruntime="false"
                encoding="UTF-8"
-               source="${target.sourcelevel}" 
-               target="${target.targetlevel}" 
-               bootclasspath="${target.rt.jar}"
+               release="${target.releaselevel}" 
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <classpath refid="javac.android.classpath"/>
             <src path="${src.java}" />

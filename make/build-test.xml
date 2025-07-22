@@ -97,9 +97,7 @@
                classpath="${gluegen-rt.jar};${jocl.jar};${junit.jar};${jogl-all-noawt.jar}"
                memoryMaximumSize="${javac.memorymax}"
                encoding="UTF-8"
-               source="${target.sourcelevel}" 
-               target="${target.targetlevel}" 
-               bootclasspath="${target.rt.jar}"
+               release="${target.releaselevel}" 
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <compilerarg value="-Xlint:all"/>
         </javac>
@@ -132,9 +130,7 @@
                classpath="${android.jar};${gluegen-rt-android.jar};${jocl.jar};${junit.jar}"
                memoryMaximumSize="${javac.memorymax}"
                encoding="UTF-8"
-               source="${target.sourcelevel}" 
-               target="${target.targetlevel}" 
-               bootclasspath="${target.rt.jar}"
+               release="${target.releaselevel}" 
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <src path="${src.test}" />
             <compilerarg value="-Xlint:all"/>
