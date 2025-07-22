@@ -88,10 +88,10 @@
     </target>
 
     <target name="set.debug">
-        <property name="c.compiler.debug" value="true" /> 
-        <property name="c.compiler.optimise"  value="none" /> 
-        <property name="javacdebug"       value="true" /> 
-        <property name="javacdebuglevel"  value="source,lines,vars" /> 
+        <property name="c.compiler.debug" value="true" />
+        <property name="c.compiler.optimise"  value="none" />
+        <property name="javacdebug"       value="true" />
+        <property name="javacdebuglevel"  value="source,lines,vars" />
     </target>
 
     <!-- ================================================================== -->
@@ -287,14 +287,14 @@
             <filterchain>
                 <replaceregex pattern="/\*extends java.lang.AutoCloseable\*/" replace="extends java.lang.AutoCloseable"/>
             </filterchain>
-        </copy>       
+        </copy>
     </target>
 
     <target name="generate.jdk6.autocloseable" unless="${enable.jdk7.features}">
         <echo message="Generating JDK6 AutoCloseable"/>
         <copy file="${project.root}/src/com/jogamp/opencl/AutoCloseable.jtemplate"
             tofile="${build}/gensrc/java/com/jogamp/opencl/AutoCloseable.java" overwrite="true">
-        </copy>      
+        </copy>
     </target>
 
     <target name="make-build-utilities" depends="init">
@@ -302,12 +302,12 @@
         <!--compile build utilities-->
         <mkdir dir="${etc.build.dir}"/>
 
-        <javac destdir="${etc.build.dir}" 
-               classpath="${ant.core.lib}" 
+        <javac destdir="${etc.build.dir}"
+               classpath="${ant.core.lib}"
                fork="yes"
                includeAntRuntime="false"
                memoryMaximumSize="${javac.memorymax}"
-               release="${target.releaselevel}" 
+               release="${target.releaselevel}"
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <src path="${basedir}/../etc/src"/>
             <compilerarg value="-Xlint:all"/>
@@ -433,11 +433,11 @@
        - Compile the original and generated source.
       -->
     <target name="java.compile" depends="java.generate">
-        <javac destdir="${classes}" 
+        <javac destdir="${classes}"
                includeantruntime="false"
                excludes="${java.part.android}"
                encoding="UTF-8"
-               release="${target.releaselevel}" 
+               release="${target.releaselevel}"
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <classpath refid="javac.classpath"/>
             <src path="${src.java}" />
@@ -450,10 +450,10 @@
 
     <target name="android.compile" if="android-jars.available">
         <!--compile gluegen-rt-android last-->
-        <javac destdir="${classes}" 
+        <javac destdir="${classes}"
                includeantruntime="false"
                encoding="UTF-8"
-               release="${target.releaselevel}" 
+               release="${target.releaselevel}"
                debug="${javacdebug}" debuglevel="${javacdebuglevel}">
             <classpath refid="javac.android.classpath"/>
             <src path="${src.java}" />
@@ -489,14 +489,14 @@
 
             <echo message="Compiling @{output.lib.name}" />
 
-            <cc outtype="shared" 
-                objdir="${obj}" 
+            <cc outtype="shared"
+                objdir="${obj}"
                 usehighleveltool="true"
                 writesoname="true"
                 outfile="${obj}/@{output.lib.name}"
-                optimize="${c.compiler.optimise}" 
+                optimize="${c.compiler.optimise}"
                 debug="${c.compiler.debug}"
-                multithreaded="true" 
+                multithreaded="true"
                 exceptions="false">
 
                 <compiler extends="@{compiler.cfg.id}" >
@@ -535,7 +535,7 @@
                 <linker extends="@{linker.cfg.id}" />
             </cc>
 
-            <gluegen.make.libsymbols builddir="${build}" 
+            <gluegen.make.libsymbols builddir="${build}"
                 nativelib="${obj}/${native.library.prefix}@{output.lib.name}.${native.library.suffix}"
                 symbolsfile="${obj}/${native.library.prefix}@{output.lib.name}.symbols"/>
 
@@ -567,7 +567,7 @@
         </copy>
         <native.tag.jar objdir="${build}/obj"
                         nativejarfile="${build}/jar/jocl-natives-${os.and.arch}.jar"
-                        manifestfile="${build}/tempversion-natives" 
+                        manifestfile="${build}/tempversion-natives"
                         module="opencl"
                         includelibs="*jocl.${native.library.suffix}" />
 
@@ -641,7 +641,7 @@
     </target>
 
     <target name="android.package" depends="init,jocl.build.check.aapt" if="isAndroid" unless="jocl.build.skip.aapt" >
-        <aapt.signed 
+        <aapt.signed
             assetsdir="resources/assets"
             jarsrcdir="${src.java}"
             jarbuilddir="${build}/jar"
@@ -655,8 +655,8 @@
             version.code="${jogamp.version.int}"
             version.name="${jogamp.version}">
           <d8-classpaths>
-              <arg line="--classpath ${gluegen-rt-android.jar}"/> 
-              <arg line="--classpath ${jogl-all-noawt.jar}"/> 
+              <arg line="--classpath ${gluegen-rt-android.jar}"/>
+              <arg line="--classpath ${jogl-all-noawt.jar}"/>
           </d8-classpaths>
         </aapt.signed>
     </target>
@@ -724,9 +724,9 @@
       -->
     <target name="javadoc" depends="init, javadoc.init, javadoc.public, javadoc.dev, javadoc.zip"/>
 
-    <!-- copies ${gluegen-javadoc.path}/** to ${javadoc.root.path}/gluegen/ 
+    <!-- copies ${gluegen-javadoc.path}/** to ${javadoc.root.path}/gluegen/
          gluegen-javadoc.path is the parent folder of element-list:
-            gluegen-javadoc.path := build/javadoc/gluegen 
+            gluegen-javadoc.path := build/javadoc/gluegen
             with build/javadoc/gluegen/javadoc/element-list
       -->
     <target name="javadoc.gluegen" depends="init" if="gluegen-javadoc.path">
@@ -744,7 +744,7 @@
         <property name="javadoc.link" value="http://docs.oracle.com/javase/6/docs/api/" />
 
         <!-- Link offline with relative URLs does not work.
-             Link online with relative URLs works, 
+             Link online with relative URLs works,
              so we have to assume the same relative online folder structure:
 
                  http://jogamp.org/deployment/jogamp-next/javadoc/gluegen/javadoc/
@@ -772,9 +772,9 @@
         <property name="javadoc.packagenames" value="com.jogamp.opencl.*" />
         <property name="javadoc.dev.packagenames" value="${javadoc.packagenames},jogamp.opencl.*" />
 
-        <!-- if gluegen-javadoc.path is not set, check in default location, 
+        <!-- if gluegen-javadoc.path is not set, check in default location,
              ${gluegen.root}/${rootrel.build}/javadoc/gluegen -->
-        <available file="${gluegen.build}/javadoc/gluegen/javadoc/element-list" 
+        <available file="${gluegen.build}/javadoc/gluegen/javadoc/element-list"
                    type="file"
                    property="gluegen-javadoc.path"
                    value="${gluegen.build}/javadoc/gluegen" />
