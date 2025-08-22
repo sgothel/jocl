@@ -506,6 +506,7 @@
                     <sysincludepath path="${java.includes.dir}"/>
                     <sysincludepath path="${java.includes.dir.platform}"/>
                     <sysincludepath path="${stub.includes.gluegen.cc}"/>
+                    <includepath path="${jogl.root}/make/stub_includes/khr"/>
                     <includepath path="${jogl.root}/make/stub_includes/opengl"/>
                     <includepath path="${gen.includes.dir}/CL11"/>
                 </compiler>
@@ -517,6 +518,7 @@
                     <sysincludepath path="${java.includes.dir}"/>
                     <sysincludepath path="${java.includes.dir.platform}"/>
                     <sysincludepath path="${stub.includes.gluegen.cc}"/>
+                    <includepath path="${jogl.root}/make/stub_includes/khr"/>
                     <includepath path="${jogl.root}/make/stub_includes/opengl"/>
                     <includepath path="${gen.includes.dir}/CL12"/>
                 </compiler>
@@ -528,6 +530,7 @@
                     <sysincludepath path="${java.includes.dir}"/>
                     <sysincludepath path="${java.includes.dir.platform}"/>
                     <sysincludepath path="${stub.includes.gluegen.cc}"/>
+                    <includepath path="${jogl.root}/make/stub_includes/khr"/>
                     <includepath path="${jogl.root}/make/stub_includes/opengl"/>
                     <includepath path="${gen.includes.dir}/CL20"/>
                 </compiler>
