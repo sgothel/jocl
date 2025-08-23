@@ -54,16 +54,13 @@ public class JOCLVersion extends JogampVersion {
     private static final String PACKAGE = "com.jogamp.opencl";
 
     private JOCLVersion(final Manifest mf) {
-        super(PACKAGE, mf);
+        super(mf);
     }
 
     private static JOCLVersion createInstance() {
         return doPrivileged(new PrivilegedAction<JOCLVersion>() {
             @Override public JOCLVersion run() {
-                Manifest manifest = VersionUtil.getManifest(CL.class.getClassLoader(), PACKAGE);
-                if(manifest == null) {
-                manifest = new Manifest();
-                }
+                final Manifest manifest = VersionUtil.getManifest(CL.class.getClassLoader(), PACKAGE);
                 return new JOCLVersion(manifest);
             }
         });

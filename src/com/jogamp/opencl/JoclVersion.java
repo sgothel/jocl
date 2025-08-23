@@ -47,8 +47,8 @@ public class JoclVersion extends JogampVersion {
 
     protected static volatile JoclVersion jogampCommonVersionInfo;
 
-    protected JoclVersion(final String packageName, final Manifest mf) {
-        super(packageName, mf);
+    protected JoclVersion(final Manifest mf) {
+        super(mf);
     }
 
     public static JoclVersion getInstance() {
@@ -57,7 +57,7 @@ public class JoclVersion extends JogampVersion {
                 if( null == jogampCommonVersionInfo ) {
                     final String packageName = "com.jogamp.opencl";
                     final Manifest mf = VersionUtil.getManifest(JoclVersion.class.getClassLoader(), packageName);
-                    jogampCommonVersionInfo = new JoclVersion(packageName, mf);
+                    jogampCommonVersionInfo = new JoclVersion(mf);
                 }
             }
         }
