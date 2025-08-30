@@ -29,6 +29,7 @@
 package com.jogamp.opencl;
 
 import com.jogamp.common.nio.AbstractBuffer;
+import com.jogamp.common.nio.Buffers;
 import com.jogamp.common.nio.CachedBufferFactory;
 import com.jogamp.opencl.util.CLProgramConfiguration;
 import com.jogamp.opencl.util.CLUtil;
@@ -643,7 +644,7 @@ public class CLProgram extends CLObjectResource {
         final ByteBuffer binaries = newDirectByteBuffer(binariesSize);
 
 
-        long address = UnsafeUtil.getDirectBufferAddress(binaries);
+        long address = Buffers.getDirectBufferAddress(binaries);
         final PointerBuffer addresses = PointerBuffer.allocateDirect(sizes.capacity());
         sizes.rewind();
         while(sizes.remaining() != 0) {
