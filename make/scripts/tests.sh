@@ -54,6 +54,8 @@ function jrun() {
     awton=$1
     shift
 
+    MODULE_ARGS="--enable-native-access=ALL-UNNAMED --add-opens java.desktop/sun.awt=ALL-UNNAMED --add-opens java.desktop/sun.awt.windows=ALL-UNNAMED --add-opens java.desktop/sun.java2d=ALL-UNNAMED"
+
     #D_ARGS="-Djocl.debug.DebugCL -Djocl.debug.TraceCL"
 
     #D_ARGS="-Djogamp.debug=all"
@@ -91,9 +93,9 @@ function jrun() {
     echo
     echo "Test Start: $*"
     echo
-    echo "$javaexe" $javaxargs $X_ARGS $D_ARGS $C_ARG $*
-    #gdb --args "$javaexe" $javaxargs $X_ARGS $D_ARGS $C_ARG $*
-    "$javaexe" $javaxargs $X_ARGS $D_ARGS $C_ARG $*
+    echo "$javaexe" $javaxargs $MODULE_ARGS $X_ARGS $D_ARGS $C_ARG $*
+    #gdb --args "$javaexe" $javaxargs $MODULE_ARGS $X_ARGS $D_ARGS $C_ARG $*
+    "$javaexe" $javaxargs $MODULE_ARGS $X_ARGS $D_ARGS $C_ARG $*
     echo
     echo "Test End: $*"
     echo
