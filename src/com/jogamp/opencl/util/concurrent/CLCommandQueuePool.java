@@ -222,10 +222,9 @@ public class CLCommandQueuePool<C extends CLQueueContext> implements CLResource 
             this.index = 0;
         }
 
+        @Override
         public synchronized Thread newThread(final Runnable runnable) {
-
-            final SecurityManager sm = System.getSecurityManager();
-            final ThreadGroup group = (sm != null) ? sm.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            final ThreadGroup group = Thread.currentThread().getThreadGroup();
 
             final CLQueueContext queue = context.get(index);
             final QueueThread thread = new QueueThread(group, runnable, queue, index++);
@@ -254,6 +253,7 @@ public class CLCommandQueuePool<C extends CLQueueContext> implements CLResource 
             this.mode = mode;
         }
 
+        @Override
         public R call() throws Exception {
             final CLQueueContext context = ((QueueThread)Thread.currentThread()).context;
             // we make sure to only wrap tasks on the correct kind of thread, so this

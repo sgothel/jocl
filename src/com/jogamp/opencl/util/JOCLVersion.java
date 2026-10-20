@@ -37,10 +37,8 @@ import com.jogamp.common.util.JogampVersion;
 import com.jogamp.common.util.VersionUtil;
 import com.jogamp.opencl.llb.CL;
 
-import java.security.PrivilegedAction;
 import java.util.jar.Manifest;
 
-import static java.security.AccessController.*;
 import static com.jogamp.common.util.VersionUtil.*;
 
 /**
@@ -58,18 +56,16 @@ public class JOCLVersion extends JogampVersion {
     }
 
     private static JOCLVersion createInstance() {
-        return doPrivileged(new PrivilegedAction<JOCLVersion>() {
-            @Override public JOCLVersion run() {
-                final Manifest manifest = VersionUtil.getManifest(CL.class.getClassLoader(), PACKAGE);
-                return new JOCLVersion(manifest);
-            }
-        });
+        final Manifest manifest = VersionUtil.getManifest(CL.class.getClassLoader(), PACKAGE);
+        return new JOCLVersion(manifest);
     }
 
+    @Deprecated
     public static String getVersion() {
         return createInstance().toString();
     }
 
+    @Deprecated
     public static String getAllVersions() {
 
         final StringBuilder sb = new StringBuilder();
@@ -89,6 +85,7 @@ public class JOCLVersion extends JogampVersion {
         return sb.toString();
     }
 
+    @Deprecated
     public static void main(final String[] args) {
         System.out.println(JOCLVersion.getAllVersions());
     }

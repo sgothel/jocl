@@ -35,8 +35,6 @@ import com.jogamp.common.os.Platform;
 import com.jogamp.common.util.RunnableExecutor;
 import com.jogamp.common.util.cache.TempJarCache;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.*;
 
 import jogamp.common.os.PlatformPropsImpl;
@@ -46,18 +44,12 @@ public final class CLDynamicLibraryBundleInfo implements DynamicLibraryBundleInf
     private static final List<String> glueLibNames;
 
     static {
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            @Override
-            public Object run() {
-                Platform.initSingleton();
+        Platform.initSingleton();
 
-                if( TempJarCache.isInitialized(true) ) {
-                   // only: jocl.jar -> jocl-natives-<os.and.arch>.jar
-                   JNILibLoaderBase.addNativeJarLibs(new Class<?>[] { jogamp.opencl.Debug.class }, null );
-                }
-                return null;
-            }
-        });
+        if( TempJarCache.isInitialized(true) ) {
+           // only: jocl.jar -> jocl-natives-<os.and.arch>.jar
+           JNILibLoaderBase.addNativeJarLibs(new Class<?>[] { jogamp.opencl.Debug.class }, null );
+        }
         isAndroid = Platform.OSType.ANDROID == PlatformPropsImpl.OS_TYPE;
 
         glueLibNames = new ArrayList<String>();

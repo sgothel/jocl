@@ -125,7 +125,7 @@ public class CLUtil {
         return map;
     }
 
-    static List<Method> listMethods(final Class<?> clazz) throws SecurityException {
+    static List<Method> listMethods(final Class<?> clazz) {
         final List<Method> list = new ArrayList<Method>();
         for (final Method method : clazz.getDeclaredMethods()) {
             final Annotation[] annotations = method.getDeclaredAnnotations();

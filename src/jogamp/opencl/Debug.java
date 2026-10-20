@@ -28,9 +28,6 @@
 
 package jogamp.opencl;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
 import com.jogamp.common.util.PropertyAccess;
 
 /** Helper routines for logging and debugging. */
@@ -41,12 +38,7 @@ public class Debug extends PropertyAccess {
   private static final boolean debugAll;
 
   static {
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-        @Override
-        public Object run() {
-            PropertyAccess.addTrustedPrefix("jocl.");
-            return null;
-    } } );
+    PropertyAccess.addTrustedPrefix("jocl.");
 
     verbose = isPropertyDefined("jocl.verbose", true);
     debugAll = isPropertyDefined("jocl.debug", true);
