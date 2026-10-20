@@ -44,9 +44,14 @@ fi
 
 #export LD_LIBRARY_PATH=/opt-linux-x86_64/opencl-lala/lib64:$LD_LIBRARY_PATH
 
+#export RUSTICL_DEVICE_TYPE=cpu
+export RUSTICL_ENABLE=llvmpipe
+
 which "$javaexe" 2>&1 | tee -a java-run.log
 "$javaexe" -version 2>&1 | tee -a java-run.log
 echo LD_LIBRARY_PATH $LD_LIBRARY_PATH 2>&1 | tee -a java-run.log
+echo "RUSTICL_DEVICE_TYPE ${RUSTICL_DEVICE_TYPE}"
+echo "RUSTICL_ENABLE ${RUSTICL_ENABLE}"
 echo "$javaexe" $javaxargs $X_ARGS $D_ARGS $* 2>&1 | tee -a java-run.log
 echo MacOsX $MOSX
 
